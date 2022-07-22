@@ -1,0 +1,43 @@
+@use 'sass:math';
+@import 'debuttonify';
+
+.app-shell-body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+
+  // Unused
+  .tab-label {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: start;
+  }
+
+  .close-button {
+    @include debuttonify;
+
+    $height: 16px;
+
+    max-width: $height;
+    min-width: $height;
+    height: $height;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    border-radius: math.div($height, 2);
+  }
+
+  .close-button:hover {
+    background: #e5e5e5;
+  }
+
+  .close-icon {
+    width: 14px;
+    height: 14px;
+    color: gray;
+  }
+}

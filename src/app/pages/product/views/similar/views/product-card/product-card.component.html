@@ -1,0 +1,52 @@
+<a
+  [routerLink]="['/product', item?.id]"
+  [title]="title"
+  class="product-card-body">
+
+  <!-- PRIMARY CONTENT -->
+  <img
+    *ngIf="item?.images?.[0]"
+    [src]="item?.images?.[0]?.small"
+    alt=""
+    class="card-image">
+  <div
+    *ngIf="item?.title"
+    class="wb-typography-link card-label">
+    {{ title }}
+  </div>
+
+  <!-- VISITED ENTRY -->
+  <div
+    *ngIf="(visitedEntry$ | async) as visitedEntry"
+    class="wb-typography-caption visited-entry">
+    <mat-icon
+      svgIcon="done"
+      class="visited-entry-icon">
+    </mat-icon>
+    <span>
+      Просмотрено
+    </span>
+  </div>
+
+  <!-- FEEDBACKS -->
+  <div
+    *ngIf="(feedbacks$ | async) as feedbacks"
+    class="wb-typography-caption feedbacks-block">
+    <mat-spinner
+      *ngIf="feedbacks.isLoading"
+      diameter="16">
+    </mat-spinner>
+    <ng-container *ngIf="!feedbacks.isLoading">
+      <span>
+        {{ (feedbacks?.amount ?? 0) | wbPlural:['отзыв', 'отзыва', 'отзывов'] }}
+      </span>
+      <div class="feedback-photos">
+        <img
+          *ngFor="let photo of (feedbacks.photos | slice:0:feedbackPhotosPerProduct)"
+          [src]="photo"
+          alt=""
+          class="feedback-photo">
+      </div>
+    </ng-container>
+  </div>
+</a>

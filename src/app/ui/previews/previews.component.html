@@ -1,0 +1,23 @@
+<div
+  [class.ui-previews-vertical]="vertical"
+  [class.ui-previews-centered]="centered"
+  class="ui-previews">
+  <div
+    *ngFor="let preview of items; index as loopSectionIndex; trackBy: trackByChunk;"
+    [class.ui-previews-vertical]="vertical"
+    [class.ui-previews-centered]="centered"
+    class="ui-preview-chunks">
+    <button
+      *ngFor="let image of preview.photos; index as loopPhotoIndex; trackBy: trackByPhoto;"
+      [class.active]="sectionIndex === loopSectionIndex && photoIndex === loopPhotoIndex"
+      (click)="emitChange(loopSectionIndex, loopPhotoIndex)"
+      class="ui-previews-button">
+      <img
+        #image
+        [src]="image.small"
+        alt=""
+        referrerpolicy="no-referrer"
+        class="ui-previews-image">
+    </button>
+  </div>
+</div>

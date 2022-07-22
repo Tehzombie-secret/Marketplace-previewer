@@ -1,0 +1,8 @@
+@mixin delinkify() {
+  text-decoration: none;
+
+  &:link,
+  &:-webkit-any-link {
+      text-decoration: none;
+  }
+}

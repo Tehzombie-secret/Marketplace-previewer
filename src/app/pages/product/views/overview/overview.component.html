@@ -1,0 +1,61 @@
+<div
+  [class.collapsed]="item?.overviewCollapsed"
+  class="overview-body">
+  <div
+    [wbImageOverlay]="overlay"
+    class="image-block">
+    <img
+      [@imageShrinkInOut]="item?.overviewCollapsed ? 'collapsed' : 'opened'"
+      [src]="item?.item?.images?.[item?.activeImage ?? 0]?.big"
+      crossorigin="anonymous"
+      alt=""
+      referrerpolicy="no-referrer"
+      class="overview-image">
+  </div>
+  <div class="overview-side">
+    <h1
+      *ngIf="title"
+      [class.collapsed]="item?.overviewCollapsed"
+      class="wb-typography-h2 overview-title">
+      {{ title }}
+    </h1>
+    <div
+      [@collapseInOut]="item?.overviewCollapsed ? 'collapsed' : 'opened'"
+      [class.collapsed]="item?.overviewCollapsed"
+      class="collapsible-block">
+      <a
+        *ngIf="item?.item?.externalURL"
+        [href]="item?.item?.externalURL"
+        target="_blank"
+        rel="noreferrer noopener"
+        mat-stroked-button
+        color="primary"
+        class="external-link">
+        Открыть товар
+        <mat-icon svgIcon="external"></mat-icon>
+      </a>
+      <button
+        *ngIf="item?.item?.description"
+        [title]="item?.descriptionExpanded ? '' : item?.item?.description"
+        [class.collapsed]="!item?.descriptionExpanded"
+        (click)="toggleDescription()"
+        class="wb-typography-body overview-description">
+        {{ item?.item?.description }}
+      </button>
+      <ui-previews
+        [items]="[{ id: '1', photos: item?.item?.images }]"
+        [sectionIndex]="0"
+        [photoIndex]="item?.activeImage ?? 0"
+        (indexChange)="selectImage($event[1])">
+      </ui-previews>
+    </div>
+    <button
+      (click)="toggleOverview()"
+      mat-stroked-button
+      color="primary"
+      class="collapse-button">
+      {{ item?.overviewCollapsed ? 'Развернуть' : 'Спрятать' }}
+      <mat-icon [svgIcon]="item?.overviewCollapsed ? 'fold' : 'unfold'"></mat-icon>
+    </button>
+  </div>
+</div>

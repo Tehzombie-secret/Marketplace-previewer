@@ -1,0 +1,12 @@
+.similar-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+
+  .cards-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+}

@@ -1,0 +1,63 @@
+@import 'debuttonify';
+
+$gallery-border: 3px;
+
+.ui-previews {
+  display: flex;
+  gap: 16px - $gallery-border * 2;
+  overflow-x: auto; // flex-wrap doesn't combine with content collapser
+  overflow-y: hidden;
+}
+
+.ui-previews-centered {
+  justify-content: center;
+}
+
+.ui-previews-vertical {
+  width: 100%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.ui-preview-chunks {
+  display: flex;
+  gap: 16px;
+  padding: $gallery-border;
+}
+
+.ui-previews-button {
+  @include debuttonify;
+
+  position: relative; // For pseudo-element styling
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 6px;
+    transition: all 160ms ease;
+  }
+
+  &.active::before {
+    top: -$gallery-border;
+    left: -$gallery-border;
+    bottom: -$gallery-border;
+    right: -$gallery-border;
+  }
+}
+
+.ui-previews-image {
+  display: block;
+  object-fit: cover;
+  border-radius: 4px;
+  height: 100px;
+  max-width: 120px;
+  width: auto;
+  transform: translate(0);
+}

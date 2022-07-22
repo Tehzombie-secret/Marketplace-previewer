@@ -1,0 +1,106 @@
+<div
+  *ngIf="(person$ | async) as person"
+  class="person-body">
+  <!-- BACK BUTTON -->
+  <a
+    *ngIf="(backTarget$ | async) as backTarget"
+    [routerLink]="backTarget.path"
+    [queryParams]="backTarget.params"
+    class="wb-typography-h3 back-anchor">
+    <mat-icon
+      svgIcon="chevron-left"
+      class="back-icon">
+    </mat-icon>
+    <img
+      [src]="productPhoto$ | async"
+      alt=""
+      referrerpolicy="no-referrer"
+      class="product-image">
+    <span class="product-label">
+      {{ productName$ | async }}
+    </span>
+  </a>
+
+  <!-- PROFILE INFO -->
+  <div class="profile-block">
+    <img
+      [src]="person.photo"
+      alt=""
+      referrerpolicy="no-referrer"
+      class="profile-image">
+    <h1 class="wb-typography-h2 profile-name">
+      {{ person.name }}
+      <a
+        *ngIf="person.externalURL"
+        [href]="person.externalURL"
+        aria-label="Перейти на страницу пользователя"
+        matTooltip="Перейти на страницу пользователя"
+        target="_blank"
+        rel="noreferrer noopener"
+        mat-icon-button
+        color="primary"
+        class="wb-filled-button external-link">
+        <mat-icon svgIcon="external"></mat-icon>
+      </a>
+    </h1>
+  </div>
+
+  <!-- LAST VISIT ENTRY -->
+  <div
+    *ngIf="(visitedEntry$ | async) as visitedEntry"
+    class="wb-typography-caption visited-entry">
+    <mat-icon svgIcon="done" class="visited-entry-icon"></mat-icon>
+    <span>
+      Последнее посещение: {{ visitedEntry.date[visitedEntry.date.length - 1] | wbFriendlyDate }}
+    </span>
+  </div>
+
+  <button
+    (click)="toggleGalleryMode()"
+    mat-stroked-button
+    color="primary"
+    class="gallery-switcher">
+    {{ (galleryMode$ | async) ? 'Режим отзывов' : 'Режим галереи' }}
+  </button>
+
+  <!-- CARD MODE -->
+  <ul
+    [class.gallery-mode]="galleryMode$ | async"
+    class="feedback-list">
+    <li
+      *ngFor="let feedback of person?.feedbackViewModels; trackBy: trackByFeedback;"
+      class="feedback-entry">
+      <div class="product-photo-wrapper">
+        <img
+          *ngIf="feedback.productPhoto?.small"
+          [src]="feedback.productPhoto?.small"
+          alt=""
+          referrerpolicy="no-referrer"
+          class="product-photo">
+      </div>
+      <div class="feedback-content">
+        <a
+          [routerLink]="['/product', feedback.productId]"
+          class="wb-typography-link feedback-product">
+          {{ feedback.productName }}
+        </a>
+        <div class="wb-typography-caption feedback-text">
+          {{ feedback.text }}
+        </div>
+        <ul class="feedback-items">
+          <li *ngFor="let photo of feedback.photoViewModels; index as i; trackBy: trackByPhoto;">
+            <a
+              [wbImageOverlay]="photo.gallery"
+              [href]="photo.photo.big">
+              <img
+                [src]="photo.photo.small"
+                alt=""
+                referrerpolicy="no-referrer"
+                class="feedback-photo">
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+</div>

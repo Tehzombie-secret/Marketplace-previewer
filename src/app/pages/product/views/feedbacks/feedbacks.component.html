@@ -1,0 +1,104 @@
+<div class="feedbacks-body">
+  <div class="informational-block">
+    <div class="controls-block">
+      <button
+        *ngIf="feedbacks.length"
+        (click)="toggleGalleryMode()"
+        mat-stroked-button
+        color="primary">
+        {{ (galleryMode$ | async) ? 'Режим отзывов' : 'Режим галереи' }}
+      </button>
+      <div
+        *ngIf="isLoading"
+        class="wb-typography-caption loader-block">
+        Загружаем отзывы
+        <mat-progress-spinner
+          [value]="progress"
+          [color]="hasError ? 'accent' : 'primary'"
+          diameter="24"
+          mode="determinate">
+        </mat-progress-spinner>
+      </div>
+      <div
+        *ngIf="feedbacks.length"
+        class="wb-typography-caption">
+        {{ feedbacks.length | wbPlural:['отзыв', 'отзыва', 'отзывов'] }} c {{ photoSize | wbPlural:['фотографией', 'фотографиями'] }}
+      </div>
+    </div>
+    <div
+      *ngIf="hasError"
+      class="error-block">
+      <mat-icon
+        color="accent"
+        svgIcon="error">
+      </mat-icon>
+      <span class="wb-typography-body">
+        Произошла ошибка загрузки
+      </span>
+      <button
+        (click)="retry()"
+        mat-stroked-button
+        color="primary">
+        Возобновить загрузку
+        <mat-icon svgIcon="arrow-down"></mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- CARD MODE -->
+  <ul
+    [class.gallery-mode]="galleryMode$ | async"
+    class="feed-list">
+    <li
+      *ngFor="let item of feedbacks; trackBy: trackByFeedback;"
+      class="feedback-card">
+      <div class="feedback-photo-wrapper">
+        <img
+          [src]="item.item.photo"
+          alt=""
+          referrerpolicy="no-referrer"
+          class="feedback-photo">
+      </div>
+      <div class="feedback-block">
+        <a
+          [routerLink]="['/person', item.item.userId]"
+          [queryParams]="{ fromProduct: product?.item?.id }"
+          class="wb-typography-link person-link">
+          {{ item.item.name }}
+        </a>
+        <ul class="photos-list">
+          <li *ngFor="let photo of item.photos; trackBy: trackByPhoto;">
+            <a
+              [wbImageOverlay]="photo.gallery"
+              [href]="photo.photo.big"
+              class="photo-button">
+              <img
+                [src]="photo.photo.big"
+                alt=""
+                referrerpolicy="no-referrer"
+                class="photo-preview">
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+    <li
+      *ngIf="hasError && feedbacks.length > 5"
+      class="error-block">
+      <mat-icon
+        color="accent"
+        svgIcon="error">
+      </mat-icon>
+      <span class="wb-typography-body">
+        Произошла ошибка загрузки
+      </span>
+      <button
+        (click)="retry()"
+        mat-stroked-button
+        color="primary">
+        Возобновить загрузку
+        <mat-icon svgIcon="arrow-down"></mat-icon>
+      </button>
+    </li>
+  </ul>
+</div>

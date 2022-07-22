@@ -1,0 +1,136 @@
+.person-body {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-bottom: 40px;
+
+  .back-anchor {
+    display: flex;
+    align-items: center;
+    height: 80px;
+    color: black;
+    margin-bottom: 24px;
+  }
+
+  .product-image {
+    display: block;
+    max-height: 64px;
+    width: auto;
+    border-radius: 4px;
+    margin-right: 12px;
+    object-fit: contain;
+  }
+
+  .product-label {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .back-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .profile-block {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 24px;
+  }
+
+  .profile-image {
+    border-radius: 4px;
+  }
+
+  .profile-name {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .external-link {
+    margin-left: 8px;
+  }
+
+  .visited-entry {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 16px;
+  }
+
+  .visited-entry-icon {
+    flex-shrink: 0;
+  }
+
+
+  .gallery-switcher {
+    align-self: flex-start;
+    width: 160px;
+    margin: 0 16px;
+  }
+
+  .feedback-list {
+    display: flex;
+    padding: 0 16px;
+    margin: 0;
+    list-style: none;
+    gap: 24px;
+
+    &.gallery-mode {
+      flex-wrap: wrap;
+    }
+
+    &:not(.gallery-mode) {
+      flex-direction: column;
+    }
+  }
+
+  .feedback-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .product-photo-wrapper {
+    width: 75px;
+  }
+
+  .gallery-mode .product-photo-wrapper {
+    display: none;
+  }
+
+  .product-photo {
+    border-radius: 4px;
+  }
+
+  .feedback-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .feedback-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    &.padded {
+      padding: 0 16px;
+    }
+  }
+
+  .gallery-mode .feedback-product,
+  .gallery-mode .feedback-text {
+    display: none;
+  }
+
+  .feedback-photo {
+    display: block;
+    border-radius: 4px;
+  }
+}

@@ -1,0 +1,86 @@
+@import 'debuttonify';
+
+$collapse-transition: 160ms;
+$image-width: 400px;
+
+.overview-body {
+  display: flex;
+  align-items: flex-start;
+
+  & > :not(:last-child) {
+    transition: margin-right $collapse-transition ease;
+  }
+
+  &.collapsed > :not(:last-child) {
+    margin-right: 16px;
+  }
+
+  &:not(.collapsed) > :not(:last-child) {
+    margin-right: 40px;
+  }
+
+  .image-block {
+    flex-shrink: 0;
+  }
+
+  .overview-image {
+    display: block;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .overview-side {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .overview-title {
+    margin-bottom: 16px;
+
+    &.collapsed {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .external-link {
+    align-self: flex-start;
+    width: 160px;
+    margin-bottom: 16px;
+  }
+
+  .collapsible-block {
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden; // For collapse transition
+    margin-bottom: 0;
+    transition: margin-bottom $collapse-transition ease;
+    gap: 16px;
+
+    &:not(.collapsed) {
+      margin-bottom: 16px;
+    }
+  }
+
+  .overview-description {
+    @include debuttonify;
+
+    text-align: start;
+
+    &.collapsed {
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+  }
+
+  .collapse-button {
+    width: 160px;
+    align-self: flex-start;
+  }
+}
+

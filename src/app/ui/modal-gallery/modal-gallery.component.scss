@@ -1,0 +1,261 @@
+@import 'debuttonify';
+@import 'delinkify';
+
+$feedbackPhotoHeight: 120px;
+$feedbackPhotoGap: 4px;
+
+@mixin paginationButton {
+  @include debuttonify;
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  outline: none;
+
+  mat-icon {
+    width: 56px;
+    height: 56px;
+    color: #646464;
+    filter: drop-shadow(2px 1px 0px rgba(white, 0.5)) drop-shadow(1px -1px 0px rgba(white, 0.5)) drop-shadow(-1px -1px 0px rgba(white, 0.5)) drop-shadow(-1px 1px 0px rgba(white, 0.5));
+    transition: color 140ms ease;
+  }
+}
+
+:host {
+  height: 100%;
+}
+
+.ui-gallery {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(386px, 25%) 1fr auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.ui-gallery-two-column {
+  grid-template-columns: 1fr auto;
+}
+
+.ui-gallery-left-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding-left: 16px;
+}
+
+.ui-gallery-author-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ui-gallery-author {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ui-gallery-quote {
+  display: -webkit-box;
+  -webkit-line-clamp: 14;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ui-gallery-author-block + .ui-gallery-quote {
+  min-height: 100px;
+}
+
+.ui-gallery-reference {
+  @include delinkify;
+
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ui-gallery-reference-photo {
+  max-height: 180px;
+  width: auto;
+  border-radius: 4px;
+}
+
+.ui-gallery-reference-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ui-gallery-reference-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ui-gallery-reference-feedbacks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ui-gallery-visited-entry {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ui-gallery-visited-entry-icon {
+  flex-shrink: 0;
+}
+
+.ui-gallery-reference-feedback-photos {
+  height: $feedbackPhotoHeight * 2 + $feedbackPhotoGap;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ui-gallery-reference-feedback-photo {
+  height: $feedbackPhotoHeight;
+  width: calc(25% - $feedbackPhotoGap);
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.ui-gallery-image-wrapper-cell {
+  position: relative; // For image positioning
+  height: 100%;
+  width: 100%;
+}
+
+.ui-gallery-prev-button {
+  @include paginationButton;
+
+  left: 0;
+  right: 80%;
+}
+
+.ui-gallery-next-button {
+  @include paginationButton;
+
+  left: 20%;
+  right: 0;
+  justify-content: flex-end;
+}
+
+.ui-gallery-hover-trigger {
+  height: 100%;
+  width: 100%;
+  max-width: 140px;
+  display: flex;
+  align-items: center;
+
+  &:hover mat-icon {
+    color: black;
+  }
+}
+
+.ui-gallery-hover-trigger-end {
+  justify-content: flex-end;
+}
+
+.ui-gallery-image-wrapper {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.ui-gallery-image {
+  grid-row: 1;
+  grid-column: 1;
+  max-height: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  visibility: hidden; // We need this block to be hidden, but we need to get it's dimensions
+}
+
+.ui-gallery-image-canvas {
+  grid-row: 1;
+  grid-column: 1;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.ui-gallery-image-loader {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: center;
+  justify-self: center;
+}
+
+.ui-gallery-retry-block {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: center;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 2; // To be above navigation buttons
+}
+
+.ui-gallery-right-column {
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.ui-gallery-app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.ui-gallery-previews {
+  height: 100%;
+  width: 120px;
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1;
+}
+
+.ui-gallery-paginator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 16px 0;
+}
+
+.ui-gallery-paginator-label {
+  min-width: 80px;
+  text-align: center;
+}
+
+.ui-gallery-chevron-icon {
+  width: 40px;
+  height: 40px;
+}

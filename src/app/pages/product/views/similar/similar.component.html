@@ -1,0 +1,18 @@
+<div class="similar-body">
+  <div
+    *ngIf="items.length"
+    class="cards-row">
+    <wb-product-card
+      *ngFor="let item of items; trackBy: trackByProduct;"
+      [item]="item">
+    </wb-product-card>
+  </div>
+  <button
+    *ngIf="canLoadMore"
+    (click)="loadMore()"
+    mat-stroked-button
+    color="primary">
+    {{ hasItems ? 'Загрузить следующие' : 'Загрузить похожие' }}
+    <mat-icon svgIcon="arrow-down"></mat-icon>
+  </button>
+</div>

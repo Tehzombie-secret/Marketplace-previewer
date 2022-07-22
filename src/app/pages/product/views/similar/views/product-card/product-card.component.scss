@@ -1,0 +1,57 @@
+@use 'sass:math';
+
+$width: 240px;
+
+.product-card-body {
+  max-width: $width;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &:-webkit-any-link {
+    text-decoration: none;
+  }
+
+  .card-image {
+    width: $width;
+    height: 320px;
+    object-fit: cover;
+  }
+
+  .card-label {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .visited-entry {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+  }
+
+  .visited-entry-icon {
+    flex-shrink: 0;
+  }
+
+  .feedbacks-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .feedback-photos {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .feedback-photo {
+    width: math.div($width, 4) - 4px;
+    height: auto;
+    border-radius: 2px;
+    object-fit: contain;
+  }
+}

@@ -1,0 +1,42 @@
+<div
+  *ngIf="(product$ | async) as product"
+  class="product-body">
+  <!-- LOADER -->
+  <ng-container *ngIf="product.isLoading">
+    <div
+      @fadeOut
+      class="progress-block">
+      <mat-spinner></mat-spinner>
+    </div>
+  </ng-container>
+
+  <div
+    *ngIf="!product.isLoading && !product.error && product.item"
+    @fadeIn
+    class="content-block">
+    <!-- CONTENT -->
+    <wb-product-overview [item]="product"></wb-product-overview>
+
+    <div
+      *ngIf="(visitedEntry$ | async) as visitedEntry"
+      class="wb-typography-caption visited-entry">
+      <mat-icon
+        svgIcon="done"
+        class="visited-entry-icon">
+      </mat-icon>
+      <span>
+        Последнее посещение: {{ visitedEntry.date[visitedEntry.date.length - 1] | wbFriendlyDate }}
+      </span>
+    </div>
+
+    <!-- SIMILAR ITEMS -->
+    <wb-product-similar [item]="product"></wb-product-similar>
+
+    <!-- FEEDBACKS -->
+    <wb-product-feedbacks
+      [item]="feedbacks$ | async"
+      [product]="product"
+      (retryFeedbacks)="retryFeedbacks()">
+    </wb-product-feedbacks>
+  </div>
+</div>

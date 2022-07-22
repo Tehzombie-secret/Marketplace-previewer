@@ -1,0 +1,16 @@
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+.wb-dialog-container .mat-dialog-container {
+  position: relative; // For close button positioning
+  height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+  padding: 0;
+  border-radius: 0;
+}
+
+.wb-filled-button.mat-icon-button {
+  background-color: rgba(235, 235, 235, 50%);
+}

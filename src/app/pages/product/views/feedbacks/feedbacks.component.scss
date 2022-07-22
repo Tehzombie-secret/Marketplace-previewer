@@ -1,0 +1,99 @@
+@import 'debuttonify';
+
+.feedbacks-body {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  .informational-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .controls-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .loader-block {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .error-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feed-list {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    gap: 24px;
+
+    &.gallery-mode {
+      flex-wrap: wrap;
+    }
+
+    &:not(.gallery-mode) {
+      flex-direction: column;
+    }
+  }
+
+  .feedback-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .feedback-photo-wrapper {
+    max-width: 200px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .gallery-mode .feedback-photo-wrapper {
+    display: none;
+  }
+
+  .feedback-photo {
+    border-radius: 4px;
+  }
+
+  .feedback-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .gallery-mode .person-link {
+    display: none;
+  }
+
+  .photos-list {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .photo-button {
+    @include debuttonify;
+  }
+
+  .photo-preview {
+    display: block;
+    height: 160px;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+}

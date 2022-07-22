@@ -1,0 +1,150 @@
+import { animate, style, transition, trigger } from '@angular/animations';
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Title } from '@angular/platform-browser';
+import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
+import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, startWith, Subject, Subscription, switchMap, withLatestFrom } from 'rxjs';
+import { filterTruthy } from '../../helpers/observables/filter-truthy';
+import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
+import { Product } from '../../models/product/product.interface';
+import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
+import { HistoryService } from '../../services/history/history.service';
+import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
+import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
+import { WBAPIService } from '../../services/wb-api/wb-api.service';
+import { FeedbackViewModel } from './models/feedback-view-model.interface';
+import { ProductViewModel } from './models/product-view-model.interface';
+import { ProductFeedbacksComponent } from './views/feedbacks/feedbacks.component';
+import { ProductOverviewComponent } from './views/overview/overview.component';
+import { ProductSimilarComponent } from './views/similar/similar.component';
+
+@Component({
+  standalone: true,
+  selector: 'wb-product',
+  templateUrl: './product.component.html',
+  styleUrls: ['./product.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    ProductOverviewComponent,
+    ProductFeedbacksComponent,
+    ProductSimilarComponent,
+    FriendlyDatePipe,
+  ],
+  animations: [
+    trigger('fadeOut', [
+      transition(':leave', [
+        style({ opacity: 1, transform: 'scale(1)' }),
+        animate('200ms ease-out', style({ opacity: 0, transform: 'scale(1.05)' })),
+      ]),
+    ]),
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.95)' }),
+        animate('220ms ease-in', style({ opacity: 1, transform: 'scale(1)' })),
+      ]),
+    ]),
+  ],
+})
+export class ProductComponent implements OnInit, OnDestroy {
+
+  readonly id$ = this.getIdChanges();
+  readonly product$ = this.getProductChanges(this.id$);
+  private readonly retryFeedbacks$ = new Subject<void>();
+  readonly feedbacks$ = this.getSafeFeedbackChanges(this.getFeedbackChanges(this.product$), this.retryFeedbacks$);
+  private readonly visitDate$ = new ReplaySubject<Date>(1);
+  readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.product$);
+  private readonly subscriptions$ = new Subscription();
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private WBAPI: WBAPIService,
+    private title: Title,
+    private history: HistoryService,
+  ) {
+  }
+
+  ngOnInit(): void {
+    const effectsSubscription$ = this.product$.subscribe((item: Partial<ProductViewModel>) => {
+      if (item?.item?.id) {
+        const date = new Date();
+        this.visitDate$.next(date);
+        this.history.visit(VisitedEntryType.PRODUCT, date, item.item.id);
+        this.history.visit(VisitedEntryType.PRODUCT, date, item.item.parentId);
+      }
+      this.title.setTitle(item.item?.title ?? 'Товар');
+    });
+    this.subscriptions$.add(effectsSubscription$);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions$.unsubscribe();
+  }
+
+  retryFeedbacks(): void {
+    this.retryFeedbacks$.next();
+  }
+
+  private getIdChanges(): Observable<string> {
+    return this.activatedRoute.paramMap
+      .pipe(
+        map((paramMap: ParamMap) => paramMap.get('id')),
+        filterTruthy(),
+      );
+  }
+
+  private getVisitedChanges(date$: Observable<Date>, product$: Observable<ProductViewModel>): Observable<VisitedEntry | null> {
+    return combineLatest([
+      product$,
+      date$,
+    ])
+      .pipe(
+        switchMap(([product, date]: [ProductViewModel, Date]) => product
+          ? this.history.hasVisitedChanges(VisitedEntryType.PRODUCT, product.item?.parentId, date)
+          : of(null)
+        ),
+      );
+  }
+
+  private getProductChanges(id$: Observable<string>): Observable<ProductViewModel> {
+    return id$
+      .pipe(
+        switchMap((id: string) => this.WBAPI.getProductChanges(id)),
+        map((product: Partial<Product>) => ({ isLoading: false, item: product })),
+        catchError((error: HttpErrorResponse) => of({ isLoading: false, error })),
+        startWith({ isLoading: true }),
+      );
+  }
+
+  private getSafeFeedbackChanges(feedbacks$: Observable<ProductFeedbacks>, retrySignal$: Observable<void>): Observable<ProductFeedbacks> {
+    return merge(
+      feedbacks$,
+      retrySignal$
+        .pipe(
+          switchMap(() => this.product$),
+          filter((item: ProductViewModel) => !item.isLoading),
+          map((item: ProductViewModel) => item.item),
+          filterTruthy(),
+          withLatestFrom(feedbacks$),
+          switchMap(([product, feedbacks]: [Partial<Product>, ProductFeedbacks]) => this.WBAPI.getFeedbacksChanges(product, null, feedbacks)),
+        ),
+    );
+  }
+
+  private getFeedbackChanges(product$: Observable<ProductViewModel>): Observable<ProductFeedbacks> {
+    return product$
+      .pipe(
+        filter((item: ProductViewModel) => !item.isLoading),
+        map((item: ProductViewModel) => item.item),
+        filterTruthy(),
+        switchMap((item: Partial<Product>) => this.WBAPI.getFeedbacksChanges(item)),
+      );
+  }
+
+}

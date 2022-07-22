@@ -1,0 +1,236 @@
+<div
+  *ngIf="(currentPhoto$ | async) as currentPhoto"
+  [class.ui-gallery-two-column]="!currentPhoto?.section?.author && !(reference$ | async)"
+  class="ui-gallery">
+  <!-- LEFT COLUMN -->
+  <div
+    *ngIf="currentPhoto?.section?.author || (reference$ | async)"
+    class="ui-gallery-left-column">
+    <!-- QUOTE -->
+    <div
+      *ngIf="currentPhoto?.section?.author?.photo || currentPhoto?.section?.author?.name || currentPhoto?.section?.author?.date"
+      class="ui-gallery-author-block">
+      <img
+        *ngIf="currentPhoto?.section?.author?.photo"
+        [src]="currentPhoto?.section?.author?.photo"
+        alt=""
+        class="ui-gallery-author-photo">
+      <div class="ui-gallery-author">
+        <span
+          *ngIf="currentPhoto?.section?.author?.name"
+          class="wb-typography-h3">
+          {{ currentPhoto?.section?.author?.name }}
+        </span>
+        <span
+          *ngIf="currentPhoto?.section?.author?.country"
+          class="wb-typography-body">
+          {{ currentPhoto?.section?.author?.country }}
+        </span>
+        <span
+          *ngIf="currentPhoto?.section?.author?.date"
+          class="wb-typography-caption">
+          {{ currentPhoto?.section?.author?.date | wbFriendlyDate }}
+        </span>
+      </div>
+    </div>
+    <span
+      *ngIf="currentPhoto?.section?.author?.quote"
+      [title]="currentPhoto?.section?.author?.quote"
+      class="wb-typography-caption ui-gallery-quote">
+      “{{ currentPhoto?.section?.author?.quote }}”
+    </span>
+
+    <!-- REFERENCE -->
+    <ng-container *ngIf="(reference$ | async) as reference">
+      <a
+        *ngIf="(reference$ | async) as reference"
+        mat-dialog-close
+        [routerLink]="reference?.path"
+        [queryParams]="reference?.params"
+        title="Перейти к товару"
+        class="ui-gallery-reference">
+        <img
+          [src]="reference?.photo"
+          alt=""
+          referrerpolicy="no-referrer"
+          class="ui-gallery-reference-photo">
+        <div class="ui-gallery-reference-content">
+          <span class="wb-typography-link ui-gallery-reference-text">
+            {{ reference?.title }}
+          </span>
+          <div
+            *ngIf="(feedbacks$ | async) as feedbacks"
+            class="ui-gallery-reference-feedbacks">
+            <mat-spinner
+              *ngIf="feedbacks.isLoading"
+              diameter="16">
+            </mat-spinner>
+            <span
+              *ngIf="!feedbacks.isLoading"
+              class="wb-typography-caption">
+              {{ feedbacks.amount ? 'Еще ' + (feedbacks.amount | wbPlural:['отзыв', 'отзыва', 'отзывов']) : 'Без отзывов' }}
+            </span>
+            <mat-icon
+              *ngIf="feedbacks.isHidden"
+              svgIcon="visibility"
+              matTooltip="Этот отзыв скрыт"
+              class="wb-typography-caption">
+            </mat-icon>
+          </div>
+          <div
+            *ngIf="(visitedEntry$ | async) as visitedEntry"
+            class="wb-typography-caption ui-gallery-visited-entry">
+            <mat-icon
+              svgIcon="done"
+              class="ui-gallery-visited-entry-icon">
+            </mat-icon>
+            <span>
+              Просмотрено
+            </span>
+          </div>
+        </div>
+      </a>
+      <ng-container *ngIf="(feedbacks$ | async) as feedbacks">
+        <div
+          *ngIf="feedbacks.photos.length > 0"
+          class="ui-gallery-reference-feedback-photos">
+          <img
+            *ngFor="let photo of (feedbacks.photos | slice:0:photosPerFeedbackReference)"
+            [src]="photo"
+            alt=""
+            class="ui-gallery-reference-feedback-photo">
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <!-- IMAGES -->
+  <div class="ui-gallery-image-wrapper-cell">
+    <button
+      (click)="prev()"
+      aria-label="Предыдущее фото"
+      class="ui-gallery-prev-button">
+      <div class="ui-gallery-hover-trigger">
+        <mat-icon svgIcon="chevron-left"></mat-icon>
+      </div>
+    </button>
+    <div class="ui-gallery-image-wrapper">
+      <img
+        #image
+        [src]="currentPhoto?.photo?.big"
+        (load)="drawImage($event)"
+        (error)="showError()"
+        alt=""
+        referrerpolicy="no-referrer"
+        crossorigin="anonymous"
+        class="ui-gallery-image">
+      <canvas
+        #canvas
+        class="ui-gallery-image-canvas">
+      </canvas>
+      <mat-spinner
+        *ngIf="loadingImage"
+        diameter="24"
+        class="ui-gallery-image-loader">
+      </mat-spinner>
+      <div
+        *ngIf="hasError"
+        class="ui-gallery-retry-block">
+        <div class="wb-typography-body">
+          Не удалось загрузить изображение
+        </div>
+        <button
+          (click)="retry()"
+          mat-stroked-button
+          color="primary">
+          Повторить загрузку
+        </button>
+      </div>
+    </div>
+    <button
+      (click)="next()"
+      aria-label="Следующее фото"
+      class="ui-gallery-next-button">
+      <div class="ui-gallery-hover-trigger ui-gallery-hover-trigger-end">
+        <mat-icon svgIcon="chevron-right"></mat-icon>
+      </div>
+    </button>
+  </div>
+
+  <!-- RIGHT BAR -->
+  <div class="ui-gallery-right-column">
+    <!-- TOP (APP) BAR -->
+    <div class="ui-gallery-app-bar">
+      <button
+        (click)="rotate()"
+        mat-icon-button
+        aria-label="Повернуть вправо на 90 градусов (хоткей: клавиша r)"
+        matTooltip="Повернуть вправо (R)">
+        <mat-icon svgIcon="rotate"></mat-icon>
+      </button>
+      <button
+        (click)="download()"
+        mat-icon-button
+        aria-label="Скачать (хоткей: клавиша d)"
+        matTooltip="Скачать (D)">
+        <mat-icon svgIcon="download"></mat-icon>
+      </button>
+      <button
+        (click)="openInNewTab()"
+        mat-icon-button
+        aria-label="Открыть в новом окне (хоткей: клавиша o)"
+        matTooltip="Открыть в новом окне (O)">
+        <mat-icon svgIcon="external"></mat-icon>
+      </button>
+      <button
+        mat-dialog-close
+        mat-icon-button
+        aria-label="Закрыть (хоткей: клавиша escape)"
+        matTooltip="Закрыть (Esc)"
+        class="ui-gallery-close">
+        <mat-icon svgIcon="close"></mat-icon>
+      </button>
+    </div>
+
+    <!-- PREVIEWS -->
+    <ui-previews
+      *ngIf="imagesLength > 1"
+      [items]="previews"
+      [sectionIndex]="currentPhoto.sectionIndex"
+      [photoIndex]="currentPhoto.photoIndex"
+      [centered]="true"
+      [vertical]="true"
+      (indexChange)="selectSection($event[0], $event[1])"
+      class="ui-gallery-previews">
+    </ui-previews>
+
+    <!-- PAGINATOR -->
+    <div class="ui-gallery-paginator">
+      <ng-container *ngIf="imagesLength > 1">
+        <button
+          (click)="prev()"
+          mat-icon-button
+          color="primary"
+          aria-label="Предыдущее изображение">
+          <mat-icon
+            svgIcon="chevron-left"
+            class="ui-gallery-chevron-icon">
+          </mat-icon>
+        </button>
+        <span class="wb-typography-body ui-gallery-paginator-label">
+          {{ currentPhoto.globalIndex + 1 }} из {{ imagesLength }}
+        </span>
+        <button
+          (click)="next()"
+          mat-icon-button
+          color="primary"
+          aria-label="Следующее изображение">
+          <mat-icon
+            svgIcon="chevron-right"
+            class="ui-gallery-chevron-icon">
+          </mat-icon>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<ng-content></ng-content>
+<div
+  *ngIf="!wbImageOverlay?.hideOverlay"
+  class="ui-image-essentials-overlay">
+  <button
+    (click)="download()"
+    mat-icon-button
+    aria-label="Скачать"
+    matTooltip="Скачать"
+    color="primary"
+    class="wb-filled-button">
+    <mat-icon svgIcon="download"></mat-icon>
+  </button>
+  <button
+    (click)="openInNewTab()"
+    mat-icon-button
+    aria-label="Открыть в новом окне"
+    matTooltip="Открыть в новом окне"
+    color="primary"
+    class="wb-filled-button">
+    <mat-icon svgIcon="external"></mat-icon>
+  </button>
+  <button
+    (click)="openInGallery()"
+    mat-icon-button
+    aria-label="Открыть в галерее"
+    matTooltip="Открыть в галерее"
+    color="primary"
+    class="wb-filled-button">
+    <mat-icon svgIcon="open"></mat-icon>
+  </button>
+</div>

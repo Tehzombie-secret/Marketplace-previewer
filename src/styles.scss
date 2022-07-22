@@ -1,0 +1,11 @@
+@use '@angular/material' as mat;
+@use './app/ui/previews/previews-theme.scss' as previews;
+
+@import 'theme';
+@import 'fonts';
+@import 'typography';
+@import 'common';
+
+@include mat.all-component-themes($wb-theme);
+@include mat.core();
+@include previews.theme($wb-theme);
