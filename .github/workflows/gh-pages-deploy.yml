@@ -32,7 +32,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: .
-          file: {context}/config/prod.Dockerfile
+          file: ./config/prod.Dockerfile
           push: true
           tags: ${{ secrets.YANDEX_CLOUD_REGISTRY }}/app:latest
