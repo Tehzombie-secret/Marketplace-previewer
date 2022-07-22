@@ -11,7 +11,7 @@
     "dev:ssr": "ng run wb:serve-ssr",
     "serve:ssr": "node dist/wb/server/main.js",
     "build:ssr": "ng build && ng run wb:server",
-    "prerender": "ng run wb:prerender"
+    "build:ssr:production": "ng build --configuration=production && ng run wb:server:production"
   },
   "private": true,
   "dependencies": {
