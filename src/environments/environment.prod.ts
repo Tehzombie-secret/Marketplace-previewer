@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  baseHref: '/WB-preview/',
+  baseHref: '/',
   host: '',
   jsonLogs: true,
 };

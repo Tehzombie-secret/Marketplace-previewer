@@ -7,7 +7,6 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy": "ng build --output-path docs --base-href /WB-preview/ --configuration=production && cpy ./docs/index.html --rename=404.html .",
     "dev:ssr": "ng run wb:serve-ssr",
     "serve:ssr": "node dist/wb/server/main.js",
     "build:ssr": "ng build && ng run wb:server",
