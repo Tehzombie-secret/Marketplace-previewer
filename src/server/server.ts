@@ -34,6 +34,11 @@ export async function app(): Promise<express.Express> {
         .get('/rp', reverseProxyController)
       )
     )
+    .get(
+      '/.well-known/acme-challenge/KEG4b2Ini6Socf235BBSS5JdZYLrY_wMtD-JeY2wHvE',
+      (_: express.Request, res: express.Response) =>
+        res.send('KEG4b2Ini6Socf235BBSS5JdZYLrY_wMtD-JeY2wHvE.fJUmVeVv-MZ-UAICqcujCw-CM-lcLuVwwLlb3pVj4bQ'),
+    )
     .get('*.*', express.static(distFolder, { maxAge: '3d' }))
     .get('*', (req, res) => res.send(indexHTML));
 }
