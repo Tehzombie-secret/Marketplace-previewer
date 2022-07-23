@@ -21,4 +21,4 @@ COPY --from=build /src/app/dist dist
 # Set the user to Node
 USER root
 
-CMD ["node", "./dist/server/main.js"]
+CMD ["node", "./dist/wb/server/main.js"]
