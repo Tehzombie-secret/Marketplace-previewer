@@ -14,6 +14,8 @@
       class="ui-previews-button">
       <img
         #image
+        [class.ui-previews-image-vertical]="vertical"
+        [class.ui-previews-image-horizontal]="!vertical"
         [src]="image.small"
         alt=""
         referrerpolicy="no-referrer"

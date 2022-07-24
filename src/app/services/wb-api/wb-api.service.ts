@@ -182,7 +182,6 @@ export class WBAPIService {
           const progress = item.feedbackCount < request.take || request.skip + request.take > this.maxFeedbacks
             ? 100
             : progressBeforeRequest;
-          console.log(progress);
           const feedbacks = getProductFeedbacks(itemId, progress, requestsMade, item);
 
           return feedbacks;

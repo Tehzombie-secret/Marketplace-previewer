@@ -25,31 +25,15 @@ $gallery-border: 3px;
 .ui-preview-chunks {
   display: flex;
   gap: 16px;
-  padding: $gallery-border;
 }
 
 .ui-previews-button {
   @include debuttonify;
 
   position: relative; // For pseudo-element styling
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 6px;
-    transition: all 160ms ease;
-  }
-
-  &.active::before {
-    top: -$gallery-border;
-    left: -$gallery-border;
-    bottom: -$gallery-border;
-    right: -$gallery-border;
-  }
+  border: $gallery-border solid transparent;
+  border-radius: 6px;
+  transition: border-color 160ms ease;
 }
 
 .ui-previews-image {
@@ -57,7 +41,14 @@ $gallery-border: 3px;
   object-fit: cover;
   border-radius: 4px;
   height: 100px;
-  max-width: 120px;
   width: auto;
   transform: translate(0);
+}
+
+.ui-previews-image-vertical {
+  max-width: 100%;
+}
+
+.ui-previews-image-horizontal {
+  max-width: 120px;
 }

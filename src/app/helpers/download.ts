@@ -17,7 +17,6 @@ export function download(
   const imageHeight = image.naturalHeight || image.height;
   canvas.width = rotation === 1 || rotation === 3 ? imageHeight : imageWidth;
   canvas.height = rotation === 1 || rotation === 3 ? imageWidth : imageHeight;
-  console.log(rotation, `${imageWidth}x${imageHeight} -- ${canvas.width}x${canvas.height}`);
   const context = canvas.getContext('2d');
   if (rotation !== 0) {
     context?.translate(canvas.width / 2, canvas.height / 2);

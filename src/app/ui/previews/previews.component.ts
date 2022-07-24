@@ -29,15 +29,21 @@ export class PreviewsComponent {
 
   ngOnChanges(changes: SimpleChanges): void {
     const indexChanged = changes['photoIndex'] || changes['sectionIndex'];
-    if (indexChanged && this.lastClickedIndex[0] !== this.sectionIndex || this.lastClickedIndex[1] !== this.photoIndex) {
-      let imageIndex = 0;
-      let sectionIndex = 0;
-      while (sectionIndex <= this.sectionIndex && sectionIndex <= (this.items?.length ?? 0) - 1) {
-        imageIndex += this.items?.[sectionIndex]?.photos?.length ?? 0;
-        sectionIndex++;
-      }
-      this.imagesRef?.get?.(imageIndex)?.nativeElement?.scrollIntoView?.();
+    const currentIndexIsNotClickedIndex = this.lastClickedIndex[0] !== this.sectionIndex || this.lastClickedIndex[1] !== this.photoIndex;
+    const shouldNotScroll = !(indexChanged && currentIndexIsNotClickedIndex);
+    if (shouldNotScroll) {
+
+      return;
     }
+    let imageIndex = 0;
+    let sectionIndex = 0;
+    while (sectionIndex <= this.sectionIndex && sectionIndex <= (this.items?.length ?? 0) - 1) {
+      imageIndex += sectionIndex === this.sectionIndex
+        ? this.photoIndex
+        : this.items?.[sectionIndex]?.photos?.length ?? 0;
+      sectionIndex++;
+    }
+    this.imagesRef?.get?.(imageIndex)?.nativeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   trackByChunk(_index: number, item: PreviewChunk): string {
