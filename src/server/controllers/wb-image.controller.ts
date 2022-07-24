@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { emitRequestLog } from '../helpers/emit-request-log';
 import { retryable } from '../helpers/retryable';
 import { ImageSize } from '../models/image-size.enum';
 
@@ -8,6 +9,8 @@ const WB_SIZE_TO_PREFIX_STRATEGY: Record<ImageSize, string> = {
 };
 
 export async function WBImageController(request: Request, response: Response): Promise<void> {
+  emitRequestLog(request, response);
+
   // Examples:
   // basket01.wb.ru/vol79/part7908/7908072/images/c246x328/1.jpg
   // basket01.wb.ru/vol79/part7908/7908072/images/big/1.jpg

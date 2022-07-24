@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
+import { emitRequestLog } from '../helpers/emit-request-log';
 import { getBrotliContent } from '../helpers/get-brotli-content';
 import { retryable } from '../helpers/retryable';
 
 export async function reverseProxyController(request: Request, response: Response): Promise<void> {
+  emitRequestLog(request, response);
+
   const url = request.query['url'];
   if (!url) {
     response.sendStatus(200);

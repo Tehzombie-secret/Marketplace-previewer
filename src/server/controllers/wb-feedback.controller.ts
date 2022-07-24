@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import { WBFeedbackRequest } from '../../app/services/wb-api/models/feedback/wb-feedback-request.interface';
+import { emitRequestLog } from '../helpers/emit-request-log';
 import { retryable } from '../helpers/retryable';
 
 export async function WBFeedbackController(request: Request, response: Response): Promise<void> {
+  emitRequestLog(request, response);
+
   const body: WBFeedbackRequest = {
     imtId: request?.body?.imtId,
     skip: request?.body?.skip,

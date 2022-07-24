@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
+import { emitRequestLog } from '../helpers/emit-request-log';
 
 export async function WBUserController(request: Request, response: Response): Promise<void> {
+  emitRequestLog(request, response);
+
   const id = request.params['id'];
   if (!id) {
     response.sendStatus(404);

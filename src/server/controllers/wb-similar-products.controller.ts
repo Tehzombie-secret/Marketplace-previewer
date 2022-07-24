@@ -1,7 +1,10 @@
 import { Request, Response as ExpressResponse } from 'express';
+import { emitRequestLog } from '../helpers/emit-request-log';
 import { retryable } from '../helpers/retryable';
 
 export async function WBSimilarProductsController(request: Request, response: ExpressResponse): Promise<void> {
+  emitRequestLog(request, response);
+
   const id = request.params['id'];
   if (!id) {
     response.sendStatus(400);
