@@ -5,8 +5,6 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { truthy } from '../../../../helpers/truthy';
 import { ReferenceType } from '../../../../models/photo/reference-type.enum';
-import { ImageOverlayComponent } from '../../../../ui/image-overlay/image-overlay.component';
-import { ImageOverlay } from '../../../../ui/image-overlay/models/image-overlay.interface';
 import { ModalGalleryComponent } from '../../../../ui/modal-gallery/modal-gallery.component';
 import { ModalGallery } from '../../../../ui/modal-gallery/models/modal-gallery.interface';
 import { PreviewsComponent } from '../../../../ui/previews/previews.component';
@@ -23,7 +21,6 @@ import { ProductViewModel } from '../../models/product-view-model.interface';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    ImageOverlayComponent,
     PreviewsComponent,
     ModalGalleryComponent,
   ],

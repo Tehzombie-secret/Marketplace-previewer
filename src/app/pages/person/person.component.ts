@@ -20,7 +20,6 @@ import { VisitedEntry } from '../../services/history/models/visited-entry.interf
 import { SettingsKey } from '../../services/settings/models/settings-key.enum';
 import { SettingsService } from '../../services/settings/settings.service';
 import { WBAPIService } from '../../services/wb-api/wb-api.service';
-import { ImageOverlayComponent } from '../../ui/image-overlay/image-overlay.component';
 import { ModalGalleryComponent } from '../../ui/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../ui/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../ui/modal-gallery/models/modal-gallery.interface';
@@ -42,7 +41,6 @@ import { PersonViewModel } from './models/person-view-model.interface';
     MatButtonModule,
     MatTooltipModule,
     MatDialogModule,
-    ImageOverlayComponent,
     FriendlyDatePipe,
     ModalGalleryComponent,
   ],
