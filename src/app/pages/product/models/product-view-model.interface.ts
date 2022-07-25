@@ -7,5 +7,4 @@ export interface ProductViewModel {
   error?: HttpErrorResponse;
   descriptionExpanded?: boolean;
   activeImage?: number;
-  overviewCollapsed?: boolean;
 }

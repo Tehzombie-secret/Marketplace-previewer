@@ -6,25 +6,17 @@ $image-width: 400px;
 .overview-body {
   display: flex;
   align-items: flex-start;
-
-  & > :not(:last-child) {
-    transition: margin-right $collapse-transition ease;
-  }
-
-  &.collapsed > :not(:last-child) {
-    margin-right: 16px;
-  }
-
-  &:not(.collapsed) > :not(:last-child) {
-    margin-right: 40px;
-  }
+  gap: 40px;
 
   .image-block {
+    @include debuttonify;
+
     flex-shrink: 0;
   }
 
   .overview-image {
     display: block;
+    max-height: 540px;
     width: auto;
     object-fit: contain;
   }
@@ -37,12 +29,6 @@ $image-width: 400px;
 
   .overview-title {
     margin-bottom: 16px;
-
-    &.collapsed {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
   }
 
   .external-link {
@@ -54,33 +40,14 @@ $image-width: 400px;
   .collapsible-block {
     display: flex;
     flex-direction: column;
-    overflow-y: hidden; // For collapse transition
-    margin-bottom: 0;
-    transition: margin-bottom $collapse-transition ease;
     gap: 16px;
-
-    &:not(.collapsed) {
-      margin-bottom: 16px;
-    }
+    margin-bottom: 16px;
   }
 
   .overview-description {
     @include debuttonify;
 
     text-align: start;
-
-    &.collapsed {
-      max-width: 100%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      flex-shrink: 0;
-    }
-  }
-
-  .collapse-button {
-    width: 160px;
-    align-self: flex-start;
   }
 }
 

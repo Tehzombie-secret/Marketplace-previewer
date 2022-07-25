@@ -24,6 +24,7 @@ export class PreviewsComponent {
   @Input() centered = false;
   @Input() vertical = false;
   @Output() readonly indexChange = new EventEmitter<[number, number]>();
+  @Output() readonly openInsist = new EventEmitter<[number, number]>();
 
   lastClickedIndex: [number, number] = [this.sectionIndex, this.photoIndex];
 
@@ -59,4 +60,7 @@ export class PreviewsComponent {
     this.indexChange.emit(this.lastClickedIndex);
   }
 
+  emitOpenUrge(): void {
+    this.openInsist.next(this.lastClickedIndex);
+  }
 }

@@ -11,6 +11,7 @@
       *ngFor="let image of preview.photos; index as loopPhotoIndex; trackBy: trackByPhoto;"
       [class.active]="sectionIndex === loopSectionIndex && photoIndex === loopPhotoIndex"
       (click)="emitChange(loopSectionIndex, loopPhotoIndex)"
+      (dblclick)="emitOpenUrge()"
       class="ui-previews-button">
       <img
         #image

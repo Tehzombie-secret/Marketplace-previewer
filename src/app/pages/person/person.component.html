@@ -90,8 +90,8 @@
         <ul class="feedback-items">
           <li *ngFor="let photo of feedback.photoViewModels; index as i; trackBy: trackByPhoto;">
             <a
-              [wbImageOverlay]="photo.gallery"
-              [href]="photo.photo.big">
+              [href]="photo.photo.big"
+              (click)="openGallery($event, photo.gallery)">
               <img
                 [src]="photo.photo.small"
                 alt=""

@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
 import { combineLatest, map, Observable, ReplaySubject, Subscription, switchMap } from 'rxjs';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
-import { Feedback } from '../../models/feedbacks/feedback.interface';
 import { UserFeedback } from '../../models/feedbacks/user-feedback.interface';
 import { Person } from '../../models/person/person.interface';
 import { Photo } from '../../models/photo/photo.interface';
@@ -21,7 +21,9 @@ import { SettingsKey } from '../../services/settings/models/settings-key.enum';
 import { SettingsService } from '../../services/settings/settings.service';
 import { WBAPIService } from '../../services/wb-api/wb-api.service';
 import { ImageOverlayComponent } from '../../ui/image-overlay/image-overlay.component';
+import { ModalGalleryComponent } from '../../ui/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../ui/modal-gallery/models/modal-gallery-section.interface';
+import { ModalGallery } from '../../ui/modal-gallery/models/modal-gallery.interface';
 import { BackTarget } from './models/back-target.interface';
 import { PersonFeedbackViewModel } from './models/person-feedback-view-model.interface';
 import { PersonPhotoViewModel } from './models/person-photo-view-model.interface';
@@ -39,8 +41,10 @@ import { PersonViewModel } from './models/person-view-model.interface';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    MatDialogModule,
     ImageOverlayComponent,
     FriendlyDatePipe,
+    ModalGalleryComponent,
   ],
 })
 export class PersonComponent implements OnInit, OnDestroy {
@@ -62,6 +66,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     private settings: SettingsService,
     private title: Title,
     private history: HistoryService,
+    private dialog: MatDialog,
   ) {
   }
 
@@ -91,6 +96,15 @@ export class PersonComponent implements OnInit, OnDestroy {
 
   toggleGalleryMode(): void {
     this.settings.set(SettingsKey.GALLERY_MODE, !this.settings.get(SettingsKey.GALLERY_MODE));
+  }
+
+  openGallery(event: Event, gallery: ModalGallery<ReferenceType.PRODUCT, ReferenceType.PERSON>): void {
+    event.preventDefault(),
+    this.dialog.open(ModalGalleryComponent, {
+      ariaLabel: 'Галерея изображений',
+      closeOnNavigation: true,
+      data: gallery,
+    })
   }
 
   private getPersonIdChanges(): Observable<string | null> {
@@ -132,7 +146,6 @@ export class PersonComponent implements OnInit, OnDestroy {
         filterTruthy(),
       );
   }
-
 
   private getProductPhotoChanges(productId$: Observable<string | null>): Observable<string | null> {
     return productId$
@@ -191,8 +204,6 @@ export class PersonComponent implements OnInit, OnDestroy {
                           type: ReferenceType.PERSON,
                           item,
                         },
-                        hasGalleryButton: false,
-                        hideOverlay: true,
                         images,
                       },
                       photo,
@@ -210,7 +221,6 @@ export class PersonComponent implements OnInit, OnDestroy {
         }),
       );
   }
-
 
   private getVisitedChanges(date$: Observable<Date>, id$: Observable<string | null>): Observable<VisitedEntry | null> {
     return combineLatest([

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
@@ -11,9 +12,9 @@ import { ReferenceType } from '../../../../models/photo/reference-type.enum';
 import { PluralPipe } from '../../../../pipes/plural.pipe';
 import { SettingsKey } from '../../../../services/settings/models/settings-key.enum';
 import { SettingsService } from '../../../../services/settings/settings.service';
-import { ImageOverlayComponent } from '../../../../ui/image-overlay/image-overlay.component';
+import { ModalGalleryComponent } from '../../../../ui/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../../../ui/modal-gallery/models/modal-gallery-section.interface';
-import { FeedbackViewModel } from '../../models/feedback-view-model.interface';
+import { ModalGallery } from '../../../../ui/modal-gallery/models/modal-gallery.interface';
 import { ProductViewModel } from '../../models/product-view-model.interface';
 import { ProductFeedbackViewModel } from './models/product-feedback-view-model.interface';
 import { ProductPhotoViewModel } from './models/product-photo-view-model.interface';
@@ -30,8 +31,9 @@ import { ProductPhotoViewModel } from './models/product-photo-view-model.interfa
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
+    MatDialogModule,
     PluralPipe,
-    ImageOverlayComponent,
+    ModalGalleryComponent,
   ],
 })
 export class ProductFeedbacksComponent {
@@ -49,6 +51,7 @@ export class ProductFeedbacksComponent {
 
   constructor(
     private settings: SettingsService,
+    private dialog: MatDialog,
   ) {
   }
 
@@ -89,8 +92,6 @@ export class ProductFeedbacksComponent {
                 type: ReferenceType.PRODUCT,
                 item: this.product?.item ?? null,
               },
-              hasGalleryButton: false,
-              hideOverlay: true,
               images: gallery,
             },
           };
@@ -122,5 +123,14 @@ export class ProductFeedbacksComponent {
 
   toggleGalleryMode(): void {
     this.settings.set(SettingsKey.GALLERY_MODE, !this.settings.get(SettingsKey.GALLERY_MODE));
+  }
+
+  openGallery(event: Event, gallery: ModalGallery<ReferenceType.PERSON, ReferenceType.PRODUCT>): void {
+    event.preventDefault();
+    this.dialog.open(ModalGalleryComponent, {
+      ariaLabel: 'Галерея изображений',
+      closeOnNavigation: true,
+      data: gallery,
+    });
   }
 }

@@ -66,11 +66,14 @@
           class="wb-typography-link person-link">
           {{ item.item.name }}
         </a>
+        <div class="wb-typography-caption feedback-text">
+          {{ item.item.feedback }}
+        </div>
         <ul class="photos-list">
           <li *ngFor="let photo of item.photos; trackBy: trackByPhoto;">
             <a
-              [wbImageOverlay]="photo.gallery"
               [href]="photo.photo.big"
+              (click)="openGallery($event, photo.gallery)"
               class="photo-button">
               <img
                 [src]="photo.photo.big"
