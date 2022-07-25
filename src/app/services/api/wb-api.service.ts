@@ -4,21 +4,22 @@ import { EMPTY, map, NEVER, Observable, of } from 'rxjs';
 import { catchError, delay, expand, shareReplay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
-import { getErrorProductFeedback, getProductFeedbacks, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
-import { getPerson, Person } from '../../models/person/person.interface';
+import { getErrorProductFeedback, getProductFeedbacksFromWB, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
+import { getPersonFromWB, Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
-import { mapProduct, mapProductFromSimilar, Product } from '../../models/product/product.interface';
-import { WBFeedbackRequest } from './models/feedback/wb-feedback-request.interface';
-import { WBFeedbacks } from './models/feedback/wb-feedbacks.interface';
-import { WBPersonRoot } from './models/person/wb-person-root.interface';
-import { WBProduct } from './models/product/wb-product.interface';
-import { WBSimilarProduct } from './models/similar/wb-similar-product.interface';
-import { WBSimilar } from './models/similar/wb-similar.interface';
+import { mapProductFromWB, mapSimilarProductFromWB, Product } from '../../models/product/product.interface';
+import { APIBridge } from './models/api-bridge.interface';
+import { WBFeedbackRequest } from './models/wb/feedback/wb-feedback-request.interface';
+import { WBFeedbacks } from './models/wb/feedback/wb-feedbacks.interface';
+import { WBPersonRoot } from './models/wb/person/wb-person-root.interface';
+import { WBProduct } from './models/wb/product/wb-product.interface';
+import { WBSimilarProduct } from './models/wb/similar/wb-similar-product.interface';
+import { WBSimilar } from './models/wb/similar/wb-similar.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class WBAPIService {
+export class WBAPIService implements APIBridge {
 
   private readonly productIdToStreamMap = new Map<string, Observable<Partial<Product>>>();
   private readonly productIdToFeedbacksMap = new Map<string, Observable<ProductFeedbacks>>();
@@ -44,7 +45,7 @@ export class WBAPIService {
     }
     const stream$ = this.http.get<WBPersonRoot>(`${environment.host}/api/${VendorPlatform.WB}/user/${id}`)
       .pipe(
-        map((person: WBPersonRoot) => getPerson(+id, person)),
+        map((person: WBPersonRoot) => getPersonFromWB(+id, person)),
         shareReplay(1),
       );
     this.userIdToPersonMap.set(idString, stream$);
@@ -61,7 +62,7 @@ export class WBAPIService {
     }
     const product$ = this.http.get<WBProduct>(`https://wbx-content-v2.wbstatic.net/ru/${id}.json`)
       .pipe(
-        map((dto: WBProduct) => mapProduct(dto)),
+        map((dto: WBProduct) => mapProductFromWB(dto)),
         shareReplay(1),
       );
     this.productIdToStreamMap.set(idString, product$);
@@ -82,7 +83,7 @@ export class WBAPIService {
           const idList = new Set<number>();
           const items: Partial<Product>[] = [];
           (item?.data?.products ?? []).forEach((dto: WBSimilarProduct) => {
-            const product = mapProductFromSimilar(dto);
+            const product = mapSimilarProductFromWB(dto);
             if (`${product.id}` === `${id}`) {
 
               return;
@@ -182,7 +183,7 @@ export class WBAPIService {
           const progress = item.feedbackCount < request.take || request.skip + request.take > this.maxFeedbacks
             ? 100
             : progressBeforeRequest;
-          const feedbacks = getProductFeedbacks(itemId, progress, requestsMade, item);
+          const feedbacks = getProductFeedbacksFromWB(itemId, progress, requestsMade, item);
 
           return feedbacks;
         }),

@@ -10,10 +10,10 @@ import { Feedback } from '../../../../../../models/feedbacks/feedback.interface'
 import { ProductFeedbacks } from '../../../../../../models/feedbacks/product-feedbacks.interface';
 import { Product } from '../../../../../../models/product/product.interface';
 import { PluralPipe } from '../../../../../../pipes/plural.pipe';
+import { APIService } from '../../../../../../services/api/api.service';
 import { HistoryService } from '../../../../../../services/history/history.service';
 import { VisitedEntryType } from '../../../../../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../../../../../services/history/models/visited-entry.interface';
-import { WBAPIService } from '../../../../../../services/wb-api/wb-api.service';
 
 @Component({
   standalone: true,
@@ -43,7 +43,7 @@ export class ProductCardComponent implements OnChanges {
   }
 
   constructor(
-    private API: WBAPIService,
+    private API: APIService,
     private history: HistoryService,
   ) {
   }

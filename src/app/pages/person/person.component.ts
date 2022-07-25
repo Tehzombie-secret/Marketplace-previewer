@@ -14,12 +14,12 @@ import { Photo } from '../../models/photo/photo.interface';
 import { ReferenceType } from '../../models/photo/reference-type.enum';
 import { Product } from '../../models/product/product.interface';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
+import { APIService } from '../../services/api/api.service';
 import { HistoryService } from '../../services/history/history.service';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
 import { SettingsKey } from '../../services/settings/models/settings-key.enum';
 import { SettingsService } from '../../services/settings/settings.service';
-import { WBAPIService } from '../../services/wb-api/wb-api.service';
 import { ModalGalleryComponent } from '../../ui/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../ui/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../ui/modal-gallery/models/modal-gallery.interface';
@@ -60,7 +60,7 @@ export class PersonComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private WBAPI: WBAPIService,
+    private API: APIService,
     private settings: SettingsService,
     private title: Title,
     private history: HistoryService,
@@ -139,7 +139,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     return productId$
       .pipe(
         filterTruthy(),
-        switchMap((id: string) => this.WBAPI.getProductChanges(id)),
+        switchMap((id: string) => this.API.getProductChanges(id)),
         map((item: Partial<Product>) => item.title),
         filterTruthy(),
       );
@@ -149,7 +149,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     return productId$
       .pipe(
         filterTruthy(),
-        switchMap((id: string) => this.WBAPI.getProductChanges(id)),
+        switchMap((id: string) => this.API.getProductChanges(id)),
         map((item: Partial<Product>) => item.images?.[0]?.small),
         filterTruthy(),
       );
@@ -159,7 +159,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     return personId$
       .pipe(
         filterTruthy(),
-        switchMap((id: string) => this.WBAPI.getUserChanges(id)),
+        switchMap((id: string) => this.API.getUserChanges(id)),
         map((item: Partial<Person>) => {
           const images: ModalGallerySection<ReferenceType.PRODUCT>[] = (item.feedbacks || [])
             .filter((feedback: Partial<UserFeedback>) => (feedback.photos?.length ?? 0) > 0)

@@ -1,7 +1,7 @@
 import { proxifyLink } from '../../helpers/proxify-link';
 import { getWBProductCategoryId } from '../../helpers/wb/get-product-category-id';
-import { WBFeedbackPhoto } from '../../services/wb-api/models/person/wb-feedback-photo.interface';
-import { WBPersonFeedback } from '../../services/wb-api/models/person/wb-person-feedback.interface';
+import { WBFeedbackPhoto } from '../../services/api/models/wb/person/wb-feedback-photo.interface';
+import { WBPersonFeedback } from '../../services/api/models/wb/person/wb-person-feedback.interface';
 import { Photo } from '../photo/photo.interface';
 
 export interface UserFeedback {
@@ -15,7 +15,7 @@ export interface UserFeedback {
   photos: Photo[];
 }
 
-export function getUserFeedback(dto?: WBPersonFeedback | null): Partial<UserFeedback> {
+export function getUserFeedbackFromWB(dto?: WBPersonFeedback | null): Partial<UserFeedback> {
   const id = dto?.product?.cod;
   const category = getWBProductCategoryId(`${id}`);
   const productPhoto: Photo = {

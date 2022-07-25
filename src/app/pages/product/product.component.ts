@@ -11,11 +11,10 @@ import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { Product } from '../../models/product/product.interface';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
+import { APIService } from '../../services/api/api.service';
 import { HistoryService } from '../../services/history/history.service';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
-import { WBAPIService } from '../../services/wb-api/wb-api.service';
-import { FeedbackViewModel } from './models/feedback-view-model.interface';
 import { ProductViewModel } from './models/product-view-model.interface';
 import { ProductFeedbacksComponent } from './views/feedbacks/feedbacks.component';
 import { ProductOverviewComponent } from './views/overview/overview.component';
@@ -64,7 +63,7 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private WBAPI: WBAPIService,
+    private API: APIService,
     private title: Title,
     private history: HistoryService,
   ) {
@@ -115,7 +114,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   private getProductChanges(id$: Observable<string>): Observable<ProductViewModel> {
     return id$
       .pipe(
-        switchMap((id: string) => this.WBAPI.getProductChanges(id)),
+        switchMap((id: string) => this.API.getProductChanges(id)),
         map((product: Partial<Product>) => ({ isLoading: false, item: product })),
         catchError((error: HttpErrorResponse) => of({ isLoading: false, error })),
         startWith({ isLoading: true }),
@@ -132,7 +131,7 @@ export class ProductComponent implements OnInit, OnDestroy {
           map((item: ProductViewModel) => item.item),
           filterTruthy(),
           withLatestFrom(feedbacks$),
-          switchMap(([product, feedbacks]: [Partial<Product>, ProductFeedbacks]) => this.WBAPI.getFeedbacksChanges(product, null, feedbacks)),
+          switchMap(([product, feedbacks]: [Partial<Product>, ProductFeedbacks]) => this.API.getFeedbacksChanges(product, null, feedbacks)),
         ),
     );
   }
@@ -143,7 +142,7 @@ export class ProductComponent implements OnInit, OnDestroy {
         filter((item: ProductViewModel) => !item.isLoading),
         map((item: ProductViewModel) => item.item),
         filterTruthy(),
-        switchMap((item: Partial<Product>) => this.WBAPI.getFeedbacksChanges(item)),
+        switchMap((item: Partial<Product>) => this.API.getFeedbacksChanges(item)),
       );
   }
 

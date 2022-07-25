@@ -20,10 +20,10 @@ import { Person } from '../../models/person/person.interface';
 import { ReferenceType } from '../../models/photo/reference-type.enum';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 import { PluralPipe } from '../../pipes/plural.pipe';
+import { APIService } from '../../services/api/api.service';
 import { HistoryService } from '../../services/history/history.service';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
-import { WBAPIService } from '../../services/wb-api/wb-api.service';
 import { PreviewsComponent } from '../previews/previews.component';
 import { ModalGalleryCurrentEntry } from './models/modal-gallery-current-entry.interface';
 import { ModalGalleryReferenceStrategy } from './models/modal-gallery-reference-strategy.type';
@@ -88,7 +88,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
   private shouldClear = false;
 
   constructor(
-    private API: WBAPIService,
+    private API: APIService,
     private renderer: Renderer2,
     private history: HistoryService,
     private cdr: ChangeDetectorRef,

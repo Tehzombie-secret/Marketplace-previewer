@@ -23,6 +23,7 @@ export async function app(): Promise<express.Express> {
   const indexHTML = await readFile(indexHTMLPath, { encoding: 'utf8' });
 
   return express()
+    .get('robots.txt', (req: express.Request, res: express.Response) => res.send('User-agent: *\nDisallow: /'))
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
         .get('/product/:id/similar', WBSimilarProductsController)
@@ -35,7 +36,7 @@ export async function app(): Promise<express.Express> {
       )
     )
     .get('*.*', express.static(distFolder, { maxAge: '3d' }))
-    .get('*', (req, res) => res.send(indexHTML));
+    .get('*', (req: express.Request, res: express.Response) => res.send(indexHTML));
 }
 
 async function run(): Promise<void> {

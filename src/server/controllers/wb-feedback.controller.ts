@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { WBFeedbackRequest } from '../../app/services/wb-api/models/feedback/wb-feedback-request.interface';
+import { WBFeedbackRequest } from '../../app/services/api/models/wb/feedback/wb-feedback-request.interface';
 import { emitRequestLog } from '../helpers/emit-request-log';
 import { retryable } from '../helpers/retryable';
 

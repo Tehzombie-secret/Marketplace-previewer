@@ -1,8 +1,8 @@
 import { proxifyLink } from '../../helpers/proxify-link';
 import { getWBUserPhoto } from '../../helpers/wb/get-wb-user-photo';
-import { WBFeedback } from '../../services/wb-api/models/feedback/wb-feedback.interface';
-import { WBFeedbacks } from '../../services/wb-api/models/feedback/wb-feedbacks.interface';
-import { WBPhoto } from '../../services/wb-api/models/feedback/wb-photo.interface';
+import { WBFeedback } from '../../services/api/models/wb/feedback/wb-feedback.interface';
+import { WBFeedbacks } from '../../services/api/models/wb/feedback/wb-feedbacks.interface';
+import { WBPhoto } from '../../services/api/models/wb/feedback/wb-photo.interface';
 import { Photo } from '../photo/photo.interface';
 import { WBPhotoSize } from './wb/wb-photo-size.enum';
 
@@ -17,7 +17,7 @@ export interface Feedback {
   feedbackPhotos: Photo[];
 }
 
-export function getFeedbackList(id: number | undefined, dto?: WBFeedbacks | null): Partial<Feedback>[] {
+export function getFeedbackListFromWB(id: number | undefined, dto?: WBFeedbacks | null): Partial<Feedback>[] {
   const items: Partial<Feedback>[] = (dto?.feedbacks || [])
     .filter((feedback: WBFeedback) => (feedback?.photos?.length ?? 0) > 0)
     .map((feedback: WBFeedback) => {

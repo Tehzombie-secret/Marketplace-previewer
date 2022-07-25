@@ -1,5 +1,5 @@
-import { WBFeedbacks } from '../../services/wb-api/models/feedback/wb-feedbacks.interface';
-import { Feedback, getFeedbackList } from './feedback.interface';
+import { WBFeedbacks } from '../../services/api/models/wb/feedback/wb-feedbacks.interface';
+import { Feedback, getFeedbackListFromWB } from './feedback.interface';
 
 export interface ProductFeedbacks {
   /** Loading progress from 0 to 100 */
@@ -11,12 +11,17 @@ export interface ProductFeedbacks {
   feedbacks: Partial<Feedback>[];
 }
 
-export function getProductFeedbacks(id: number | undefined, progress: number, requestsMade: number, dto?: WBFeedbacks | null): ProductFeedbacks {
+export function getProductFeedbacksFromWB(
+  id: number | undefined,
+  progress: number,
+  requestsMade: number,
+  dto?: WBFeedbacks | null,
+): ProductFeedbacks {
   const item: ProductFeedbacks = {
     progress,
     size: dto?.feedbackCount ?? 0,
     withPhotosSize: dto?.feedbackCountWithPhoto ?? 0,
-    feedbacks: getFeedbackList(id, dto),
+    feedbacks: getFeedbackListFromWB(id, dto),
     hasError: false,
     requestsMade,
   };

@@ -1,8 +1,8 @@
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { ImageSize } from '../../../server/models/image-size.enum';
-import { WBProduct } from '../../services/wb-api/models/product/wb-product.interface';
-import { WBSimilarProduct } from '../../services/wb-api/models/similar/wb-similar-product.interface';
+import { WBProduct } from '../../services/api/models/wb/product/wb-product.interface';
+import { WBSimilarProduct } from '../../services/api/models/wb/similar/wb-similar-product.interface';
 import { Photo } from '../photo/photo.interface';
 
 export interface Product {
@@ -16,7 +16,7 @@ export interface Product {
   images: Photo[];
 }
 
-export function mapProduct(dto?: WBProduct | null): Partial<Product> {
+export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
   const id = dto?.nm_id;
   const item: Partial<Product> = {
     type: 'product',
@@ -42,7 +42,7 @@ export function mapProduct(dto?: WBProduct | null): Partial<Product> {
   return item;
 }
 
-export function mapProductFromSimilar(dto?: WBSimilarProduct | null): Partial<Product> {
+export function mapSimilarProductFromWB(dto?: WBSimilarProduct | null): Partial<Product> {
   const id = dto?.id;
   const item: Partial<Product> = {
     id,

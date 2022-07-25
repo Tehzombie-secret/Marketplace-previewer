@@ -1,6 +1,6 @@
-import { WBPersonFeedback } from '../../services/wb-api/models/person/wb-person-feedback.interface';
-import { WBPersonRoot } from '../../services/wb-api/models/person/wb-person-root.interface';
-import { getUserFeedback, UserFeedback } from '../feedbacks/user-feedback.interface';
+import { WBPersonFeedback } from '../../services/api/models/wb/person/wb-person-feedback.interface';
+import { WBPersonRoot } from '../../services/api/models/wb/person/wb-person-root.interface';
+import { getUserFeedbackFromWB, UserFeedback } from '../feedbacks/user-feedback.interface';
 import { Photo } from '../photo/photo.interface';
 
 export interface Person {
@@ -14,10 +14,10 @@ export interface Person {
   mergedPhotos: Photo[];
 }
 
-export function getPerson(id: number, dto?: WBPersonRoot): Partial<Person> {
+export function getPersonFromWB(id: number, dto?: WBPersonRoot): Partial<Person> {
   const feedbacks: Partial<UserFeedback>[] = (dto?.Value?.data?.profile?.feedbacks || [])
     .filter((feedback: WBPersonFeedback) => (feedback?.entity?.photos?.length || 0) > 0)
-    .map((feedback: WBPersonFeedback) => getUserFeedback(feedback))
+    .map((feedback: WBPersonFeedback) => getUserFeedbackFromWB(feedback))
   const item: Partial<Person> = {
     type: 'person',
     id,

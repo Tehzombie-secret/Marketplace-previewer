@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
 import { Product } from '../../../../models/product/product.interface';
-import { WBAPIService } from '../../../../services/wb-api/wb-api.service';
+import { APIService } from '../../../../services/api/api.service';
 import { ProductViewModel } from '../../models/product-view-model.interface';
 import { ProductCardComponent } from './views/product-card/product-card.component';
 
@@ -37,7 +37,7 @@ export class ProductSimilarComponent implements OnChanges, OnDestroy {
   }
 
   constructor(
-    private API: WBAPIService,
+    private API: APIService,
     private cdr: ChangeDetectorRef,
   ) {
   }
