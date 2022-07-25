@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ParamMap, Router } from '@angular/router';
-import { map, NEVER, Observable, switchMap } from 'rxjs';
+import { map, NEVER, Observable, switchMap, tap } from 'rxjs';
+import { valueIsInEnum } from '../../helpers/value-is-in-enum';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
@@ -59,7 +60,13 @@ export class APIService implements APIBridge {
 
     return (this.router.routerState.root.firstChild?.paramMap ?? NEVER)
       .pipe(
-        map((paramMap: ParamMap) => strategy[paramMap.get('platform') as APIPlatform ?? APIPlatform.WB] ?? this.WBAPI),
+        map((paramMap: ParamMap) => paramMap.get('platform')),
+        tap((value: string | null) => {
+          if (!valueIsInEnum(APIPlatform, value)) {
+            this.router.navigateByUrl(`/${APIPlatform.WB}${this.router.url}`);
+          }
+        }),
+        map((platform: string | null) => strategy[platform as APIPlatform ?? APIPlatform.WB] ?? this.WBAPI),
       )
   }
 }
