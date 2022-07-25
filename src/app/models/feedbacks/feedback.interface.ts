@@ -26,7 +26,7 @@ export function getFeedbackListFromWB(id: number | undefined, dto?: WBFeedbacks 
         feedback: feedback?.text,
         userId: feedback?.wbUserId,
         date: feedback?.createdDate,
-        name: feedback?.wbUserDetails?.name,
+        name: feedback?.wbUserDetails?.name || 'Без имени',
         country: feedback?.wbUserDetails?.country,
         photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback.wbUserId),
         feedbackPhotos: (feedback?.photos || []).map((photoDTO: WBPhoto, index: number) => {

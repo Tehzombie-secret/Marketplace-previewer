@@ -22,7 +22,7 @@ export function getPersonFromWB(id: number, dto?: WBPersonRoot): Partial<Person>
     type: 'person',
     id,
     externalURL: `https://www.wildberries.ru${dto?.path}`,
-    name: dto?.Value?.data?.profile?.userName,
+    name: dto?.Value?.data?.profile?.userName || 'Без имени',
     photo: dto?.Value?.data?.profile?.userPhotoLink,
     country: dto?.Value?.data?.profile?.country,
     feedbacks,
