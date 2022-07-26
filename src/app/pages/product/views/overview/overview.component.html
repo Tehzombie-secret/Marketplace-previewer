@@ -27,14 +27,11 @@
         Открыть товар
         <mat-icon svgIcon="external"></mat-icon>
       </a>
-      <button
+      <div
         *ngIf="item?.item?.description"
-        [title]="item?.descriptionExpanded ? '' : item?.item?.description"
-        [class.collapsed]="!item?.descriptionExpanded"
-        (click)="toggleDescription()"
         class="wb-typography-body overview-description">
         {{ item?.item?.description }}
-      </button>
+      </div>
       <ui-previews
         [items]="[{ id: '1', photos: item?.item?.images }]"
         [sectionIndex]="0"

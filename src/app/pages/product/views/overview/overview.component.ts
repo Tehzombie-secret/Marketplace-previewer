@@ -40,14 +40,6 @@ export class ProductOverviewComponent {
   ) {
   }
 
-  toggleDescription(): void {
-    if (!this.item) {
-
-      return;
-    }
-    this.item.descriptionExpanded = !this.item.descriptionExpanded;
-  }
-
   selectImage(index: number): void {
     if (!this.item) {
 

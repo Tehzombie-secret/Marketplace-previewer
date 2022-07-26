@@ -122,7 +122,6 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
       photo: this.images[sectionIndex].photos[photoIndex],
       section: this.images[sectionIndex],
     };
-    console.log('selecting', currentEntry);
     this.currentPhoto$.next(currentEntry);
     this.shouldClear = true;
     this.hasError = false;
