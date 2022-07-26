@@ -3,11 +3,11 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { ModalGalleryComponent } from '../../../../components/modal-gallery/modal-gallery.component';
+import { ModalGallery } from '../../../../components/modal-gallery/models/modal-gallery.interface';
+import { PreviewsComponent } from '../../../../components/previews/previews.component';
 import { truthy } from '../../../../helpers/truthy';
 import { ReferenceType } from '../../../../models/photo/reference-type.enum';
-import { ModalGalleryComponent } from '../../../../ui/modal-gallery/modal-gallery.component';
-import { ModalGallery } from '../../../../ui/modal-gallery/models/modal-gallery.interface';
-import { PreviewsComponent } from '../../../../ui/previews/previews.component';
 import { ProductViewModel } from '../../models/product-view-model.interface';
 
 @Component({
