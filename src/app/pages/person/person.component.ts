@@ -175,6 +175,7 @@ export class PersonComponent implements OnInit, OnDestroy {
                 reference: {
                   type: ReferenceType.PRODUCT,
                   item: {
+                    platform: item.platform,
                     id: feedback.productId,
                     parentId: feedback.parentProductId,
                     brand: feedback.productBrand,

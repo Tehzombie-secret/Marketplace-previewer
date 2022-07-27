@@ -21,6 +21,7 @@ import { ReferenceType } from '../../models/photo/reference-type.enum';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 import { PluralPipe } from '../../pipes/plural.pipe';
 import { APIService } from '../../services/api/api.service';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { HistoryService } from '../../services/history/history.service';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
@@ -69,6 +70,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
   }));
   readonly imagesLength = this.images.reduce((acc: number, item: ModalGallerySection<T>) => acc + item.photos.length, 0);
   readonly currentPhoto$ = new BehaviorSubject<ModalGalleryCurrentEntry<T> | null>({
+    platform: this.data.source?.item?.platform ?? APIPlatform.WB,
     sectionIndex: this.data.active[0] ?? 0,
     photoIndex: this.data.active[1] ?? 0,
     globalIndex: this.calculateGlobalIndex(this.data.active[0] ?? 0, this.data.active[1] ?? 0),
@@ -116,6 +118,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
 
   selectSection(sectionIndex: number, photoIndex: number): void {
     const currentEntry: ModalGalleryCurrentEntry<T> = {
+      platform: this.data.source?.item?.platform ?? APIPlatform.WB,
       photoIndex,
       sectionIndex,
       globalIndex: this.calculateGlobalIndex(sectionIndex, photoIndex),
@@ -247,13 +250,13 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
   private getReferenceChanges(photo$: Observable<ModalGalleryCurrentEntry<T> | null>): Observable<ModalGalleryReference | null> {
     const typeToReferenceStrategy: ModalGalleryReferenceStrategy<ModalGalleryReference> = {
       [ReferenceType.PERSON]: (item: ModalGalleryCurrentEntry<ReferenceType.PERSON>) => ({
-        path: `/person/${item.section.reference?.item?.id}`,
+        path: `/${item.platform}/person/${item.section.reference?.item?.id}`,
         params: { fromProduct: this.data.source?.item?.id },
         photo: item.section.reference?.item?.photo ?? null,
         title: item.section.reference?.item?.name ?? null,
       }),
       [ReferenceType.PRODUCT]: (item: ModalGalleryCurrentEntry<ReferenceType.PRODUCT>) => ({
-        path: `/product/${item.section.reference?.item?.id}`,
+        path: `/${item.platform}/product/${item.section.reference?.item?.id}`,
         params: { fromUser: this.data.source?.item?.id },
         photo: item.section.reference?.item?.thumbnail ?? null,
         title: getProductName(item.section.reference?.item),

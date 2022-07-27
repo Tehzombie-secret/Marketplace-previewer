@@ -1,10 +1,11 @@
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { WBPersonFeedback } from '../../services/api/models/wb/person/wb-person-feedback.interface';
 import { WBPersonRoot } from '../../services/api/models/wb/person/wb-person-root.interface';
 import { getUserFeedbackFromWB, UserFeedback } from '../feedbacks/user-feedback.interface';
 import { Photo } from '../photo/photo.interface';
 
 export interface Person {
-  type: 'person';
+  platform: APIPlatform;
   id: number;
   externalURL: string;
   name: string;
@@ -19,7 +20,7 @@ export function getPersonFromWB(id: number, dto?: WBPersonRoot): Partial<Person>
     .filter((feedback: WBPersonFeedback) => (feedback?.entity?.photos?.length || 0) > 0)
     .map((feedback: WBPersonFeedback) => getUserFeedbackFromWB(feedback))
   const item: Partial<Person> = {
-    type: 'person',
+    platform: APIPlatform.WB,
     id,
     externalURL: `https://www.wildberries.ru${dto?.path}`,
     name: dto?.Value?.data?.profile?.userName || 'Без имени',

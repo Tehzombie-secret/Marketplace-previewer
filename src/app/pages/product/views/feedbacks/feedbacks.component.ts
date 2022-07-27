@@ -13,6 +13,7 @@ import { ProductFeedbacks } from '../../../../models/feedbacks/product-feedbacks
 import { Photo } from '../../../../models/photo/photo.interface';
 import { ReferenceType } from '../../../../models/photo/reference-type.enum';
 import { PluralPipe } from '../../../../pipes/plural.pipe';
+import { APIPlatform } from '../../../../services/api/models/api-platform.enum';
 import { SettingsKey } from '../../../../services/settings/models/settings-key.enum';
 import { SettingsService } from '../../../../services/settings/settings.service';
 import { ProductViewModel } from '../../models/product-view-model.interface';
@@ -70,6 +71,7 @@ export class ProductFeedbacksComponent {
           reference: {
             type: ReferenceType.PERSON,
             item: {
+              platform: this.product?.item?.platform ?? APIPlatform.WB,
               id: item.userId,
               name: item.name,
               photo: item.photo,

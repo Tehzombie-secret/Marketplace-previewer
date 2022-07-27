@@ -1,17 +1,19 @@
 import { Routes } from '@angular/router';
-import { PersonComponent } from './pages/person/person.component';
-import { ProductComponent } from './pages/product/product.component';
 
 const COMMON_ROUTES: Routes = [
   {
+    path: '',
+    loadComponent: () => import('./pages/categories/categories.component').then(c => c.CategoriesComponent),
+  },
+  {
     path: 'product/:id',
-    component: ProductComponent,
+    loadComponent: () => import('./pages/product/product.component').then(c => c.ProductComponent),
   },
   {
     path: 'person/:id',
-    component: PersonComponent,
+    loadComponent: () => import('./pages/person/person.component').then(c => c.PersonComponent),
   },
-]
+];
 
 export const APP_ROUTES: Routes = [
   ...COMMON_ROUTES,

@@ -5,6 +5,7 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import 'zone.js/dist/zone-node';
 import { reverseProxyController } from './controllers/reverse-proxy.controller';
+import { WBCategoriesController } from './controllers/wb-categories.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
 import { WBImageController } from './controllers/wb-image.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
@@ -26,6 +27,7 @@ export async function app(): Promise<express.Express> {
     .get('robots.txt', (req: express.Request, res: express.Response) => res.send('User-agent: *\nDisallow: /'))
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
+        .get('/categories', WBCategoriesController)
         .get('/product/:id/similar', WBSimilarProductsController)
         .get('/image/:size/:id/:name', WBImageController)
         .get('/user/:id', WBUserController)

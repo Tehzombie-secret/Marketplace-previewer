@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ParamMap, Router } from '@angular/router';
 import { map, NEVER, Observable, switchMap, tap } from 'rxjs';
 import { valueIsInEnum } from '../../helpers/value-is-in-enum';
+import { Categories } from '../../models/categories/categories.interface';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
@@ -21,25 +22,20 @@ export class APIService implements APIBridge {
   ) {
   }
 
+  getCategoriesChanges(): Observable<Categories> {
+    return this.request((service: APIBridge) => service.getCategoriesChanges());
+  }
+
   getUserChanges(id?: number | string | null): Observable<Partial<Person>> {
-    return this.getPlatformChanges()
-      .pipe(
-        switchMap((service: APIBridge) => service.getUserChanges(id)),
-      );
+    return this.request((service: APIBridge) => service.getUserChanges(id));
   }
 
   getProductChanges(id: number | string): Observable<Partial<Product>> {
-    return this.getPlatformChanges()
-      .pipe(
-        switchMap((service: APIBridge) => service.getProductChanges(id)),
-      );
+    return this.request((service: APIBridge) => service.getProductChanges(id));
   }
 
   getSimilarChanges(id: number | string): Observable<Partial<Product>[]> {
-    return this.getPlatformChanges()
-      .pipe(
-        switchMap((service: APIBridge) => service.getSimilarChanges(id)),
-      );
+    return this.request((service: APIBridge) => service.getSimilarChanges(id));
   }
 
   getFeedbacksChanges(
@@ -47,13 +43,10 @@ export class APIService implements APIBridge {
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
     existingAccumulator?: ProductFeedbacks,
   ): Observable<ProductFeedbacks> {
-    return this.getPlatformChanges()
-      .pipe(
-        switchMap((service: APIBridge) => service.getFeedbacksChanges(item, fetchWhile, existingAccumulator)),
-      );
+    return this.request((service: APIBridge) => service.getFeedbacksChanges(item, fetchWhile, existingAccumulator));
   }
 
-  private getPlatformChanges(): Observable<APIBridge> {
+  private request<T>(fn: (service: APIBridge) => Observable<T>): Observable<T> {
     const strategy: Record<APIPlatform, APIBridge> = {
       [APIPlatform.WB]: this.WBAPI,
     };
@@ -67,6 +60,7 @@ export class APIService implements APIBridge {
           }
         }),
         map((platform: string | null) => strategy[platform as APIPlatform ?? APIPlatform.WB] ?? this.WBAPI),
+        switchMap((service: APIBridge) => fn(service)),
       )
   }
 }

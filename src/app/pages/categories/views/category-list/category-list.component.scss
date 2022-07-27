@@ -1,0 +1,21 @@
+.category-list-body {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .list-entry {
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .sublist {
+    padding-left: 16px;
+  }
+}

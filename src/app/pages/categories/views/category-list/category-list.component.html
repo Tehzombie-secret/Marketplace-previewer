@@ -1,0 +1,34 @@
+<ng-container *ngTemplateOutlet="categoriesTemplate; context: { $implicit: items, isRoot: true }"></ng-container>
+
+<ng-template
+  #categoriesTemplate
+  wbCategoriesTemplateGuard
+  let-items
+  let-isRoot="isRoot">
+  <ul
+    [class.root]="isRoot"
+    class="category-list-body">
+    <li
+      *ngFor="let item of items; trackBy: trackByFn;"
+      class="list-item">
+      <div class="list-entry">
+        <a
+          [routerLink]="item.url"
+          class="wb-typography-link">
+          {{ item.item.title }}
+        </a>
+        <button
+          *ngIf="item.children.length > 0"
+          (click)="toggleExpansion(item)"
+          mat-icon-button>
+          <mat-icon [svgIcon]="item.expanded ? 'chevron-down' : 'chevron-right'"></mat-icon>
+        </button>
+      </div>
+      <div
+        *ngIf="item.expanded"
+        class="sublist">
+        <ng-container *ngTemplateOutlet="categoriesTemplate; context: { $implicit: item.children, isRoot: false }"></ng-container>
+      </div>
+    </li>
+  </ul>
+</ng-template>

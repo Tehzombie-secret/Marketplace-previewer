@@ -1,12 +1,13 @@
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { ImageSize } from '../../../server/models/image-size.enum';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { WBProduct } from '../../services/api/models/wb/product/wb-product.interface';
 import { WBSimilarProduct } from '../../services/api/models/wb/similar/wb-similar-product.interface';
 import { Photo } from '../photo/photo.interface';
 
 export interface Product {
-  type: 'product';
+  platform: APIPlatform;
   externalURL: string;
   parentId: number;
   id: number;
@@ -19,7 +20,7 @@ export interface Product {
 export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
   const id = dto?.nm_id;
   const item: Partial<Product> = {
-    type: 'product',
+    platform: APIPlatform.WB,
     externalURL: `https://www.wildberries.ru/catalog/${id}/detail.aspx`,
     parentId: dto?.imt_id,
     id,
@@ -45,6 +46,7 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
 export function mapSimilarProductFromWB(dto?: WBSimilarProduct | null): Partial<Product> {
   const id = dto?.id;
   const item: Partial<Product> = {
+    platform: APIPlatform.WB,
     id,
     title: dto?.name,
     brand: dto?.brand,

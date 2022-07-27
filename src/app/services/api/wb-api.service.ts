@@ -1,14 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { EMPTY, map, NEVER, Observable, of } from 'rxjs';
-import { catchError, delay, expand, shareReplay } from 'rxjs/operators';
+import { catchError, delay, expand, share, shareReplay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
+import { Categories } from '../../models/categories/categories.interface';
 import { getErrorProductFeedback, getProductFeedbacksFromWB, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { getPersonFromWB, Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
 import { mapProductFromWB, mapSimilarProductFromWB, Product } from '../../models/product/product.interface';
 import { APIBridge } from './models/api-bridge.interface';
+import { getCategoriesChunkFromWB, WBCategory } from './models/wb/categories/wb-category.interface';
 import { WBFeedbackRequest } from './models/wb/feedback/wb-feedback-request.interface';
 import { WBFeedbacks } from './models/wb/feedback/wb-feedbacks.interface';
 import { WBPersonRoot } from './models/wb/person/wb-person-root.interface';
@@ -21,6 +23,7 @@ import { WBSimilar } from './models/wb/similar/wb-similar.interface';
 })
 export class WBAPIService implements APIBridge {
 
+  private categories$: Observable<Categories> | null = null;
   private readonly productIdToStreamMap = new Map<string, Observable<Partial<Product>>>();
   private readonly productIdToFeedbacksMap = new Map<string, Observable<ProductFeedbacks>>();
   private readonly userIdToPersonMap = new Map<string, Observable<Partial<Person>>>();
@@ -30,6 +33,20 @@ export class WBAPIService implements APIBridge {
   constructor(
     private http: HttpClient,
   ) {
+  }
+
+  getCategoriesChanges(): Observable<Categories> {
+    if (this.categories$) {
+
+      return this.categories$;
+    }
+    this.categories$ = this.http.get<WBCategory[]>(`${environment.host}/api/${VendorPlatform.WB}/categories`)
+      .pipe(
+        map((dto: WBCategory[]) => getCategoriesChunkFromWB(dto)),
+        shareReplay(1),
+      );
+
+    return this.categories$;
   }
 
   getUserChanges(id?: number | string | null): Observable<Partial<Person>> {
