@@ -5,9 +5,9 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import 'zone.js/dist/zone-node';
 import { reverseProxyController } from './controllers/reverse-proxy.controller';
+import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
-import { WBImageController } from './controllers/wb-image.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
 import { WBUserController } from './controllers/wb-user.controller';
 import { listenRuntimeErrors } from './helpers/listen-runtime-errors';
@@ -28,8 +28,8 @@ export async function app(): Promise<express.Express> {
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
         .get('/categories', WBCategoriesController)
+        .get('/catalog', WBCatalogController)
         .get('/product/:id/similar', WBSimilarProductsController)
-        .get('/image/:size/:id/:name', WBImageController)
         .get('/user/:id', WBUserController)
         .post('/feedback', bodyParser.json(), WBFeedbackController)
       )
@@ -42,12 +42,13 @@ export async function app(): Promise<express.Express> {
 }
 
 async function run(): Promise<void> {
-  const port = process.env['PORT'] || 4000;
-
-  // Start up the Node server
+  const ports = process.env['PORT']?.split(',') || [4000];
   const server = await app();
-  server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  ports.forEach((port: string | number) => {
+    // Start up the Node server
+    server.listen(port, () => {
+      console.log(`Node Express server listening on http://localhost:${port}`);
+    });
   });
 }
 
