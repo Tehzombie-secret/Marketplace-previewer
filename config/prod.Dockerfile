@@ -13,7 +13,9 @@ RUN npm run build:ssr:production
 # Release container
 FROM node:18.6.0-alpine
 # Expose the port that the application runs on
-EXPOSE 4000 80 443
+EXPOSE 443
+EXPOSE 80
+EXPOSE 4000
 # Create build directory
 WORKDIR /opt/website
 # Copy the dist
