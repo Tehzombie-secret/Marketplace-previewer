@@ -6,6 +6,10 @@ const COMMON_ROUTES: Routes = [
     loadComponent: () => import('./pages/categories/categories.component').then(c => c.CategoriesComponent),
   },
   {
+    path: 'catalog/:id',
+    loadComponent: () => import('./pages/catalog/catalog.component').then(c => c.CatalogComponent),
+  },
+  {
     path: 'product/:id',
     loadComponent: () => import('./pages/product/product.component').then(c => c.ProductComponent),
   },

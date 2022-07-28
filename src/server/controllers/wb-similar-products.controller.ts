@@ -1,4 +1,5 @@
 import { Request, Response as ExpressResponse } from 'express';
+import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
 import { retryable } from '../helpers/retryable';
 
@@ -11,20 +12,27 @@ export async function WBSimilarProductsController(request: Request, response: Ex
 
     return;
   }
+  const headers = { 'x-requested-with': 'XMLHttpRequest' };
   const [similarResponse, recommendedResponse, seeAlsoResponse] = await Promise.all([
     retryable(fetch(`https://in-similar.wildberries.ru/?nm=${id}`)),
-    retryable(fetch(`https://www.wildberries.ru/webapi/recommendations/recommended-by-nm/${id}`, { headers: { 'x-requested-with': 'XMLHttpRequest' } })),
-    retryable(fetch(`https://www.wildberries.ru/webapi/recommendations/also-buy-by-nm/${id}`, { headers: { 'x-requested-with': 'XMLHttpRequest' } }))
+    retryable(fetch(`https://www.wildberries.ru/webapi/recommendations/recommended-by-nm/${id}`, { headers })),
+    retryable(fetch(`https://www.wildberries.ru/webapi/recommendations/also-buy-by-nm/${id}`, { headers })),
   ]);
   if (similarResponse[0] && recommendedResponse[0] && seeAlsoResponse[1]) {
     response.status(500).send(similarResponse[0]);
 
     return;
   }
-  const similar = await similarResponse[1]?.json();
-  const recommended = await recommendedResponse[1]?.json();
-  const seeAlso = await seeAlsoResponse[1]?.json();
-  const ids = shuffle([similar, recommended?.value?.nmIds ?? [], seeAlso?.value?.nmIds ?? []].flat());
+  const [
+    [similarError, similar],
+    [recommendedError, recommended],
+    [seeAlsoError, seeAlso],
+  ] = await Promise.all([
+    caught(similarResponse[1]?.json()),
+    caught(recommendedResponse[1]?.json()),
+    caught(seeAlsoResponse[1]?.json()),
+  ]);
+  const ids = shuffle([similar ?? [], recommended?.value?.nmIds ?? [], seeAlso?.value?.nmIds ?? []].flat());
   const paramsList = new URLSearchParams({
     spp: '0',
     pricemarginCoeff: '1.0',

@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
+import { retryable } from '../helpers/retryable';
 
 export async function WBUserController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
@@ -18,7 +20,12 @@ export async function WBUserController(request: Request, response: Response): Pr
     method: 'POST',
     body: userFormData,
   });
-  const userHashJSON = await userHashResponse.json();
+  const [userHashJsonError, userHashJSON] = await caught(userHashResponse.json());
+  if (userHashJsonError) {
+    response.status(500).send(userHashJsonError);
+
+    return;
+  }
   const userHash = userHashJSON?.value?.url ?? '';
   if (!userHash) {
     response.sendStatus(400);
@@ -29,9 +36,18 @@ export async function WBUserController(request: Request, response: Response): Pr
   const hash = segments[segments.length - 1];
 
   // Get user profile by hash
-  const userResponse = await fetch(`https://www.wildberries.ru/webapi/profile/${hash}/data`, { method: 'POST' });
-  // TODO add path field
-  const user = await userResponse.json();
+  const [userError, userResponse] = await retryable(fetch(`https://www.wildberries.ru/webapi/profile/${hash}/data`, { method: 'POST' }));
+  if (userError) {
+    response.status(500).send(userError);
+
+    return;
+  }
+  const [userJsonError, user] = await caught(userResponse?.json());
+  if (userJsonError) {
+    response.status(500).send(userJsonError);
+
+    return;
+  }
   user.path = userHash;
-  response.status(userResponse.status).send(user);
+  response.status(userResponse?.status ?? 200).send(user);
 }

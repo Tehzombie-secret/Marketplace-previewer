@@ -1,14 +1,18 @@
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { ImageSize } from '../../../server/models/image-size.enum';
+import { proxifyLink } from '../../helpers/proxify-link';
+import { getWBImage } from '../../helpers/wb/get-wb-image';
+import { getWBProductURL } from '../../helpers/wb/get-wb-product-url';
 import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { WBProduct } from '../../services/api/models/wb/product/wb-product.interface';
 import { WBSimilarProduct } from '../../services/api/models/wb/similar/wb-similar-product.interface';
+import { WBSimilar } from '../../services/api/models/wb/similar/wb-similar.interface';
 import { Photo } from '../photo/photo.interface';
 
 export interface Product {
   platform: APIPlatform;
-  externalURL: string;
+  externalURL: string | null;
   parentId: number;
   id: number;
   brand: string;
@@ -21,7 +25,7 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
   const id = dto?.nm_id;
   const item: Partial<Product> = {
     platform: APIPlatform.WB,
-    externalURL: `https://www.wildberries.ru/catalog/${id}/detail.aspx`,
+    externalURL: getWBProductURL(id),
     parentId: dto?.imt_id,
     id,
     brand: dto?.selling?.brand_name,
@@ -32,8 +36,8 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
       .map((_: void, index: number) => {
         const image: Photo = {
           name: `product-${id}-${index + 1}`,
-          small: `${environment.host}/api/${VendorPlatform.WB}/image/${ImageSize.SMALL}/${id}/${index + 1}.jpg`,
-          big: `${environment.host}/api/${VendorPlatform.WB}/image/${ImageSize.BIG}/${id}/${index + 1}.jpg`,
+          small: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.SMALL)),
+          big: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.BIG)),
         };
 
         return image;
@@ -43,29 +47,44 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
   return item;
 }
 
-export function mapSimilarProductFromWB(dto?: WBSimilarProduct | null): Partial<Product> {
-  const id = dto?.id;
-  const item: Partial<Product> = {
-    platform: APIPlatform.WB,
-    id,
-    title: dto?.name,
-    brand: dto?.brand,
-    description: '',
-    externalURL: `https://www.wildberries.ru/catalog/${id}/detail.aspx`,
-    parentId: dto?.root,
-    images: new Array(dto?.pics ?? 0)
-      .fill(null)
-      .map((_: void, index: number) => {
-        const image: Photo = {
-          name: `product-${id}-${index + 1}`,
-          small: `${environment.host}/api/${VendorPlatform.WB}/image/${ImageSize.SMALL}/${id}/${index + 1}.jpg`,
-          big: `${environment.host}/api/${VendorPlatform.WB}/image/${ImageSize.BIG}/${id}/${index + 1}.jpg`,
-        };
+export function mapProductsFromSimilarWB(dto?: WBSimilar | null, referenceId?: string | number | null): Partial<Product>[] {
+  const idList = new Set<number>();
+  const items: Partial<Product>[] = [];
+  (dto?.data?.products ?? []).forEach((dto: WBSimilarProduct) => {
+    const id = dto?.id;
+    const product: Partial<Product> = {
+      platform: APIPlatform.WB,
+      id,
+      title: dto?.name,
+      brand: dto?.brand,
+      description: '',
+      externalURL: getWBProductURL(id),
+      parentId: dto?.root,
+      images: new Array(dto?.pics ?? 0)
+        .fill(null)
+        .map((_: void, index: number) => {
+          const image: Photo = {
+            name: `product-${id}-${index + 1}`,
+            small: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.SMALL)),
+            big: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.BIG)),
+          };
 
-        return image;
-      }),
+          return image;
+        }),
 
-  };
+    };
+    if (`${product.id}` === `${referenceId}`) {
 
-  return item;
+      return;
+    }
+    if (!product.parentId || idList.has(product.parentId)) {
+
+      return;
+    }
+    items.push(product);
+    idList.add(product.parentId);
+  });
+  console.log(dto, items);
+
+  return items;
 }

@@ -8,6 +8,7 @@ import { Product } from '../../../models/product/product.interface';
 export interface APIBridge {
 
   getCategoriesChanges(): Observable<Categories>;
+  getCatalogChanges(id?: number | string | null): Observable<Partial<Product>[]>;
   getUserChanges(id?: number | string | null): Observable<Partial<Person>>;
   getProductChanges(id: number | string): Observable<Partial<Product>>;
   getSimilarChanges(id: number | string): Observable<Partial<Product>[]>;

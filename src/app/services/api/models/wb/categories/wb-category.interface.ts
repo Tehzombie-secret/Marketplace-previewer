@@ -25,16 +25,17 @@ export function getCategoriesChunkFromWB(categories?: WBCategory[] | null): Cate
 }
 
 export function getCategoriesFromWB(categories?: WBCategory[] | null): Category[] {
-  const items: Category[] = (categories || []).map((dto: WBCategory) => {
-    const item: Category = {
-      platform: APIPlatform.WB,
-      title: dto?.name,
-      slug: dto?.id,
-      children: getCategoriesFromWB(dto?.childs),
-    };
+  const items: Category[] = (categories || [])
+    .map((dto: WBCategory) => {
+      const item: Category = {
+        platform: APIPlatform.WB,
+        title: dto?.name,
+        slug: !dto?.landing && dto?.query ? dto?.id : null,
+        children: getCategoriesFromWB(dto?.childs),
+      };
 
-    return item;
-  });
+      return item;
+    });
 
   return items;
 }

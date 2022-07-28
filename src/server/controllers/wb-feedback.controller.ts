@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { WBFeedbackRequest } from '../../app/services/api/models/wb/feedback/wb-feedback-request.interface';
+import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
 import { retryable } from '../helpers/retryable';
 
@@ -19,7 +20,12 @@ export async function WBFeedbackController(request: Request, response: Response)
   if (feedbacksError) {
     response.status(500).send(feedbacksError);
   } else if (feedbacksResponse) {
-    const responseBody = await feedbacksResponse.json();
+    const [jsonError, responseBody] = await caught(feedbacksResponse.json());
+    if (jsonError) {
+      response.status(500).send(jsonError);
+
+      return;
+    }
     response.status(feedbacksResponse.status).send(responseBody);
   } else {
     response.status(500).send({ message: 'Empty response' });

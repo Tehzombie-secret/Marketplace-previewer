@@ -1,0 +1,34 @@
+<div
+  *ngIf="(page$ | async) as page"
+  class="catalog-body">
+  <!-- LOADER -->
+  <ng-container *ngIf="page.isLoading">
+    <div
+      @fadeOut
+      class="progress-block">
+      <mat-spinner></mat-spinner>
+    </div>
+  </ng-container>
+
+  <!-- ERROR -->
+  <div
+    *ngIf="page.hasError"
+    class="error-block">
+    <div class="error-label-row">
+      <mat-icon
+        color="accent"
+        svgIcon="error">
+      </mat-icon>
+      <span>
+        Не удалось загрузить каталог
+      </span>
+    </div>
+    <button
+      (click)="retry()"
+      mat-stroked-button
+      color="primary">
+      Повторить загрузку
+      <mat-icon svgIcon="arrow-down"></mat-icon>
+    </button>
+  </div>
+</div>

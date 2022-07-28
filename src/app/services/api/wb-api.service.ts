@@ -1,21 +1,20 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { EMPTY, map, NEVER, Observable, of } from 'rxjs';
-import { catchError, delay, expand, share, shareReplay } from 'rxjs/operators';
+import { catchError, delay, expand, shareReplay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { Categories } from '../../models/categories/categories.interface';
 import { getErrorProductFeedback, getProductFeedbacksFromWB, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { getPersonFromWB, Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
-import { mapProductFromWB, mapSimilarProductFromWB, Product } from '../../models/product/product.interface';
+import { mapProductFromWB, mapProductsFromSimilarWB, Product } from '../../models/product/product.interface';
 import { APIBridge } from './models/api-bridge.interface';
 import { getCategoriesChunkFromWB, WBCategory } from './models/wb/categories/wb-category.interface';
 import { WBFeedbackRequest } from './models/wb/feedback/wb-feedback-request.interface';
 import { WBFeedbacks } from './models/wb/feedback/wb-feedbacks.interface';
 import { WBPersonRoot } from './models/wb/person/wb-person-root.interface';
 import { WBProduct } from './models/wb/product/wb-product.interface';
-import { WBSimilarProduct } from './models/wb/similar/wb-similar-product.interface';
 import { WBSimilar } from './models/wb/similar/wb-similar.interface';
 
 @Injectable({
@@ -25,6 +24,7 @@ export class WBAPIService implements APIBridge {
 
   private categories$: Observable<Categories> | null = null;
   private readonly productIdToStreamMap = new Map<string, Observable<Partial<Product>>>();
+  private readonly categoryIdToCatalogMap = new Map<string, Observable<Partial<Product>[]>>();
   private readonly productIdToFeedbacksMap = new Map<string, Observable<ProductFeedbacks>>();
   private readonly userIdToPersonMap = new Map<string, Observable<Partial<Person>>>();
   private readonly productIdToSimilarMap = new Map<string, Observable<Partial<Product>[]>>();
@@ -47,6 +47,27 @@ export class WBAPIService implements APIBridge {
       );
 
     return this.categories$;
+  }
+
+  getCatalogChanges(id?: number | string | null): Observable<Partial<Product>[]> {
+    if (!id) {
+
+      return NEVER;
+    }
+    const idString = `${id}`;
+    const existingStream$ = this.categoryIdToCatalogMap.get(idString);
+    if (existingStream$) {
+
+      return existingStream$;
+    }
+    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/user/${id}`)
+      .pipe(
+        map((dto: WBSimilar) => mapProductsFromSimilarWB(dto)),
+        shareReplay(1),
+      );
+    this.categoryIdToCatalogMap.set(idString, stream$);
+
+    return stream$;
   }
 
   getUserChanges(id?: number | string | null): Observable<Partial<Person>> {
@@ -96,25 +117,7 @@ export class WBAPIService implements APIBridge {
     }
     const items$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/product/${id}/similar`)
       .pipe(
-        map((item: WBSimilar) => {
-          const idList = new Set<number>();
-          const items: Partial<Product>[] = [];
-          (item?.data?.products ?? []).forEach((dto: WBSimilarProduct) => {
-            const product = mapSimilarProductFromWB(dto);
-            if (`${product.id}` === `${id}`) {
-
-              return;
-            }
-            if (!product.parentId || idList.has(product.parentId)) {
-
-              return;
-            }
-            items.push(product);
-            idList.add(product.parentId);
-          });
-
-          return items;
-        }),
+        map((item: WBSimilar) => mapProductsFromSimilarWB(item, id)),
         shareReplay(1),
       );
     this.productIdToSimilarMap.set(idString, items$);

@@ -131,7 +131,9 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
     setTimeout(() => {
       if (this.shouldClear) {
         this.clearCanvas();
-        this.loadingImage = true;
+        if (!this.hasError) {
+          this.loadingImage = true;
+        }
         this.cdr.markForCheck();
       }
     }, 100);
@@ -291,6 +293,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
 
               return asyncFeedback;
             }),
+            startWith({ isLoading: true, amount: 0, photos: [] }), // It's null while it's loading
           ),
       [ReferenceType.PRODUCT]: (item: ModalGalleryCurrentEntry<ReferenceType.PRODUCT>) =>
         this.API.getFeedbacksChanges(
@@ -310,6 +313,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
                 .map((feedback: Partial<Feedback>) => feedback.feedbackPhotos?.[0]?.small || null)
                 .filter(truthy),
             })),
+            startWith({ isLoading: true, amount: 0, photos: [] }), // It's null while it's loading
           ),
     };
 
@@ -329,7 +333,6 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
 
           return callback(item);
         }),
-        startWith({ isLoading: true, amount: 0, photos: [] }), // It's null while it's loading
         shareReplay(1),
       );
   }

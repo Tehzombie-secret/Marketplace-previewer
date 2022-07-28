@@ -2,7 +2,7 @@
 
 <ng-template
   #categoriesTemplate
-  wbCategoriesTemplateGuard
+  wbCategoryTemplateGuard
   let-items
   let-isRoot="isRoot">
   <ul
@@ -11,12 +11,20 @@
     <li
       *ngFor="let item of items; trackBy: trackByFn;"
       class="list-item">
-      <div class="list-entry">
+      <div
+        *ngIf="item.url || item.children.length > 0"
+        class="list-entry">
         <a
+          *ngIf="item.url"
           [routerLink]="item.url"
           class="wb-typography-link">
           {{ item.item.title }}
         </a>
+        <div
+          *ngIf="!item.url"
+          class="wb-typography-link">
+          {{ item.item.title }}
+        </div>
         <button
           *ngIf="item.children.length > 0"
           (click)="toggleExpansion(item)"

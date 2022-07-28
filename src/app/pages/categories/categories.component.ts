@@ -38,7 +38,7 @@ export class CategoriesComponent {
   private getViewModel(item: Category): CategoryViewModel {
     const viewModel: CategoryViewModel = {
       item,
-      url: [`/${item.platform}`, 'category', `${item.slug}`],
+      url: item.slug ? [`/${item.platform}`, 'category', `${item.slug}`] : null,
       expanded: false,
       children: item.children.map((child: Category) => this.getViewModel(child)),
     };

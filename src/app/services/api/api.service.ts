@@ -26,6 +26,10 @@ export class APIService implements APIBridge {
     return this.request((service: APIBridge) => service.getCategoriesChanges());
   }
 
+  getCatalogChanges(id?: number | string | null): Observable<Partial<Product>[]> {
+    return this.request((service: APIBridge) => service.getCatalogChanges(id));
+  }
+
   getUserChanges(id?: number | string | null): Observable<Partial<Person>> {
     return this.request((service: APIBridge) => service.getUserChanges(id));
   }

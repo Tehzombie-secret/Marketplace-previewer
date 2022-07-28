@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { Product } from '../../../../models/product/product.interface';
 import { APIService } from '../../../../services/api/api.service';
 import { ProductViewModel } from '../../models/product-view-model.interface';
-import { ProductCardComponent } from './views/product-card/product-card.component';
+import { ProductCardComponent } from '../../../../components/product-card/product-card.component';
 
 @Component({
   standalone: true,
@@ -73,6 +73,7 @@ export class ProductSimilarComponent implements OnChanges, OnDestroy {
         this.isLoading = false;
         this.canLoadMore = this.items.length < items.length;
         this.page++;
+        console.log(items);
         this.cdr.markForCheck();
       });
     this.subscriptions$.add(fetchSubscription$);

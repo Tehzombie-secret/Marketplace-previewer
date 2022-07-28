@@ -26,8 +26,8 @@ export class CategoryListComponent {
 
   @Input() items: CategoryViewModel[] | null = null;
 
-  trackByFn(_index: number, item: CategoryViewModel): string | number {
-    return item.item.slug;
+  trackByFn(_index: number, item: CategoryViewModel): string | number | null {
+    return item?.item?.slug ?? item.item.title;
   }
 
   toggleExpansion(item: CategoryViewModel): void {

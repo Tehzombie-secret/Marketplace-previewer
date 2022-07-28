@@ -9,8 +9,8 @@ export class CategoryTemplateGuardDirective {
 
   static ngTemplateContextGuard(
     _dir: CategoryTemplateGuardDirective,
-    _ctx: { $implicit: CategoryViewModel, isRoot: boolean },
-  ): _ctx is { $implicit: CategoryViewModel, isRoot: boolean } {
+    _ctx: { $implicit: CategoryViewModel[], isRoot: boolean },
+  ): _ctx is { $implicit: CategoryViewModel[], isRoot: boolean } {
     return true;
   }
 

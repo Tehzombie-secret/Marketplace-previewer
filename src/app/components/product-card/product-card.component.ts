@@ -4,16 +4,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
 import { BehaviorSubject, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
-import { truthy } from '../../../../../../helpers/truthy';
-import { AsyncFeedback } from '../../../../../../models/feedbacks/async-feedback.interface';
-import { Feedback } from '../../../../../../models/feedbacks/feedback.interface';
-import { ProductFeedbacks } from '../../../../../../models/feedbacks/product-feedbacks.interface';
-import { Product } from '../../../../../../models/product/product.interface';
-import { PluralPipe } from '../../../../../../pipes/plural.pipe';
-import { APIService } from '../../../../../../services/api/api.service';
-import { HistoryService } from '../../../../../../services/history/history.service';
-import { VisitedEntryType } from '../../../../../../services/history/models/visited-entry-type.enum';
-import { VisitedEntry } from '../../../../../../services/history/models/visited-entry.interface';
+import { truthy } from '../../helpers/truthy';
+import { AsyncFeedback } from '../../models/feedbacks/async-feedback.interface';
+import { Feedback } from '../../models/feedbacks/feedback.interface';
+import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
+import { Product } from '../../models/product/product.interface';
+import { PluralPipe } from '../../pipes/plural.pipe';
+import { APIService } from '../../services/api/api.service';
+import { HistoryService } from '../../services/history/history.service';
+import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
+import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
 
 @Component({
   standalone: true,
