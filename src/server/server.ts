@@ -24,7 +24,8 @@ export async function app(): Promise<express.Express> {
   const indexHTML = await readFile(indexHTMLPath, { encoding: 'utf8' });
 
   return express()
-    .get('robots.txt', (req: express.Request, res: express.Response) => res.send('User-agent: *\nDisallow: /'))
+    .get('/healthcheck', (req: express.Request, res: express.Response) => res.send('OK'))
+    .get('/robots.txt', (req: express.Request, res: express.Response) => res.send('User-agent: *\nDisallow: /'))
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
         .get('/categories', WBCategoriesController)
