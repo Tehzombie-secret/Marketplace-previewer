@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
-import { retryable } from '../helpers/retryable';
+import { smartFetch } from '../helpers/smart-fetch';
 
 export const WB_CATALOG_URL = 'https://www.wildberries.ru/webapi/menu/main-menu-ru-ru.json';
 
 export async function WBCategoriesController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
 
-  const [categoriesError, categoriesResponse] = await retryable(fetch(WB_CATALOG_URL));
+  const [categoriesError, categoriesResponse] = await smartFetch(WB_CATALOG_URL);
   if (categoriesError) {
     response.status(500).send(categoriesError);
   } else if (categoriesResponse) {

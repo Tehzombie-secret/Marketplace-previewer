@@ -4,7 +4,7 @@ import { WBCategory } from '../../app/services/api/models/wb/categories/wb-categ
 import { caught } from '../helpers/caught/caught';
 import { Caught } from '../helpers/caught/models/caught.type';
 import { emitRequestLog } from '../helpers/emit-request-log';
-import { retryable } from '../helpers/retryable';
+import { smartFetch } from '../helpers/smart-fetch';
 import { WB_CATALOG_URL } from './wb-categories.controller';
 
 export async function WBCatalogController(request: Request, response: Response): Promise<void> {
@@ -18,7 +18,7 @@ export async function WBCatalogController(request: Request, response: Response):
   }
 
   // Get menu
-  const [menuError, menuResponse] = await retryable(fetch(WB_CATALOG_URL));
+  const [menuError, menuResponse] = await smartFetch(WB_CATALOG_URL);
   if (menuError) {
     response.status(500).send(menuError);
 
@@ -51,7 +51,7 @@ export async function WBCatalogController(request: Request, response: Response):
     curr: 'rub',
     ...Object.fromEntries(categoryParams),
   });
-  const [catalogError, catalogResponse] = await retryable(fetch(`https://card.wb.ru/cards/list?${params}`));
+  const [catalogError, catalogResponse] = await smartFetch(`https://card.wb.ru/cards/list?${params}`);
   if (catalogError) {
     response.status(500).send(catalogError);
 

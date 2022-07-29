@@ -1,7 +1,7 @@
 import { Request, Response as ExpressResponse } from 'express';
 import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
-import { retryable } from '../helpers/retryable';
+import { smartFetch } from '../helpers/smart-fetch';
 
 export async function WBSimilarProductsController(request: Request, response: ExpressResponse): Promise<void> {
   emitRequestLog(request, response);
@@ -14,9 +14,9 @@ export async function WBSimilarProductsController(request: Request, response: Ex
   }
   const headers = { 'x-requested-with': 'XMLHttpRequest' };
   const [similarResponse, recommendedResponse, seeAlsoResponse] = await Promise.all([
-    retryable(fetch(`https://in-similar.wildberries.ru/?nm=${id}`)),
-    retryable(fetch(`https://www.wildberries.ru/webapi/recommendations/recommended-by-nm/${id}`, { headers })),
-    retryable(fetch(`https://www.wildberries.ru/webapi/recommendations/also-buy-by-nm/${id}`, { headers })),
+    smartFetch(`https://in-similar.wildberries.ru/?nm=${id}`),
+    smartFetch(`https://www.wildberries.ru/webapi/recommendations/recommended-by-nm/${id}`, { headers }),
+    smartFetch(`https://www.wildberries.ru/webapi/recommendations/also-buy-by-nm/${id}`, { headers }),
   ]);
   if (similarResponse[0] && recommendedResponse[0] && seeAlsoResponse[1]) {
     response.status(500).send(similarResponse[0]);
@@ -45,7 +45,7 @@ export async function WBSimilarProductsController(request: Request, response: Ex
     nm: ids.join(';'),
   });
   const params = decodeURIComponent(`${paramsList}`);
-  const [productsError, productsResponse] = await retryable(fetch(`https://card.wb.ru/cards/list?${params}`))
+  const [productsError, productsResponse] = await smartFetch(`https://card.wb.ru/cards/list?${params}`)
   if (productsError) {
     response.status(500).send(productsError);
   } else {

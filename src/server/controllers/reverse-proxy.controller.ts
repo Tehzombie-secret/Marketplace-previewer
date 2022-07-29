@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { emitRequestLog } from '../helpers/emit-request-log';
 import { getBrotliContent } from '../helpers/get-brotli-content';
-import { retryable } from '../helpers/retryable';
+import { smartFetch } from '../helpers/smart-fetch';
 
 export async function reverseProxyController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
@@ -20,7 +20,7 @@ export async function reverseProxyController(request: Request, response: Respons
 
     return;
   }
-  const [error, proxyResponse] = await retryable(fetch(decodeURI(decoupledURL)));
+  const [error, proxyResponse] = await smartFetch(decodeURI(decoupledURL));
   if (error) {
     response.status(500).send(error);
 

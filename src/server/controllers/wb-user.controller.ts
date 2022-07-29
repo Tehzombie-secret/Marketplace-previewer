@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
 import { retryable } from '../helpers/retryable';
+import { smartFetch } from '../helpers/smart-fetch';
 
 export async function WBUserController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
@@ -16,11 +17,14 @@ export async function WBUserController(request: Request, response: Response): Pr
   // Get user hash from ID
   const userFormData = new FormData();
   userFormData.append('userId', id);
-  const userHashResponse = await fetch('https://www.wildberries.ru/webapi/profile/spa/profile/url', {
+  const [userHashError, userHashResponse] = await smartFetch('https://www.wildberries.ru/webapi/profile/spa/profile/url', {
     method: 'POST',
     body: userFormData,
   });
-  const [userHashJsonError, userHashJSON] = await caught(userHashResponse.json());
+  if (userHashError) {
+    response.status(500).send(userHashError);
+  }
+  const [userHashJsonError, userHashJSON] = await caught(userHashResponse?.json());
   if (userHashJsonError) {
     response.status(500).send(userHashJsonError);
 
