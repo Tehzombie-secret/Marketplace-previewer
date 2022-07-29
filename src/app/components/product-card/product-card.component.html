@@ -1,5 +1,5 @@
 <a
-  [routerLink]="['/product', item?.id]"
+  [routerLink]="productPath$ | async"
   [title]="title"
   class="product-card-body">
 

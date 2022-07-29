@@ -1,34 +1,67 @@
 <div
   *ngIf="(page$ | async) as page"
   class="catalog-body">
-  <!-- LOADER -->
-  <ng-container *ngIf="page.isLoading">
+
+  <a
+    [routerLink]="menuPath$ | async"
+    class="wb-typography-caption back-anchor">
+    <mat-icon
+      svgIcon="chevron-left"
+      class="anchor-icon">
+    </mat-icon>
+    <span>Меню</span>
+  </a>
+
+  <h1 class="wb-typography-h2">
+    {{ title$ | async }}
+  </h1>
+
+  <div class="content-block">
+    <div class="cards-block">
+      <ul class="cards-list">
+        <li *ngFor="let item of page.items | slice:0:visibleItems; trackBy: trackByProduct;">
+          <wb-product-card [item]="item"></wb-product-card>
+        </li>
+      </ul>
+      <button
+        *ngIf="visibleItems < page.items.length"
+        (click)="nextPage()"
+        mat-stroked-button
+        color="primary"
+        class="load-more-button">
+        Загрузить еще
+        <mat-icon svgIcon="arrow-down"></mat-icon>
+      </button>
+    </div>
+
+    <!-- LOADER -->
     <div
+      *ngIf="page.isLoading"
       @fadeOut
       class="progress-block">
       <mat-spinner></mat-spinner>
     </div>
-  </ng-container>
 
-  <!-- ERROR -->
-  <div
-    *ngIf="page.hasError"
-    class="error-block">
-    <div class="error-label-row">
-      <mat-icon
-        color="accent"
-        svgIcon="error">
-      </mat-icon>
-      <span>
-        Не удалось загрузить каталог
-      </span>
+    <!-- ERROR -->
+    <div
+      *ngIf="page.hasError"
+      class="error-block">
+      <div class="error-label-row">
+        <mat-icon
+          color="accent"
+          svgIcon="error">
+        </mat-icon>
+        <span>
+          Не удалось загрузить каталог
+        </span>
+      </div>
+      <button
+        (click)="retry()"
+        mat-stroked-button
+        color="primary">
+        Повторить загрузку
+        <mat-icon svgIcon="arrow-down"></mat-icon>
+      </button>
     </div>
-    <button
-      (click)="retry()"
-      mat-stroked-button
-      color="primary">
-      Повторить загрузку
-      <mat-icon svgIcon="arrow-down"></mat-icon>
-    </button>
   </div>
 </div>

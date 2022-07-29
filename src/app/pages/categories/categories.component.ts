@@ -1,6 +1,8 @@
 import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { map, Observable } from 'rxjs';
+import { ROUTE_PATH } from '../../constants/route-path.const';
 import { Categories } from '../../models/categories/categories.interface';
 import { Category } from '../../models/categories/category.interface';
 import { APIService } from '../../services/api/api.service';
@@ -25,7 +27,12 @@ export class CategoriesComponent {
 
   constructor(
     private API: APIService,
+    private title: Title,
   ) {
+  }
+
+  ngOnInit(): void {
+    this.title.setTitle('Обзор категорий');
   }
 
   private getCategoriesChanges(): Observable<CategoryViewModel[]> {
@@ -38,7 +45,7 @@ export class CategoriesComponent {
   private getViewModel(item: Category): CategoryViewModel {
     const viewModel: CategoryViewModel = {
       item,
-      url: item.slug ? [`/${item.platform}`, 'category', `${item.slug}`] : null,
+      url: item.slug ? [`/${item.platform}`, ROUTE_PATH.CATALOG, `${item.slug}`] : null,
       expanded: false,
       children: item.children.map((child: Category) => this.getViewModel(child)),
     };

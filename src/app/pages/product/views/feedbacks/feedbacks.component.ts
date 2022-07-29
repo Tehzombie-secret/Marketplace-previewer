@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { ModalGalleryComponent } from '../../../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../../../components/modal-gallery/models/modal-gallery.interface';
+import { ROUTE_PATH } from '../../../../constants/route-path.const';
 import { Feedback } from '../../../../models/feedbacks/feedback.interface';
 import { ProductFeedbacks } from '../../../../models/feedbacks/product-feedbacks.interface';
 import { Photo } from '../../../../models/photo/photo.interface';
@@ -49,6 +50,7 @@ export class ProductFeedbacksComponent {
   progress = 12;
   photoSize = 0;
   feedbacks: ProductFeedbackViewModel[] = [];
+  readonly personPathPrefix = `/${ROUTE_PATH.PERSON}`;
 
   constructor(
     private settings: SettingsService,

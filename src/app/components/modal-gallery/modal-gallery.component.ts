@@ -7,6 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { asyncScheduler, BehaviorSubject, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { ROUTE_PATH } from '../../constants/route-path.const';
 import { download } from '../../helpers/download';
 import { getNextId } from '../../helpers/get-next-id';
 import { getProductName } from '../../helpers/get-product-name';
@@ -252,13 +253,13 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
   private getReferenceChanges(photo$: Observable<ModalGalleryCurrentEntry<T> | null>): Observable<ModalGalleryReference | null> {
     const typeToReferenceStrategy: ModalGalleryReferenceStrategy<ModalGalleryReference> = {
       [ReferenceType.PERSON]: (item: ModalGalleryCurrentEntry<ReferenceType.PERSON>) => ({
-        path: `/${item.platform}/person/${item.section.reference?.item?.id}`,
+        path: `/${item.platform}/${ROUTE_PATH.PERSON}/${item.section.reference?.item?.id}`,
         params: { fromProduct: this.data.source?.item?.id },
         photo: item.section.reference?.item?.photo ?? null,
         title: item.section.reference?.item?.name ?? null,
       }),
       [ReferenceType.PRODUCT]: (item: ModalGalleryCurrentEntry<ReferenceType.PRODUCT>) => ({
-        path: `/${item.platform}/product/${item.section.reference?.item?.id}`,
+        path: `/${item.platform}/${ROUTE_PATH.PRODUCT}/${item.section.reference?.item?.id}`,
         params: { fromUser: this.data.source?.item?.id },
         photo: item.section.reference?.item?.thumbnail ?? null,
         title: getProductName(item.section.reference?.item),

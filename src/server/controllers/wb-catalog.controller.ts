@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { URLSearchParams } from 'url';
+import { treeFind } from '../../app/helpers/tree-find';
 import { WBCategory } from '../../app/services/api/models/wb/categories/wb-category.interface';
 import { caught } from '../helpers/caught/caught';
 import { Caught } from '../helpers/caught/models/caught.type';
@@ -28,9 +29,7 @@ export async function WBCatalogController(request: Request, response: Response):
 
     response.status(500).send(menuJsonError);
   }
-  const category = (menu || [])
-    .flatMap((item: WBCategory) => (item.childs || []).concat(item))
-    .find((item: WBCategory) => `${item.id}` === id);
+  const category = treeFind(menu, (item: WBCategory) => item.childs, (item: WBCategory) => `${item.id}` === id);
   if (!category) {
     response.sendStatus(404);
 
@@ -38,9 +37,8 @@ export async function WBCatalogController(request: Request, response: Response):
   }
 
   // Get items
-  const categoryParams = (category.query || '').split('&').map((item: string) => item.split('='));
   const params = new URLSearchParams({
-    spp: '0',
+    spp: '19',
     pricemarginCoeff: '1.0',
     reg: '0',
     appType: '1',
@@ -48,9 +46,10 @@ export async function WBCatalogController(request: Request, response: Response):
     locale: 'ru',
     lang: 'ru',
     curr: 'rub',
-    ...Object.fromEntries(categoryParams),
+    dest: '-1216601,-337422,-1114354,-1181032',
   });
-  const catalogResponse = await smartFetch(response, `https://card.wb.ru/cards/list?${params}`);
+  const url = `https://catalog.wb.ru/catalog/${category.shard}/catalog?${[params, category.query].join('&')}`;
+  const catalogResponse = await smartFetch(response, url);
   if (!catalogResponse) {
 
     return;
@@ -63,3 +62,4 @@ export async function WBCatalogController(request: Request, response: Response):
   }
   response.send(catalog);
 }
+

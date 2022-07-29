@@ -61,7 +61,7 @@
       </div>
       <div class="feedback-block">
         <a
-          [routerLink]="['/person', item.item.userId]"
+          [routerLink]="[personPathPrefix, item.item.userId]"
           [queryParams]="{ fromProduct: product?.item?.id }"
           class="wb-typography-link person-link">
           {{ item.item.name }}

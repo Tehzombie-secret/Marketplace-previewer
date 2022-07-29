@@ -2,8 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterModule } from '@angular/router';
-import { BehaviorSubject, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
+import { BehaviorSubject, combineLatest, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
+import { ROUTE_PATH } from '../../constants/route-path.const';
 import { truthy } from '../../helpers/truthy';
 import { AsyncFeedback } from '../../models/feedbacks/async-feedback.interface';
 import { Feedback } from '../../models/feedbacks/feedback.interface';
@@ -37,6 +38,7 @@ export class ProductCardComponent implements OnChanges {
   readonly visitedEntry$ = this.getHistoryChanges(this.item$);
   readonly feedbacks$ = this.getFeedbacksChanges(this.item$);
   readonly feedbackPhotosPerProduct = 4;
+  readonly productPath$ = this.getPathChanges(this.item$);
 
   get title(): string {
     return `${this.item?.brand ? this.item?.brand + ' / ' : ''}${this.item?.title}`;
@@ -45,6 +47,7 @@ export class ProductCardComponent implements OnChanges {
   constructor(
     private API: APIService,
     private history: HistoryService,
+    private route: ActivatedRoute,
   ) {
   }
 
@@ -89,6 +92,18 @@ export class ProductCardComponent implements OnChanges {
         }),
         startWith({ isLoading: true, amount: 0, photos: [] }), // It's null while it's loading
         shareReplay(1),
+      );
+  }
+
+  private getPathChanges(item$: Observable<Partial<Product> | null>): Observable<string[]> {
+    return combineLatest([
+      item$,
+      this.route.paramMap,
+    ])
+      .pipe(
+        map(([item, paramMap]: [Partial<Product> | null, ParamMap]) =>
+          [`/${paramMap.get('platform')}`, ROUTE_PATH.PRODUCT, `${item?.id ?? ''}`]
+        ),
       );
   }
 }

@@ -1,12 +1,18 @@
-import { trigger, transition, style, animate } from '@angular/animations';
-import { AsyncPipe, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
-import { BehaviorSubject, catchError, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, map, Observable, of, startWith, Subscription, switchMap, tap } from 'rxjs';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { ROUTE_PATH } from '../../constants/route-path.const';
+import { filterTruthy } from '../../helpers/observables/filter-truthy';
+import { treeFind } from '../../helpers/tree-find';
+import { Categories } from '../../models/categories/categories.interface';
+import { Category } from '../../models/categories/category.interface';
 import { Product } from '../../models/product/product.interface';
 import { APIService } from '../../services/api/api.service';
 import { CatalogViewModel } from './models/catalog-view-model.interface';
@@ -19,7 +25,9 @@ import { CatalogViewModel } from './models/catalog-view-model.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgIf,
+    NgForOf,
     AsyncPipe,
+    SlicePipe,
     RouterModule,
     MatProgressSpinnerModule,
     MatIconModule,
@@ -41,19 +49,81 @@ import { CatalogViewModel } from './models/catalog-view-model.interface';
     ]),
   ],
 })
-export class CatalogComponent {
+export class CatalogComponent implements OnInit, OnDestroy {
 
+  private readonly itemsPerPage = 7;
+  visibleItems = this.itemsPerPage;
+  readonly title$ = this.getNameChanges();
   private readonly retry$ = new BehaviorSubject<void>(void 0);
   readonly page$ = this.getCatalogChanges(this.retry$);
+  private readonly subscription$ = new Subscription();
+  readonly menuPath$ = this.getMenuPathChanges();
 
   constructor(
     private API: APIService,
     private route: ActivatedRoute,
+    private title: Title,
+    private cdr: ChangeDetectorRef,
   ) {
+  }
+
+  ngOnInit(): void {
+    this.listenPaginationResetChanges();
+    this.listenTitleChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription$.unsubscribe();
+  }
+
+  trackByProduct(_index: number, item: Partial<Product>): number | null {
+    return item.id ?? null;
   }
 
   retry(): void {
     this.retry$.next();
+  }
+
+  nextPage(): void {
+    this.visibleItems += this.itemsPerPage;
+  }
+
+  private listenPaginationResetChanges(): void {
+    const paginationSubscription$ = this.route.paramMap
+      .pipe(
+        map((paramMap: ParamMap) => paramMap.get('id')),
+        distinctUntilChanged(),
+      )
+      .subscribe(() => {
+        this.visibleItems = this.itemsPerPage;
+        this.cdr.markForCheck();
+      });
+    this.subscription$.add(paginationSubscription$);
+  }
+
+  private listenTitleChanges(): void {
+    const titleSubscription$ = this.title$.subscribe((title: string) => this.title.setTitle(title));
+    this.subscription$.add(titleSubscription$);
+  }
+
+  private getNameChanges(): Observable<string> {
+    return combineLatest([
+      this.API.getCategoriesChanges(),
+      this.route.paramMap
+        .pipe(
+          map((paramMap: ParamMap) => paramMap.get('id')),
+          filterTruthy(),
+        ),
+    ])
+      .pipe(
+        tap(([categories, id]: [Categories, string]) =>
+          console.log(categories, id, treeFind(categories.items, (item: Category) => item.children, (item: Category) => item.slug === id))
+        ),
+        map(([categories, id]: [Categories, string]) =>
+          treeFind(categories.items, (item: Category) => item.children, (item: Category) => `${item.slug}` === id)
+        ),
+        map((category: Category | null) => category?.title ?? 'Каталог'),
+      );
   }
 
   private getCatalogChanges(retry$: Observable<void>): Observable<CatalogViewModel> {
@@ -94,6 +164,13 @@ export class CatalogComponent {
           : of(emptyResponse)
         ),
         catchError(() => of(errorResponse)),
+      );
+  }
+
+  private getMenuPathChanges(): Observable<string[]> {
+    return this.route.paramMap
+      .pipe(
+        map((paramMap: ParamMap) => [`/${paramMap.get('platform')}`]),
       );
   }
 

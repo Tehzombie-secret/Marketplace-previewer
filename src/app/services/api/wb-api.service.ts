@@ -60,7 +60,7 @@ export class WBAPIService implements APIBridge {
 
       return existingStream$;
     }
-    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/user/${id}`)
+    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/catalog/${id}`)
       .pipe(
         map((dto: WBSimilar) => mapProductsFromSimilarWB(dto)),
         shareReplay(1),

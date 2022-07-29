@@ -84,7 +84,6 @@ export function mapProductsFromSimilarWB(dto?: WBSimilar | null, referenceId?: s
     items.push(product);
     idList.add(product.parentId);
   });
-  console.log(dto, items);
 
   return items;
 }

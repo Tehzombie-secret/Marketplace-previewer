@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { ROUTE_PATH } from './constants/route-path.const';
 
 const COMMON_ROUTES: Routes = [
   {
@@ -7,15 +8,15 @@ const COMMON_ROUTES: Routes = [
     loadComponent: () => import('./pages/categories/categories.component').then(c => c.CategoriesComponent),
   },
   {
-    path: 'catalog/:id',
+    path: `${ROUTE_PATH.CATALOG}/:id`,
     loadComponent: () => import('./pages/catalog/catalog.component').then(c => c.CatalogComponent),
   },
   {
-    path: 'product/:id',
+    path: `${ROUTE_PATH.PRODUCT}/:id`,
     loadComponent: () => import('./pages/product/product.component').then(c => c.ProductComponent),
   },
   {
-    path: 'person/:id',
+    path: `${ROUTE_PATH.PERSON}/:id`,
     loadComponent: () => import('./pages/person/person.component').then(c => c.PersonComponent),
   },
 ];

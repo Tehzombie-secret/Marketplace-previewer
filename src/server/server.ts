@@ -6,6 +6,7 @@ import { join } from 'path';
 import 'zone.js/dist/zone-node';
 import { documentController } from './controllers/document.controller';
 import { reverseProxyController } from './controllers/reverse-proxy.controller';
+import { robotsController } from './controllers/robots.controller';
 import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
@@ -26,11 +27,11 @@ export async function app(): Promise<express.Express> {
 
   return express()
     .get('/healthcheck', (req: express.Request, res: express.Response) => res.send('OK'))
-    .get('/robots.txt', (req: express.Request, res: express.Response) => res.send('User-agent: *\nDisallow: /'))
+    .get('/robots.txt', robotsController)
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
         .get('/categories', WBCategoriesController)
-        .get('/catalog', WBCatalogController)
+        .get('/catalog/:id', WBCatalogController)
         .get('/product/:id/similar', WBSimilarProductsController)
         .get('/user/:id', WBUserController)
         .post('/feedback', bodyParser.json(), WBFeedbackController)

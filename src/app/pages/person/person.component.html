@@ -80,7 +80,7 @@
       </div>
       <div class="feedback-content">
         <a
-          [routerLink]="['/product', feedback.productId]"
+          [routerLink]="[productPathPrefix, feedback.productId]"
           class="wb-typography-link feedback-product">
           {{ feedback.productName }}
         </a>

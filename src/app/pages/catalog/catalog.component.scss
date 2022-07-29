@@ -1,3 +1,5 @@
+@import 'delinkify';
+
 :host {
   display: block;
   height: 100%;
@@ -5,9 +7,52 @@
 
 .catalog-body {
   width: 100%;
-  height: 100%;
-  display: grid;
-  overflow-x: hidden; // Due to scale animations
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  box-sizing: border-box;
+
+  .back-anchor {
+    @include delinkify;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .anchor-icon {
+    vertical-align: middle;
+  }
+
+  .content-block {
+    width: 100%;
+    flex-grow: 1;
+    display: grid;
+    overflow-x: hidden; // Due to scale animations
+  }
+
+  .cards-block {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .cards-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .load-more-button {
+    align-self: center;
+  }
 
   .progress-block {
     grid-row: 1;

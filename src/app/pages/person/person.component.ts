@@ -10,6 +10,7 @@ import { combineLatest, map, Observable, ReplaySubject, Subscription, switchMap 
 import { ModalGalleryComponent } from '../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../components/modal-gallery/models/modal-gallery.interface';
+import { ROUTE_PATH } from '../../constants/route-path.const';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { UserFeedback } from '../../models/feedbacks/user-feedback.interface';
 import { Person } from '../../models/person/person.interface';
@@ -56,6 +57,7 @@ export class PersonComponent implements OnInit, OnDestroy {
   private readonly visitDate$ = new ReplaySubject<Date>(1);
   readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.personId$);
   readonly galleryMode$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
+  readonly productPathPrefix = `/${ROUTE_PATH.PRODUCT}`;
   private readonly subscriptions$ = new Subscription();
 
   constructor(
@@ -129,7 +131,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     ])
       .pipe(
         map(([productId, personId]: (string | null)[]) => productId && personId
-          ? { path: `/product/${productId}`, params: { fromPerson: personId } }
+          ? { path: `/${ROUTE_PATH.PRODUCT}/${productId}`, params: { fromPerson: personId } }
           : null
         ),
       )
