@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 const COMMON_ROUTES: Routes = [
   {
     path: '',
+    pathMatch: 'full',
     loadComponent: () => import('./pages/categories/categories.component').then(c => c.CategoriesComponent),
   },
   {

@@ -60,7 +60,11 @@ export class APIService implements APIBridge {
         map((paramMap: ParamMap) => paramMap.get('platform')),
         tap((value: string | null) => {
           if (!valueIsInEnum(APIPlatform, value)) {
-            this.router.navigateByUrl(`/${APIPlatform.WB}${this.router.url}`);
+            let newURL = `/${APIPlatform.WB}${this.router.url}`;
+            newURL = newURL.endsWith('/')
+              ? newURL.substring(0, newURL.length - 1)
+              : newURL;
+            this.router.navigateByUrl(newURL);
           }
         }),
         map((platform: string | null) => strategy[platform as APIPlatform ?? APIPlatform.WB] ?? this.WBAPI),
