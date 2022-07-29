@@ -12,22 +12,20 @@ export async function WBFeedbackController(request: Request, response: Response)
     skip: request?.body?.skip,
     take: request?.body?.take,
   };
-  const [feedbacksError, feedbacksResponse] = await smartFetch('https://public-feedbacks.wildberries.ru/api/v1/summary/full', {
+  const feedbacksResponse = await smartFetch(response, 'https://public-feedbacks.wildberries.ru/api/v1/summary/full', {
     body: JSON.stringify(body),
     headers: { 'content-type': 'application/json' },
     method: 'POST',
   });
-  if (feedbacksError) {
-    response.status(500).send(feedbacksError);
-  } else if (feedbacksResponse) {
-    const [jsonError, responseBody] = await caught(feedbacksResponse.json());
-    if (jsonError) {
-      response.status(500).send(jsonError);
+  if (!feedbacksResponse) {
 
-      return;
-    }
-    response.status(feedbacksResponse.status).send(responseBody);
-  } else {
-    response.status(500).send({ message: 'Empty response' });
+    return;
   }
+  const [jsonError, responseBody] = await caught(feedbacksResponse.json());
+  if (jsonError) {
+    response.status(500).send(jsonError);
+
+    return;
+  }
+  response.status(feedbacksResponse.status).send(responseBody);
 }

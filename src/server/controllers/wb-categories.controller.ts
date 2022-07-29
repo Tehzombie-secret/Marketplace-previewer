@@ -8,18 +8,16 @@ export const WB_CATALOG_URL = 'https://www.wildberries.ru/webapi/menu/main-menu-
 export async function WBCategoriesController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
 
-  const [categoriesError, categoriesResponse] = await smartFetch(WB_CATALOG_URL);
-  if (categoriesError) {
-    response.status(500).send(categoriesError);
-  } else if (categoriesResponse) {
-    const [jsonError, responseBody] = await caught(categoriesResponse.json());
-    if (jsonError) {
-      response.status(500).send(jsonError)
+  const categoriesResponse = await smartFetch(response, WB_CATALOG_URL);
+  if (!categoriesResponse) {
 
-      return;
-    }
-    response.status(categoriesResponse.status).send(responseBody);
-  } else {
-    response.status(500).send({ message: 'Empty response' });
+    return;
   }
+  const [jsonError, responseBody] = await caught(categoriesResponse.json());
+  if (jsonError) {
+    response.status(500).send(jsonError)
+
+    return;
+  }
+  response.status(categoriesResponse.status).send(responseBody);
 }

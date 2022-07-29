@@ -20,14 +20,8 @@ export async function reverseProxyController(request: Request, response: Respons
 
     return;
   }
-  const [error, proxyResponse] = await smartFetch(decodeURI(decoupledURL));
-  if (error) {
-    response.status(500).send(error);
-
-    return;
-  }
+  const proxyResponse = await smartFetch(response, decodeURI(decoupledURL));
   if (!proxyResponse) {
-    response.status(500).send('Empty response');
 
     return;
   }

@@ -4,6 +4,7 @@ import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import 'zone.js/dist/zone-node';
+import { documentController } from './controllers/document.controller';
 import { reverseProxyController } from './controllers/reverse-proxy.controller';
 import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
@@ -39,11 +40,11 @@ export async function app(): Promise<express.Express> {
       )
     )
     .get('*.*', express.static(distFolder, { maxAge: '3d' }))
-    .get('*', (req: express.Request, res: express.Response) => res.send(indexHTML));
+    .get('*', documentController(indexHTML));
 }
 
 async function run(): Promise<void> {
-  const ports = process.env['PORT']?.split(',') || [4000];
+  const ports = (process.env['PORT'] || '443,80')?.split(',') || [4000];
   const server = await app();
   ports.forEach((port: string | number) => {
     // Start up the Node server

@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
-import { retryable } from '../helpers/retryable';
 import { smartFetch } from '../helpers/smart-fetch';
 
 export async function WBUserController(request: Request, response: Response): Promise<void> {
@@ -17,12 +16,13 @@ export async function WBUserController(request: Request, response: Response): Pr
   // Get user hash from ID
   const userFormData = new FormData();
   userFormData.append('userId', id);
-  const [userHashError, userHashResponse] = await smartFetch('https://www.wildberries.ru/webapi/profile/spa/profile/url', {
+  const userHashResponse = await smartFetch(response, 'https://www.wildberries.ru/webapi/profile/spa/profile/url', {
     method: 'POST',
     body: userFormData,
   });
-  if (userHashError) {
-    response.status(500).send(userHashError);
+  if (!userHashResponse) {
+
+    return;
   }
   const [userHashJsonError, userHashJSON] = await caught(userHashResponse?.json());
   if (userHashJsonError) {
@@ -40,9 +40,8 @@ export async function WBUserController(request: Request, response: Response): Pr
   const hash = segments[segments.length - 1];
 
   // Get user profile by hash
-  const [userError, userResponse] = await retryable(fetch(`https://www.wildberries.ru/webapi/profile/${hash}/data`, { method: 'POST' }));
-  if (userError) {
-    response.status(500).send(userError);
+  const userResponse = await smartFetch(response, `https://www.wildberries.ru/webapi/profile/${hash}/data`, { method: 'POST' });
+  if (!userResponse) {
 
     return;
   }

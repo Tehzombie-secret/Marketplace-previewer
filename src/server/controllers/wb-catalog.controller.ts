@@ -18,16 +18,15 @@ export async function WBCatalogController(request: Request, response: Response):
   }
 
   // Get menu
-  const [menuError, menuResponse] = await smartFetch(WB_CATALOG_URL);
-  if (menuError) {
-    response.status(500).send(menuError);
+  const menuResponse = await smartFetch(response, WB_CATALOG_URL);
+  if (!menuResponse) {
 
     return;
   }
   const [menuJsonError, menu]: Caught<WBCategory[]> = await caught(menuResponse?.json());
   if (menuJsonError) {
 
-    response.status(500).send(menuError);
+    response.status(500).send(menuJsonError);
   }
   const category = (menu || [])
     .flatMap((item: WBCategory) => (item.childs || []).concat(item))
@@ -51,9 +50,8 @@ export async function WBCatalogController(request: Request, response: Response):
     curr: 'rub',
     ...Object.fromEntries(categoryParams),
   });
-  const [catalogError, catalogResponse] = await smartFetch(`https://card.wb.ru/cards/list?${params}`);
-  if (catalogError) {
-    response.status(500).send(catalogError);
+  const catalogResponse = await smartFetch(response, `https://card.wb.ru/cards/list?${params}`);
+  if (!catalogResponse) {
 
     return;
   }

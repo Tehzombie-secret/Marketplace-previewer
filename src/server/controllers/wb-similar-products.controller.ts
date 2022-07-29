@@ -14,12 +14,12 @@ export async function WBSimilarProductsController(request: Request, response: Ex
   }
   const headers = { 'x-requested-with': 'XMLHttpRequest' };
   const [similarResponse, recommendedResponse, seeAlsoResponse] = await Promise.all([
-    smartFetch(`https://in-similar.wildberries.ru/?nm=${id}`),
-    smartFetch(`https://www.wildberries.ru/webapi/recommendations/recommended-by-nm/${id}`, { headers }),
-    smartFetch(`https://www.wildberries.ru/webapi/recommendations/also-buy-by-nm/${id}`, { headers }),
+    smartFetch(response, `https://in-similar.wildberries.ru/?nm=${id}`),
+    smartFetch(response, `https://www.wildberries.ru/webapi/recommendations/recommended-by-nm/${id}`, { headers }),
+    smartFetch(response, `https://www.wildberries.ru/webapi/recommendations/also-buy-by-nm/${id}`, { headers }),
   ]);
-  if (similarResponse[0] && recommendedResponse[0] && seeAlsoResponse[1]) {
-    response.status(500).send(similarResponse[0]);
+  if (!similarResponse || !recommendedResponse || !seeAlsoResponse) {
+    response.sendStatus(500);
 
     return;
   }
@@ -28,9 +28,9 @@ export async function WBSimilarProductsController(request: Request, response: Ex
     [recommendedError, recommended],
     [seeAlsoError, seeAlso],
   ] = await Promise.all([
-    caught(similarResponse[1]?.json()),
-    caught(recommendedResponse[1]?.json()),
-    caught(seeAlsoResponse[1]?.json()),
+    caught(similarResponse?.json()),
+    caught(recommendedResponse?.json()),
+    caught(seeAlsoResponse?.json()),
   ]);
   const ids = shuffle([similar ?? [], recommended?.value?.nmIds ?? [], seeAlso?.value?.nmIds ?? []].flat());
   const paramsList = new URLSearchParams({
@@ -45,13 +45,18 @@ export async function WBSimilarProductsController(request: Request, response: Ex
     nm: ids.join(';'),
   });
   const params = decodeURIComponent(`${paramsList}`);
-  const [productsError, productsResponse] = await smartFetch(`https://card.wb.ru/cards/list?${params}`)
-  if (productsError) {
-    response.status(500).send(productsError);
-  } else {
-    const products = await productsResponse?.json();
-    response.send(products);
+  const productsResponse = await smartFetch(response, `https://card.wb.ru/cards/list?${params}`)
+  if (!productsResponse) {
+
+    return;
   }
+  const [productJsonError, products] = await caught(productsResponse?.json());
+  if (productJsonError) {
+    response.status(500).send(productJsonError);
+
+    return;
+  }
+  response.send(products);
 }
 
 function shuffle<T>(array: T[]): T[] {
