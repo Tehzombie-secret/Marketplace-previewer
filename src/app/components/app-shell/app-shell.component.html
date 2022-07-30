@@ -1,3 +1,17 @@
 <div class="app-shell-body">
-  <router-outlet></router-outlet>
+  <mat-toolbar
+    *ngIf="(toolbarState$ | async) as toolbarState"
+    class="mat-elevation-z3 toolbar-component">
+    <div
+      *ngIf="toolbarState.platformColor"
+      [style.background-color]="toolbarState.platformColor"
+      class="platform-circle">
+    </div>
+    <h1>
+      {{ toolbarState.title }}
+    </h1>
+  </mat-toolbar>
+  <div class="content-block">
+    <router-outlet></router-outlet>
+  </div>
 </div>

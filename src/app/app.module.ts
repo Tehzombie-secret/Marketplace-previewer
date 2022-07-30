@@ -16,8 +16,8 @@ import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
     HttpClientModule,
     AppShellComponent,
     RouterModule.forRoot(APP_ROUTES, {
-    initialNavigation: 'enabledBlocking'
-}),
+      initialNavigation: 'enabledBlocking'
+    }),
     BrowserAnimationsModule,
   ],
   declarations: [

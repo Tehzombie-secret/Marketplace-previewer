@@ -1,25 +1,6 @@
 <div
   *ngIf="(person$ | async) as person"
   class="person-body">
-  <!-- BACK BUTTON -->
-  <a
-    *ngIf="(backTarget$ | async) as backTarget"
-    [routerLink]="backTarget.path"
-    [queryParams]="backTarget.params"
-    class="wb-typography-h3 back-anchor">
-    <mat-icon
-      svgIcon="chevron-left"
-      class="back-icon">
-    </mat-icon>
-    <img
-      [src]="productPhoto$ | async"
-      alt=""
-      referrerpolicy="no-referrer"
-      class="product-image">
-    <span class="product-label">
-      {{ productName$ | async }}
-    </span>
-  </a>
 
   <!-- PROFILE INFO -->
   <div class="profile-block">

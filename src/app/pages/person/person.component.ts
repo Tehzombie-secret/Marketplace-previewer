@@ -16,7 +16,6 @@ import { UserFeedback } from '../../models/feedbacks/user-feedback.interface';
 import { Person } from '../../models/person/person.interface';
 import { Photo } from '../../models/photo/photo.interface';
 import { ReferenceType } from '../../models/photo/reference-type.enum';
-import { Product } from '../../models/product/product.interface';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 import { APIService } from '../../services/api/api.service';
 import { HistoryService } from '../../services/history/history.service';
@@ -24,7 +23,7 @@ import { VisitedEntryType } from '../../services/history/models/visited-entry-ty
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
 import { SettingsKey } from '../../services/settings/models/settings-key.enum';
 import { SettingsService } from '../../services/settings/settings.service';
-import { BackTarget } from './models/back-target.interface';
+import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { PersonFeedbackViewModel } from './models/person-feedback-view-model.interface';
 import { PersonPhotoViewModel } from './models/person-photo-view-model.interface';
 import { PersonViewModel } from './models/person-view-model.interface';
@@ -49,10 +48,6 @@ import { PersonViewModel } from './models/person-view-model.interface';
 export class PersonComponent implements OnInit, OnDestroy {
 
   readonly personId$ = this.getPersonIdChanges();
-  readonly backTargetProductId$ = this.getBackTargetProductId();
-  readonly backTarget$ = this.getBackTargetChanges(this.backTargetProductId$, this.personId$);
-  readonly productName$ = this.getProductNameChanges(this.backTargetProductId$);
-  readonly productPhoto$ = this.getProductPhotoChanges(this.backTargetProductId$);
   readonly person$ = this.getPersonChanges(this.personId$);
   private readonly visitDate$ = new ReplaySubject<Date>(1);
   readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.personId$);
@@ -67,10 +62,13 @@ export class PersonComponent implements OnInit, OnDestroy {
     private title: Title,
     private history: HistoryService,
     private dialog: MatDialog,
+    private toolbar: ToolbarService,
   ) {
   }
 
   ngOnInit(): void {
+    this.toolbar.setTitle('Профиль');
+
     const effectsSubscription$ = this.person$.subscribe((person: Partial<PersonViewModel>) => {
       if (person.id) {
         const date = new Date();
@@ -111,49 +109,6 @@ export class PersonComponent implements OnInit, OnDestroy {
     return this.activatedRoute.paramMap
       .pipe(
         map((paramMap: ParamMap) => paramMap.get('id')),
-      );
-  }
-
-  private getBackTargetProductId(): Observable<string | null> {
-    return this.activatedRoute.queryParamMap
-      .pipe(
-        map((paramMap: ParamMap) => paramMap.get('fromProduct')),
-      );
-  }
-
-  private getBackTargetChanges(
-    productId$: Observable<string | null>,
-    personId$: Observable<string | null>,
-  ): Observable<BackTarget | null> {
-    return combineLatest([
-      productId$,
-      personId$,
-    ])
-      .pipe(
-        map(([productId, personId]: (string | null)[]) => productId && personId
-          ? { path: `/${ROUTE_PATH.PRODUCT}/${productId}`, params: { fromPerson: personId } }
-          : null
-        ),
-      )
-  }
-
-  private getProductNameChanges(productId$: Observable<string | null>): Observable<string> {
-    return productId$
-      .pipe(
-        filterTruthy(),
-        switchMap((id: string) => this.API.getProductChanges(id)),
-        map((item: Partial<Product>) => item.title),
-        filterTruthy(),
-      );
-  }
-
-  private getProductPhotoChanges(productId$: Observable<string | null>): Observable<string | null> {
-    return productId$
-      .pipe(
-        filterTruthy(),
-        switchMap((id: string) => this.API.getProductChanges(id)),
-        map((item: Partial<Product>) => item.images?.[0]?.small),
-        filterTruthy(),
       );
   }
 

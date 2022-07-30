@@ -254,13 +254,11 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
     const typeToReferenceStrategy: ModalGalleryReferenceStrategy<ModalGalleryReference> = {
       [ReferenceType.PERSON]: (item: ModalGalleryCurrentEntry<ReferenceType.PERSON>) => ({
         path: `/${item.platform}/${ROUTE_PATH.PERSON}/${item.section.reference?.item?.id}`,
-        params: { fromProduct: this.data.source?.item?.id },
         photo: item.section.reference?.item?.photo ?? null,
         title: item.section.reference?.item?.name ?? null,
       }),
       [ReferenceType.PRODUCT]: (item: ModalGalleryCurrentEntry<ReferenceType.PRODUCT>) => ({
         path: `/${item.platform}/${ROUTE_PATH.PRODUCT}/${item.section.reference?.item?.id}`,
-        params: { fromUser: this.data.source?.item?.id },
         photo: item.section.reference?.item?.thumbnail ?? null,
         title: getProductName(item.section.reference?.item),
       }),

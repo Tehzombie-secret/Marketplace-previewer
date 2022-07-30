@@ -15,6 +15,7 @@ import { Categories } from '../../models/categories/categories.interface';
 import { Category } from '../../models/categories/category.interface';
 import { Product } from '../../models/product/product.interface';
 import { APIService } from '../../services/api/api.service';
+import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { CatalogViewModel } from './models/catalog-view-model.interface';
 
 @Component({
@@ -64,6 +65,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private title: Title,
     private cdr: ChangeDetectorRef,
+    private toolbar: ToolbarService,
   ) {
   }
 
@@ -102,7 +104,10 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   private listenTitleChanges(): void {
-    const titleSubscription$ = this.title$.subscribe((title: string) => this.title.setTitle(title));
+    const titleSubscription$ = this.title$.subscribe((title: string) => {
+      this.title.setTitle(title);
+      this.toolbar.setTitle(title);
+    });
     this.subscription$.add(titleSubscription$);
   }
 

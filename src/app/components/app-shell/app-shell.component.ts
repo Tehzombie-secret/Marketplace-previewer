@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { DomSanitizer } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
+import { map, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
+import { ToolbarService } from '../../services/toolbar/toolbar.service';
 
 @Component({
   standalone: true,
@@ -14,14 +18,18 @@ import { environment } from '../../../environments/environment';
   imports: [
     CommonModule,
     MatIconModule,
+    MatToolbarModule,
     RouterModule,
   ],
 })
 export class AppShellComponent {
 
+  readonly toolbarState$ = this.toolbar.getStateChanges();
+
   constructor(
     private iconRegistry: MatIconRegistry,
     private domSanitizer: DomSanitizer,
+    private toolbar: ToolbarService,
   ) {
     // Necessary to define in constructor, since any registry changes are not reactive
     this.iconRegistry.addSvgIconResolver((name: string) =>

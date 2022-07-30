@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { ROUTE_PATH } from './constants/route-path.const';
+import { PlatformPickerComponent } from './pages/platform-picker/platform-picker.component';
 
 const COMMON_ROUTES: Routes = [
   {
@@ -25,6 +26,7 @@ export const APP_ROUTES: Routes = [
   ...COMMON_ROUTES,
   {
     path: ':platform',
+    component: PlatformPickerComponent,
     children: COMMON_ROUTES,
   }
 ];

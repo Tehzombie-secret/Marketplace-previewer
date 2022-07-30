@@ -6,6 +6,7 @@ import { ROUTE_PATH } from '../../constants/route-path.const';
 import { Categories } from '../../models/categories/categories.interface';
 import { Category } from '../../models/categories/category.interface';
 import { APIService } from '../../services/api/api.service';
+import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { CategoryViewModel } from './models/category-view-model.interface';
 import { CategoryListComponent } from './views/category-list/category-list.component';
 
@@ -28,11 +29,13 @@ export class CategoriesComponent {
   constructor(
     private API: APIService,
     private title: Title,
+    private toolbar: ToolbarService,
   ) {
   }
 
   ngOnInit(): void {
     this.title.setTitle('Обзор категорий');
+    this.toolbar.setTitle('Меню');
   }
 
   private getCategoriesChanges(): Observable<CategoryViewModel[]> {
@@ -43,6 +46,7 @@ export class CategoriesComponent {
   }
 
   private getViewModel(item: Category): CategoryViewModel {
+    console.log(item);
     const viewModel: CategoryViewModel = {
       item,
       url: item.slug ? [`/${item.platform}`, ROUTE_PATH.CATALOG, `${item.slug}`] : null,

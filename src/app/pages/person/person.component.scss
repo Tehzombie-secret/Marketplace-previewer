@@ -3,35 +3,7 @@
   flex-direction: column;
   gap: 40px;
   margin-bottom: 40px;
-
-  .back-anchor {
-    display: flex;
-    align-items: center;
-    height: 80px;
-    color: black;
-    margin-bottom: 24px;
-  }
-
-  .product-image {
-    display: block;
-    max-height: 64px;
-    width: auto;
-    border-radius: 4px;
-    margin-right: 12px;
-    object-fit: contain;
-  }
-
-  .product-label {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .back-icon {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-  }
+  padding-top: 24px;
 
   .profile-block {
     display: flex;

@@ -15,6 +15,7 @@ import { APIService } from '../../services/api/api.service';
 import { HistoryService } from '../../services/history/history.service';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
+import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { ProductViewModel } from './models/product-view-model.interface';
 import { ProductFeedbacksComponent } from './views/feedbacks/feedbacks.component';
 import { ProductOverviewComponent } from './views/overview/overview.component';
@@ -66,10 +67,13 @@ export class ProductComponent implements OnInit, OnDestroy {
     private API: APIService,
     private title: Title,
     private history: HistoryService,
+    private toolbar: ToolbarService,
   ) {
   }
 
   ngOnInit(): void {
+    this.toolbar.setTitle('Товар');
+
     const effectsSubscription$ = this.product$.subscribe((item: Partial<ProductViewModel>) => {
       if (item?.item?.id) {
         const date = new Date();
@@ -145,5 +149,4 @@ export class ProductComponent implements OnInit, OnDestroy {
         switchMap((item: Partial<Product>) => this.API.getFeedbacksChanges(item)),
       );
   }
-
 }

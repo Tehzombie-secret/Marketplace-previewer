@@ -1,8 +1,5 @@
 <div
   *ngIf="(items$ | async) as items"
   class="categories-body">
-  <h1 class="wb-typography-h2">
-    Меню
-  </h1>
   <wb-category-list [items]="items"></wb-category-list>
 </div>

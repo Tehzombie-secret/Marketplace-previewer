@@ -50,7 +50,7 @@ export class ProductFeedbacksComponent {
   progress = 12;
   photoSize = 0;
   feedbacks: ProductFeedbackViewModel[] = [];
-  readonly personPathPrefix = `/${ROUTE_PATH.PERSON}`;
+  readonly personPathPrefix = ROUTE_PATH.PERSON;
 
   constructor(
     private settings: SettingsService,
