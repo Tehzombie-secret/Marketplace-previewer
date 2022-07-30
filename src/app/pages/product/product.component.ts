@@ -8,6 +8,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
 import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, startWith, Subject, Subscription, switchMap, withLatestFrom } from 'rxjs';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
+import { truthy } from '../../helpers/truthy';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { Product } from '../../models/product/product.interface';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
@@ -81,7 +82,10 @@ export class ProductComponent implements OnInit, OnDestroy {
         this.history.visit(VisitedEntryType.PRODUCT, date, item.item.id);
         this.history.visit(VisitedEntryType.PRODUCT, date, item.item.parentId);
       }
-      this.title.setTitle(item.item?.title ?? 'Товар');
+      const title = [item?.item?.brand, item?.item?.title]
+        .filter(truthy)
+        .join(' / ')
+      this.title.setTitle(title || 'Товар');
     });
     this.subscriptions$.add(effectsSubscription$);
   }

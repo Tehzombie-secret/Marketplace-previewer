@@ -1,12 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
-import { map, Subscription } from 'rxjs';
+import { RouterModule } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
 
 @Component({
@@ -16,15 +16,19 @@ import { ToolbarService } from '../../services/toolbar/toolbar.service';
   styleUrls: ['./app-shell.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
+    NgIf,
+    AsyncPipe,
+    MatSidenavModule,
     MatIconModule,
-    MatToolbarModule,
+    MatButtonModule,
+    MatListModule,
     RouterModule,
   ],
 })
 export class AppShellComponent {
 
   readonly toolbarState$ = this.toolbar.getStateChanges();
+  sidenavOpened = false;
 
   constructor(
     private iconRegistry: MatIconRegistry,
@@ -39,5 +43,13 @@ export class AppShellComponent {
 
   trackByTab(_index: number, item: { index: number }): number {
     return item.index;
+  }
+
+  openSidenav(): void {
+    this.sidenavOpened = true;
+  }
+
+  closeSidenav(): void {
+    this.sidenavOpened = false;
   }
 }

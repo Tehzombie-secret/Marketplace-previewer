@@ -1,0 +1,11 @@
+<div class="home-body">
+  <div class="wb-typography-h2">Выберите платформу:</div>
+  <div class="platforms-block">
+    <a
+      *ngFor="let item of items; trackBy: trackByItem;"
+      [style.background-color]="item.color"
+      [routerLink]="item.url"
+      class="navigation-circle">
+    </a>
+  </div>
+</div>

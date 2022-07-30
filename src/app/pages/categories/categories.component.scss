@@ -1,6 +1,20 @@
+@import 'delinkify';
+
 .categories-body {
   display: flex;
   flex-direction: column;
   gap: 24px;
   padding: 24px 16px;
+
+  .back-anchor {
+    @include delinkify;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .anchor-icon {
+    vertical-align: middle;
+  }
 }

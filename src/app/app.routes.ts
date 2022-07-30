@@ -23,6 +23,11 @@ const COMMON_ROUTES: Routes = [
 ];
 
 export const APP_ROUTES: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./pages/home/home.component').then(c => c.HomeComponent),
+  },
   ...COMMON_ROUTES,
   {
     path: ':platform',

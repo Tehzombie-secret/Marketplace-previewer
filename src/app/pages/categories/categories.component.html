@@ -1,5 +1,14 @@
 <div
   *ngIf="(items$ | async) as items"
   class="categories-body">
+  <a
+    [routerLink]="['/']"
+    class="wb-typography-caption back-anchor">
+    <mat-icon
+      svgIcon="chevron-left"
+      class="anchor-icon">
+    </mat-icon>
+    <span>Главная</span>
+  </a>
   <wb-category-list [items]="items"></wb-category-list>
 </div>

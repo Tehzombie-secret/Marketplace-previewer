@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, NgZone } from '@angular/core';
+import { asyncScheduler, BehaviorSubject, Observable, scheduled } from 'rxjs';
 import { APIPlatform } from '../api/models/api-platform.enum';
 import { ToolbarState } from './models/toolbar-state.interface';
 
@@ -11,7 +11,7 @@ export class ToolbarService {
   private readonly state$ = new BehaviorSubject<ToolbarState>({ platformColor: null, title: '' });
 
   getStateChanges(): Observable<ToolbarState> {
-    return this.state$.asObservable();
+    return scheduled(this.state$.asObservable(), asyncScheduler);
   }
 
   setPlatform(platform: APIPlatform | null): void {

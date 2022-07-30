@@ -1,17 +1,48 @@
-<div class="app-shell-body">
-  <mat-toolbar
-    *ngIf="(toolbarState$ | async) as toolbarState"
-    class="mat-elevation-z3 toolbar-component">
-    <div
-      *ngIf="toolbarState.platformColor"
-      [style.background-color]="toolbarState.platformColor"
-      class="platform-circle">
+<mat-sidenav-container class="app-shell-body">
+  <mat-sidenav
+    [opened]="sidenavOpened"
+    (closedStart)="closeSidenav()"
+    mode="over"
+    class="sidenav-component">
+    <div class="side-block">
+      <button
+        (click)="closeSidenav()"
+        mat-icon-button
+        class="sidenav-close-button">
+        <mat-icon svgIcon="close"></mat-icon>
+      </button>
+      <mat-nav-list role="list">
+        <a
+          mat-list-item
+          [routerLink]="['/']">
+          Главная
+        </a>
+      </mat-nav-list>
     </div>
-    <h1>
-      {{ toolbarState.title }}
-    </h1>
-  </mat-toolbar>
-  <div class="content-block">
-    <router-outlet></router-outlet>
-  </div>
-</div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="sidenav-content">
+      <div
+        *ngIf="(toolbarState$ | async) as toolbarState"
+        class="mat-elevation-z3 toolbar-block">
+        <button
+          (click)="openSidenav()"
+          mat-icon-button>
+          <mat-icon svgIcon="menu"></mat-icon>
+        </button>
+        <div
+          *ngIf="toolbarState.platformColor"
+          [style.background-color]="toolbarState.platformColor"
+          class="platform-circle">
+        </div>
+        <h1 class="wb-typography-h3">
+          {{ toolbarState.title }}
+        </h1>
+      </div>
+      <div class="content-block">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+

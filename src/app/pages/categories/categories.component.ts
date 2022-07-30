@@ -1,6 +1,8 @@
 import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { Title } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { Categories } from '../../models/categories/categories.interface';
@@ -19,6 +21,8 @@ import { CategoryListComponent } from './views/category-list/category-list.compo
   imports: [
     NgIf,
     AsyncPipe,
+    RouterModule,
+    MatIconModule,
     CategoryListComponent,
   ],
 })
@@ -46,7 +50,6 @@ export class CategoriesComponent {
   }
 
   private getViewModel(item: Category): CategoryViewModel {
-    console.log(item);
     const viewModel: CategoryViewModel = {
       item,
       url: item.slug ? [`/${item.platform}`, ROUTE_PATH.CATALOG, `${item.slug}`] : null,
