@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import * as localforage from 'localforage';
 import { from, map, NEVER, Observable } from 'rxjs';
+import { filterTruthy } from '../../helpers/observables/filter-truthy';
+import { truthy } from '../../helpers/truthy';
+import { APIPlatform } from '../api/models/api-platform.enum';
+import { HistoryEntry } from './models/history-entry.interface';
+import { VisitRequest } from './models/visit-request.interface';
 import { VisitedEntryType } from './models/visited-entry-type.enum';
 import { VisitedEntry } from './models/visited-entry.interface';
 
@@ -9,22 +14,60 @@ import { VisitedEntry } from './models/visited-entry.interface';
 })
 export class HistoryService {
 
+  private readonly config = {
+    name: 'wb-preview',
+    version: 1,
+  };
+  private readonly historyEntries = localforage.createInstance({ ...this.config, storeName: 'history' });
+  private readonly visitedEntries = localforage.createInstance({ ...this.config, storeName: 'visited' });
+  private readonly legacyVisitedEntries = ['wb-preview', 'wb_preview'];
+
   constructor() {
-    localforage.config({
-      name: 'wb-preview',
-      storeName: 'wb-preview',
-      version: 1,
+    this.legacyVisitedEntries.forEach((storeName: string) => {
+      const instance = localforage.createInstance({ ...this.config, storeName });
+      instance.keys().then((keys: string[]) => {
+        keys.forEach(async (key: string) => {
+          const item = await instance.getItem(key);
+          await this.visitedEntries.setItem(key, item);
+          await instance.removeItem(key);
+        });
+      });
     });
   }
 
-  hasVisitedChanges(type: VisitedEntryType, id?: string | number | null, currentDate?: Date): Observable<VisitedEntry | null> {
+  getHistoryLengthChanges(): Observable<number> {
+    return from(this.historyEntries.length());
+  }
+
+  getHistoryChanges(take: number, skip: number): Observable<HistoryEntry[]> {
+    const entries: HistoryEntry[] = [];
+    const iteratee = this.historyEntries.iterate((value: VisitedEntry, key: string, index: number) => {
+      if (index >= skip) {
+        const entry: HistoryEntry = {
+          ...value,
+          date: +key,
+        };
+        entries.push(entry);
+      }
+      if (entries.length >= take) {
+
+        return entries;
+      }
+
+      return undefined;
+    }).then(() => entries);
+
+    return from(iteratee).pipe(filterTruthy());
+  }
+
+  hasVisitedChanges(type: VisitedEntryType, platform: APIPlatform, id?: string | number | null, currentDate?: Date): Observable<VisitedEntry | null> {
     if (!id) {
 
       return NEVER;
     }
-    const key = this.getKey(id, type);
+    const key = this.getKey(platform, id, type);
 
-    return from(localforage.getItem<VisitedEntry>(key))
+    return from(this.visitedEntries.getItem<VisitedEntry>(key))
       .pipe(
         map((entry: VisitedEntry | null) => {
           if (!entry) {
@@ -45,22 +88,32 @@ export class HistoryService {
       );
   }
 
-  async visit(type: VisitedEntryType, date: Date, id?: string | number | null): Promise<void> {
-    if (!id) {
+  async visit(request: VisitRequest): Promise<void> {
+    const ids = request.ids || [];
+    if (!ids.length) {
 
       return;
     }
-    const key = this.getKey(id, type);
-    const maybeEntry: VisitedEntry | null = await localforage.getItem<VisitedEntry>(key)
-    const entry = maybeEntry ?? {
-      id: key,
-      date: [],
-    };
-    entry.date.push(date.toISOString());
-    localforage.setItem(key, entry);
+    ids
+      .filter(truthy)
+      .forEach(async (id: string | number) => {
+        const key = this.getKey(request.platform, id, request.type);
+        const maybeEntry: VisitedEntry | null = await this.visitedEntries.getItem<VisitedEntry>(key);
+        const entry: VisitedEntry = {
+          id: key,
+          date: [],
+          type: maybeEntry?.type || request.type,
+          platform: maybeEntry?.platform || request.platform,
+          title: request.title || maybeEntry?.title,
+          photo: request.photo || maybeEntry?.photo,
+        };
+        entry.date.push(request.date.toISOString());
+        await this.visitedEntries.setItem(key, entry);
+        await this.historyEntries.setItem(`${+new Date()}`, { ...entry, id });
+      });
   }
 
-  private getKey(id: string | number, entry: VisitedEntryType): string {
-    return `wb-visited-${entry}-${id}`;
+  private getKey(platform: APIPlatform, id: string | number, entry: VisitedEntryType): string {
+    return `${platform}-visited-${entry}-${id}`;
   }
 }

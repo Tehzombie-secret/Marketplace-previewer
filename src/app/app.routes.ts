@@ -28,6 +28,10 @@ export const APP_ROUTES: Routes = [
     pathMatch: 'full',
     loadComponent: () => import('./pages/home/home.component').then(c => c.HomeComponent),
   },
+  {
+    path: ROUTE_PATH.HISTORY,
+    loadComponent: () => import('./pages/history/history.component').then(c => c.HistoryComponent),
+  },
   ...COMMON_ROUTES,
   {
     path: ':platform',

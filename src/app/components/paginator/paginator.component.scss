@@ -1,0 +1,68 @@
+@import 'debuttonify';
+
+.paginator {
+  display: flex;
+  align-items: center;
+
+  .paginator-button {
+    @include debuttonify;
+
+    position: relative; // For box pseudo-element positioning
+    min-width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 40px;
+    cursor: default;
+
+    &.has-page {
+      cursor: pointer;
+    }
+
+    &:not(.has-page) {
+      // Ellipsis button is disabled, but we don't need to use colors
+      // for disabled buttons
+      color: inherit;
+    }
+
+    &.left-margin {
+      margin-left: 40px;
+    }
+
+    &.right-margin {
+      margin-right: 40px;
+    }
+
+    &:not(.active) {
+      font-weight: 800;
+    }
+
+    &.active::before {
+      // Square border for active button
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border: 1px solid #BDBDBD;
+      border-radius: 40px;
+    }
+
+    &.colored:hover {
+      // Page buttons have a background hover instead
+      background: #EFEDEA;
+    }
+  }
+
+  .prefix-icon {
+    margin-right: 4px;
+  }
+
+  .suffix-icon {
+    margin-left: 4px;
+  }
+}

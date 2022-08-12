@@ -13,7 +13,9 @@ import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.inter
 import { Product } from '../../models/product/product.interface';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 import { APIService } from '../../services/api/api.service';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { HistoryService } from '../../services/history/history.service';
+import { VisitRequest } from '../../services/history/models/visit-request.interface';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
@@ -76,15 +78,22 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.toolbar.setTitle('Товар');
 
     const effectsSubscription$ = this.product$.subscribe((item: Partial<ProductViewModel>) => {
-      if (item?.item?.id) {
-        const date = new Date();
-        this.visitDate$.next(date);
-        this.history.visit(VisitedEntryType.PRODUCT, date, item.item.id);
-        this.history.visit(VisitedEntryType.PRODUCT, date, item.item.parentId);
-      }
       const title = [item?.item?.brand, item?.item?.title]
         .filter(truthy)
         .join(' / ')
+      if (item?.item?.id) {
+        const date = new Date();
+        this.visitDate$.next(date);
+        const visit: VisitRequest = {
+          type: VisitedEntryType.PRODUCT,
+          date,
+          title,
+          platform: item.item.platform ?? APIPlatform.WB,
+          ids: [item.item.id, item.item.parentId],
+          photo: item.item?.images?.[0]?.small,
+        };
+        this.history.visit(visit);
+      }
       this.title.setTitle(title || 'Товар');
     });
     this.subscriptions$.add(effectsSubscription$);
@@ -113,7 +122,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     ])
       .pipe(
         switchMap(([product, date]: [ProductViewModel, Date]) => product
-          ? this.history.hasVisitedChanges(VisitedEntryType.PRODUCT, product.item?.parentId, date)
+          ? this.history.hasVisitedChanges(VisitedEntryType.PRODUCT, product.item?.platform ?? APIPlatform.WB, product.item?.parentId, date)
           : of(null)
         ),
       );

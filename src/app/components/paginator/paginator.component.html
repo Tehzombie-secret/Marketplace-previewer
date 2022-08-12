@@ -1,0 +1,20 @@
+<div
+  *ngIf="(total || 0) > 1"
+  class="paginator">
+  <button
+    *ngFor="let button of buttons; trackBy: trackByFn;"
+    [class.active]="button.isActive"
+    [class.colored]="!button.label && !button.isActive"
+    [class.has-page]="button.page && !button.isActive"
+    [class.right-margin]="button.withRightMargin"
+    [class.left-margin]="button.withLeftMargin"
+    [attr.aria-hidden]="!button.page"
+    [attr.aria-label]="button.page ? 'Go to page ' + (button.page || 1) + ' out of ' + (total || 1) + (button.isActive ? ', active page' : '') : ''"
+    [disabled]="!button.page || button.isActive"
+    (click)="setPage(button.page)"
+    class="wb-typography-link paginator-button">
+    <span>
+      {{ button.label || button.page }}
+    </span>
+  </button>
+</div>

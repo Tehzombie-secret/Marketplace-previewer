@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use './app/components/previews/previews-theme.scss' as previews;
+@use './app/components/paginator/paginator-theme.scss' as paginator;
 
 @import 'theme';
 @import 'fonts';
@@ -9,3 +10,4 @@
 @include mat.all-component-themes($wb-theme);
 @include mat.core();
 @include previews.theme($wb-theme);
+@include paginator.theme($wb-theme);

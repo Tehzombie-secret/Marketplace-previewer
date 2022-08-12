@@ -351,9 +351,10 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
         switchMap((entry: ModalGalleryCurrentEntry<T> | null) => {
           const referenceType = entry?.section?.reference?.type ?? ReferenceType.PRODUCT as T;
           const visitedType = typeToTypeStrategy[referenceType];
+          const platform = entry?.section?.reference?.item?.platform ?? APIPlatform.WB;
 
           return entry?.section?.reference
-            ? this.history.hasVisitedChanges(visitedType, typeToIdStrategy[referenceType]?.(entry))
+            ? this.history.hasVisitedChanges(visitedType, platform, typeToIdStrategy[referenceType]?.(entry))
             : of(null);
         }),
       );

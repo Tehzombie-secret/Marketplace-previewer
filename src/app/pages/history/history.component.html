@@ -1,0 +1,32 @@
+<div class="history-body">
+  <ul class="entries-list">
+    <li
+      *ngFor="let item of (items$ | async); trackBy: trackByEntry;"
+      class="entry-list-item">
+      <a
+        [routerLink]="item | wbVisitedEntryLink"
+        class="entry-anchor">
+        <img
+          [src]="item.photo"
+          alt=""
+          loading="lazy"
+          class="entry-photo">
+        <div class="entry-content">
+          <div class="wb-typography-caption">
+            {{ item.type | wbVisitedEntryLabel }}, {{ item.date | wbFriendlyDate }}
+          </div>
+          <div class="wb-typography-body">
+            {{ item.title }}
+          </div>
+        </div>
+      </a>
+    </li>
+  </ul>
+  <wb-paginator
+    *ngIf="((totalPages$ | async) || 0) > 1"
+    [page]="((page$ | async) || 0) + 1"
+    [total]="totalPages$ | async"
+    (pageChange)="setPage($event - 1)"
+    class="paginator-component">
+  </wb-paginator>
+</div>

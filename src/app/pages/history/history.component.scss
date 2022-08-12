@@ -1,0 +1,53 @@
+@import 'variables';
+
+.history-body {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+
+  .entries-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .entry-list-item {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .entry-anchor {
+    display: flex;
+    gap: 8px;
+    text-decoration: none;
+    color: unset;
+  }
+
+  .entry-photo {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+
+  .entry-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .paginator-component {
+    display: block;
+    position: sticky;
+    bottom: 0;
+    padding: 8px 0 24px 0;
+    background: $background;
+  }
+}

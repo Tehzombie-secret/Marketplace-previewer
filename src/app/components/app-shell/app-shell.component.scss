@@ -1,4 +1,5 @@
 @use 'sass:math';
+@import 'variables';
 @import 'debuttonify';
 
 .app-shell-body {
@@ -46,7 +47,7 @@
 
   .content-block {
     flex-grow: 1;
-    background: #f7f7f7;
+    background: $background;
     overflow-y: auto;
   }
 }

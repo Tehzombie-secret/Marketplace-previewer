@@ -17,6 +17,11 @@
           [routerLink]="['/']">
           Главная
         </a>
+        <a
+          mat-list-item
+          [routerLink]="historyPagePath">
+          История
+        </a>
       </mat-nav-list>
     </div>
   </mat-sidenav>
@@ -39,7 +44,7 @@
           {{ toolbarState.title }}
         </h1>
       </div>
-      <div class="content-block">
+      <div [ngClass]="scrollContainerClass">
         <router-outlet></router-outlet>
       </div>
     </div>

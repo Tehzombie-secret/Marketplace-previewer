@@ -6,7 +6,8 @@ import { Pipe, PipeTransform } from '@angular/core';
   pure: true,
 })
 export class FriendlyDatePipe implements PipeTransform {
-  transform(value?: string | null): string {
+
+  transform(value?: string | number | null): string {
     if (!value) {
 
       return '';
@@ -16,4 +17,5 @@ export class FriendlyDatePipe implements PipeTransform {
 
     return beautifulDate;
   }
+
 }

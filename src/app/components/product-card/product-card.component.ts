@@ -12,6 +12,7 @@ import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.inter
 import { Product } from '../../models/product/product.interface';
 import { PluralPipe } from '../../pipes/plural.pipe';
 import { APIService } from '../../services/api/api.service';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { HistoryService } from '../../services/history/history.service';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
@@ -58,7 +59,7 @@ export class ProductCardComponent implements OnChanges {
     return item$
       .pipe(
         switchMap((item: Partial<Product> | null) => item
-          ? this.history.hasVisitedChanges(VisitedEntryType.PRODUCT, item.parentId)
+          ? this.history.hasVisitedChanges(VisitedEntryType.PRODUCT, item.platform ?? APIPlatform.WB, item.parentId)
           : of(null)
         ),
       );

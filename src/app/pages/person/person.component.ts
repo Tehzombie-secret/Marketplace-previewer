@@ -18,7 +18,9 @@ import { Photo } from '../../models/photo/photo.interface';
 import { ReferenceType } from '../../models/photo/reference-type.enum';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 import { APIService } from '../../services/api/api.service';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { HistoryService } from '../../services/history/history.service';
+import { VisitRequest } from '../../services/history/models/visit-request.interface';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
 import { SettingsKey } from '../../services/settings/models/settings-key.enum';
@@ -47,10 +49,9 @@ import { PersonViewModel } from './models/person-view-model.interface';
 })
 export class PersonComponent implements OnInit, OnDestroy {
 
-  readonly personId$ = this.getPersonIdChanges();
-  readonly person$ = this.getPersonChanges(this.personId$);
+  readonly person$ = this.getPersonChanges();
   private readonly visitDate$ = new ReplaySubject<Date>(1);
-  readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.personId$);
+  readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.person$);
   readonly galleryMode$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
   readonly productPathPrefix = `/${ROUTE_PATH.PRODUCT}`;
   private readonly subscriptions$ = new Subscription();
@@ -73,7 +74,15 @@ export class PersonComponent implements OnInit, OnDestroy {
       if (person.id) {
         const date = new Date();
         this.visitDate$.next(date);
-        this.history.visit(VisitedEntryType.PERSON, date, person.id);
+        const entry: VisitRequest = {
+          type: VisitedEntryType.PERSON,
+          date,
+          title: person.name,
+          platform: person.platform ?? APIPlatform.WB,
+          ids: [person.id],
+          photo: person.photo,
+        };
+        this.history.visit(entry);
       }
       this.title.setTitle(person.name ?? 'Профиль');
     });
@@ -105,16 +114,10 @@ export class PersonComponent implements OnInit, OnDestroy {
     })
   }
 
-  private getPersonIdChanges(): Observable<string | null> {
+  private getPersonChanges(): Observable<Partial<PersonViewModel>> {
     return this.activatedRoute.paramMap
       .pipe(
         map((paramMap: ParamMap) => paramMap.get('id')),
-      );
-  }
-
-  private getPersonChanges(personId$: Observable<string | null>): Observable<Partial<PersonViewModel>> {
-    return personId$
-      .pipe(
         filterTruthy(),
         switchMap((id: string) => this.API.getUserChanges(id)),
         map((item: Partial<Person>) => {
@@ -178,13 +181,15 @@ export class PersonComponent implements OnInit, OnDestroy {
       );
   }
 
-  private getVisitedChanges(date$: Observable<Date>, id$: Observable<string | null>): Observable<VisitedEntry | null> {
+  private getVisitedChanges(date$: Observable<Date>, person$: Observable<Partial<PersonViewModel>>): Observable<VisitedEntry | null> {
     return combineLatest([
-      id$.pipe(filterTruthy()),
       date$,
+      person$,
     ])
       .pipe(
-        switchMap(([id, date]: [string, Date]) => this.history.hasVisitedChanges(VisitedEntryType.PERSON, id, date)),
+        switchMap(([date, person]: [Date, Partial<PersonViewModel>]) =>
+          this.history.hasVisitedChanges(VisitedEntryType.PERSON, person.platform ?? APIPlatform.WB, person.id, date)
+        ),
       );
   }
 }
