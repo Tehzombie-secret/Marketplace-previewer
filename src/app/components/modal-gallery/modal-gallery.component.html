@@ -107,6 +107,7 @@
   <div class="ui-gallery-image-wrapper-cell">
     <button
       (click)="prev()"
+      (contextmenu)="download()"
       aria-label="Предыдущее фото"
       class="ui-gallery-prev-button">
       <div class="ui-gallery-hover-trigger">
@@ -148,6 +149,7 @@
     </div>
     <button
       (click)="next()"
+      (contextmenu)="download()"
       aria-label="Следующее фото"
       class="ui-gallery-next-button">
       <div class="ui-gallery-hover-trigger ui-gallery-hover-trigger-end">

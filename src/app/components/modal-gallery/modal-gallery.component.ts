@@ -173,11 +173,11 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
     this.drawImage();
   }
 
-  download(): void {
+  download(): false {
     const photo = this.currentPhoto$.getValue()?.photo?.big;
     if (!photo) {
 
-      return;
+      return false;
     }
     download(
       this.imageRef?.nativeElement,
@@ -186,6 +186,8 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
       this.document,
       this.imageToRotationMap.get(photo) ?? 0,
     );
+
+    return false;
   }
 
   openInNewTab(): void {
