@@ -6,9 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
-import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, map, Observable, of, startWith, Subscription, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, map, Observable, of, startWith, Subscription, switchMap } from 'rxjs';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
-import { ROUTE_PATH } from '../../constants/route-path.const';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { treeFind } from '../../helpers/tree-find';
 import { Categories } from '../../models/categories/categories.interface';
@@ -121,9 +120,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
         ),
     ])
       .pipe(
-        tap(([categories, id]: [Categories, string]) =>
-          console.log(categories, id, treeFind(categories.items, (item: Category) => item.children, (item: Category) => item.slug === id))
-        ),
         map(([categories, id]: [Categories, string]) =>
           treeFind(categories.items, (item: Category) => item.children, (item: Category) => `${item.slug}` === id)
         ),

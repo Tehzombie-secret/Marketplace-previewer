@@ -19,9 +19,9 @@ export function downloadFromCanvas(
     const anchor = renderer.createElement('a');
     renderer.setStyle(anchor, 'display', 'none');
     renderer.setAttribute(anchor, 'href', url);
-    renderer.setAttribute(anchor, 'download', `${name ?? 'photo'}.png`);
+    renderer.setAttribute(anchor, 'download', `${name ?? 'photo'}.jpg`);
     renderer.appendChild(document.body, anchor);
     anchor.click();
     URL.revokeObjectURL(url);
-  });
+  }, 'image/jpeg', 1);
 }
