@@ -14,23 +14,42 @@
       <div
         *ngIf="item.url || item.children.length > 0"
         class="list-entry">
-        <a
-          *ngIf="item.url"
-          [routerLink]="item.url"
-          class="wb-typography-link">
+
+        <!-- ANCHOR -->
+        <ng-container *ngIf="item.url">
+          <a
+            *ngIf="item.url"
+            [routerLink]="item.url"
+            class="wb-typography-link">
+            {{ item.item.title }}
+          </a>
+          <button
+            *ngIf="item.children.length > 0"
+            (click)="toggleExpansion(item)"
+            mat-icon-button>
+            <mat-icon [svgIcon]="item.expanded ? 'chevron-down' : 'chevron-right'"></mat-icon>
+          </button>
+        </ng-container>
+
+        <!-- LABEL, EXPANDABLE -->
+        <button
+          *ngIf="!item.url && item.children.length > 0"
+          (click)="toggleExpansion(item)"
+          class="wb-typography-link list-entry-button">
           {{ item.item.title }}
-        </a>
+          <mat-icon
+            [svgIcon]="item.expanded ? 'chevron-down' : 'chevron-right'"
+            class="list-entry-icon">
+          </mat-icon>
+        </button>
+
+        <!-- LABEL, UNEXPANDABLE -->
         <div
-          *ngIf="!item.url"
+          *ngIf="!item.url && !item.children.length"
           class="wb-typography-link">
           {{ item.item.title }}
         </div>
-        <button
-          *ngIf="item.children.length > 0"
-          (click)="toggleExpansion(item)"
-          mat-icon-button>
-          <mat-icon [svgIcon]="item.expanded ? 'chevron-down' : 'chevron-right'"></mat-icon>
-        </button>
+
       </div>
       <div
         *ngIf="item.expanded"

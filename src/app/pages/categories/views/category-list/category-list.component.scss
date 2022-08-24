@@ -1,3 +1,5 @@
+@import 'debuttonify';
+
 .category-list-body {
   margin: 0;
   padding: 0;
@@ -13,6 +15,17 @@
     height: 40px;
     display: flex;
     align-items: center;
+  }
+
+  .list-entry-button {
+    @include debuttonify;
+
+    display: flex;
+    align-items: center;
+  }
+
+  .list-entry-icon {
+    width: 40px;
   }
 
   .sublist {
