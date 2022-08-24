@@ -118,7 +118,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
   }
 
   selectSection(sectionIndex: number, photoIndex: number): void {
-    const currentEntry: ModalGalleryCurrentEntry<T> = {
+    const newEntry: ModalGalleryCurrentEntry<T> = {
       platform: this.data.source?.item?.platform ?? APIPlatform.WB,
       photoIndex,
       sectionIndex,
@@ -126,7 +126,12 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
       photo: this.images[sectionIndex].photos[photoIndex],
       section: this.images[sectionIndex],
     };
-    this.currentPhoto$.next(currentEntry);
+    const oldEntry = this.currentPhoto$.getValue();
+    if (newEntry.globalIndex === oldEntry?.globalIndex) {
+
+      return;
+    }
+    this.currentPhoto$.next(newEntry);
     this.shouldClear = true;
     this.hasError = false;
     setTimeout(() => {

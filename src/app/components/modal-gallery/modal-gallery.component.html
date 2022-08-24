@@ -106,6 +106,7 @@
   <!-- IMAGES -->
   <div class="ui-gallery-image-wrapper-cell">
     <button
+      *ngIf="imagesLength > 1"
       (click)="prev()"
       (contextmenu)="download()"
       aria-label="Предыдущее фото"
@@ -114,7 +115,9 @@
         <mat-icon svgIcon="chevron-left"></mat-icon>
       </div>
     </button>
-    <div class="ui-gallery-image-wrapper">
+    <div
+      (contextmenu)="download()"
+      class="ui-gallery-image-wrapper">
       <img
         #image
         [src]="currentPhoto?.photo?.big"
@@ -148,6 +151,7 @@
       </div>
     </div>
     <button
+      *ngIf="imagesLength > 1"
       (click)="next()"
       (contextmenu)="download()"
       aria-label="Следующее фото"
