@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
-import { combineLatest, map, Observable, ReplaySubject, Subscription, switchMap } from 'rxjs';
+import { combineLatest, map, Observable, ReplaySubject, shareReplay, Subscription, switchMap } from 'rxjs';
 import { ModalGalleryComponent } from '../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../components/modal-gallery/models/modal-gallery.interface';
@@ -111,7 +111,7 @@ export class PersonComponent implements OnInit, OnDestroy {
       ariaLabel: 'Галерея изображений',
       closeOnNavigation: true,
       data: gallery,
-    })
+    });
   }
 
   private getPersonChanges(): Observable<Partial<PersonViewModel>> {
@@ -178,6 +178,7 @@ export class PersonComponent implements OnInit, OnDestroy {
 
           return viewModel;
         }),
+        shareReplay(1),
       );
   }
 

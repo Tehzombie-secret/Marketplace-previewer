@@ -21,6 +21,7 @@ export async function WBUserController(request: Request, response: Response): Pr
     body: userFormData,
   });
   if (!userHashResponse) {
+    response.status(500).send('No hash returned');
 
     return;
   }
@@ -42,6 +43,7 @@ export async function WBUserController(request: Request, response: Response): Pr
   // Get user profile by hash
   const userResponse = await smartFetch(response, `https://www.wildberries.ru/webapi/profile/${hash}/data`, { method: 'POST' });
   if (!userResponse) {
+    response.status(500).send('No user returned');
 
     return;
   }

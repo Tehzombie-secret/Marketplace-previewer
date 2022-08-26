@@ -16,16 +16,17 @@ export interface Person {
 }
 
 export function getPersonFromWB(id: number, dto?: WBPersonRoot): Partial<Person> {
-  const feedbacks: Partial<UserFeedback>[] = (dto?.Value?.data?.profile?.feedbacks || [])
+  const data = dto?.Value?.data ?? dto?.value?.data;
+  const feedbacks: Partial<UserFeedback>[] = (data?.profile?.feedbacks || [])
     .filter((feedback: WBPersonFeedback) => (feedback?.entity?.photos?.length || 0) > 0)
-    .map((feedback: WBPersonFeedback) => getUserFeedbackFromWB(feedback))
+    .map((feedback: WBPersonFeedback) => getUserFeedbackFromWB(feedback));
   const item: Partial<Person> = {
     platform: APIPlatform.WB,
     id,
     externalURL: `https://www.wildberries.ru${dto?.path}`,
-    name: dto?.Value?.data?.profile?.userName || 'Без имени',
-    photo: dto?.Value?.data?.profile?.userPhotoLink,
-    country: dto?.Value?.data?.profile?.country,
+    name: data?.profile?.userName || 'Без имени',
+    photo: data?.profile?.userPhotoLink,
+    country: data?.profile?.country,
     feedbacks,
     mergedPhotos: feedbacks.flatMap((value: Partial<UserFeedback>) => value.photos || []),
   };
