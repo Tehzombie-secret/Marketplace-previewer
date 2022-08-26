@@ -5,7 +5,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
+import { ActivatedRoute, ParamMap, RouterLinkWithHref } from '@angular/router';
 import { combineLatest, map, Observable, ReplaySubject, shareReplay, Subscription, switchMap } from 'rxjs';
 import { ModalGalleryComponent } from '../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../components/modal-gallery/models/modal-gallery-section.interface';
@@ -38,7 +38,7 @@ import { PersonViewModel } from './models/person-view-model.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
-    RouterModule,
+    RouterLinkWithHref,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,

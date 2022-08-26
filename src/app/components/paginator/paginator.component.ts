@@ -34,7 +34,6 @@ export class PaginatorComponent implements OnChanges {
 
       return;
     }
-    console.log('rebuild row', this.page, this.total, changes);
     this.constructButtonRow(this.page, this.total);
   }
 
@@ -69,7 +68,6 @@ export class PaginatorComponent implements OnChanges {
         page = 1;
       }
     }
-    console.log('set page to', page);
     this.page = page;
     if (total !== null) {
       this.total = total;

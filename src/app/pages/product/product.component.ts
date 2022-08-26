@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, startWith, Subject, Subscription, switchMap, withLatestFrom } from 'rxjs';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { truthy } from '../../helpers/truthy';
@@ -32,7 +32,6 @@ import { ProductSimilarComponent } from './views/similar/similar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
-    RouterModule,
     MatIconModule,
     MatProgressSpinnerModule,
     ProductOverviewComponent,

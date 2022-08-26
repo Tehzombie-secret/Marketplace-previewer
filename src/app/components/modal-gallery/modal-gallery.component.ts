@@ -5,7 +5,7 @@ import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterModule } from '@angular/router';
+import { RouterLinkWithHref } from '@angular/router';
 import { asyncScheduler, BehaviorSubject, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { download } from '../../helpers/download';
@@ -42,7 +42,6 @@ import { ModalGallery } from './models/modal-gallery.interface';
   encapsulation: ViewEncapsulation.None,
   imports: [
     CommonModule,
-    RouterModule,
     MatDialogModule,
     MatButtonModule,
     MatProgressSpinnerModule,
@@ -51,6 +50,7 @@ import { ModalGallery } from './models/modal-gallery.interface';
     PreviewsComponent,
     PluralPipe,
     FriendlyDatePipe,
+    RouterLinkWithHref,
   ],
 })
 export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceType> {

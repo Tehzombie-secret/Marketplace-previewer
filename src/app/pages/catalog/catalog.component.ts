@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
+import { ActivatedRoute, ParamMap, RouterLinkWithHref } from '@angular/router';
 import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, map, Observable, of, startWith, Subscription, switchMap } from 'rxjs';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
@@ -28,7 +28,7 @@ import { CatalogViewModel } from './models/catalog-view-model.interface';
     NgForOf,
     AsyncPipe,
     SlicePipe,
-    RouterModule,
+    RouterLinkWithHref,
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, RouterModule } from '@angular/router';
+import { ActivatedRoute, ParamMap, RouterOutlet } from '@angular/router';
 import { map, Subscription } from 'rxjs';
 import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
@@ -10,7 +10,7 @@ import { ToolbarService } from '../../services/toolbar/toolbar.service';
   template: '<router-outlet></router-outlet>',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    RouterModule,
+    RouterOutlet,
   ],
 })
 export class PlatformPickerComponent implements OnInit, OnDestroy {

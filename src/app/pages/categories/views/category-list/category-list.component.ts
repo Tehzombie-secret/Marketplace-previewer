@@ -2,7 +2,7 @@ import { NgForOf, NgIf, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { RouterLinkWithHref } from '@angular/router';
 import { CategoryTemplateGuardDirective } from '../../directives/category-template-guard.directive';
 import { CategoryViewModel } from '../../models/category-view-model.interface';
 
@@ -16,7 +16,7 @@ import { CategoryViewModel } from '../../models/category-view-model.interface';
     NgIf,
     NgForOf,
     NgTemplateOutlet,
-    RouterModule,
+    RouterLinkWithHref,
     MatButtonModule,
     MatIconModule,
     CategoryTemplateGuardDirective,

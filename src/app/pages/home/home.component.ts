@@ -1,7 +1,7 @@
 import { NgForOf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
+import { RouterLinkWithHref } from '@angular/router';
 import { PLATFORM_TO_COLOR_STRATEGY } from '../../constants/platform-to-color-strategy.const';
 import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
@@ -15,7 +15,7 @@ import { PlatformNavigation } from './models/platform-navigation.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgForOf,
-    RouterModule,
+    RouterLinkWithHref,
   ],
 })
 export class HomeComponent implements OnInit {

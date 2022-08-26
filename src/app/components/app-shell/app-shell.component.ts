@@ -5,7 +5,7 @@ import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Event, NavigationEnd, Router, RouterModule } from '@angular/router';
+import { Event, NavigationEnd, Router, RouterLinkWithHref, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ROUTE_PATH } from '../../constants/route-path.const';
@@ -26,7 +26,8 @@ import { ToolbarService } from '../../services/toolbar/toolbar.service';
     MatIconModule,
     MatButtonModule,
     MatListModule,
-    RouterModule,
+    RouterOutlet,
+    RouterLinkWithHref,
   ],
 })
 export class AppShellComponent {
