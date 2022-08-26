@@ -10,6 +10,7 @@ import { robotsController } from './controllers/robots.controller';
 import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
+import { WBSearchController } from './controllers/wb-search.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
 import { WBUserController } from './controllers/wb-user.controller';
 import { listenRuntimeErrors } from './helpers/listen-runtime-errors';
@@ -32,6 +33,7 @@ export async function app(): Promise<express.Express> {
       .use(`/${VendorPlatform.WB}`, express.Router()
         .get('/categories', WBCategoriesController)
         .get('/catalog/:id', WBCatalogController)
+        .get('/search/:query', WBSearchController)
         .get('/product/:id/similar', WBSimilarProductsController)
         .get('/user/:id', WBUserController)
         .post('/feedback', bodyParser.json(), WBFeedbackController)

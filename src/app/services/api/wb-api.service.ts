@@ -25,6 +25,7 @@ export class WBAPIService implements APIBridge {
   private categories$: Observable<Categories> | null = null;
   private readonly productIdToStreamMap = new Map<string, Observable<Partial<Product>>>();
   private readonly categoryIdToCatalogMap = new Map<string, Observable<Partial<Product>[]>>();
+  private readonly queryToCatalogMap = new Map<string, Observable<Partial<Product>[]>>();
   private readonly productIdToFeedbacksMap = new Map<string, Observable<ProductFeedbacks>>();
   private readonly userIdToPersonMap = new Map<string, Observable<Partial<Person>>>();
   private readonly productIdToSimilarMap = new Map<string, Observable<Partial<Product>[]>>();
@@ -66,6 +67,26 @@ export class WBAPIService implements APIBridge {
         shareReplay(1),
       );
     this.categoryIdToCatalogMap.set(idString, stream$);
+
+    return stream$;
+  }
+
+  getSearchChanges(query?: string | null): Observable<Partial<Product>[]> {
+    if (!query) {
+
+      return NEVER;
+    }
+    const existingStream$ = this.categoryIdToCatalogMap.get(query);
+    if (existingStream$) {
+
+      return existingStream$;
+    }
+    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/search/${query}`)
+      .pipe(
+        map((dto: WBSimilar) => mapProductsFromSimilarWB(dto)),
+        shareReplay(1),
+      );
+    this.categoryIdToCatalogMap.set(query, stream$);
 
     return stream$;
   }

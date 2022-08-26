@@ -1,5 +1,6 @@
 import { AsyncPipe, NgClass, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -11,6 +12,10 @@ import { environment } from '../../../environments/environment';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { SCROLL_CONTAINER_CLASS } from '../../constants/scroll-container-class.const';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
+import { SEARCH_QUERY_PARAM } from '../../pages/catalog/constants/search-query-param.const';
 
 @Component({
   standalone: true,
@@ -22,12 +27,13 @@ import { ToolbarService } from '../../services/toolbar/toolbar.service';
     NgIf,
     AsyncPipe,
     NgClass,
+    RouterOutlet,
+    RouterLinkWithHref,
+    FormsModule,
     MatSidenavModule,
     MatIconModule,
     MatButtonModule,
     MatListModule,
-    RouterOutlet,
-    RouterLinkWithHref,
   ],
 })
 export class AppShellComponent {
@@ -37,6 +43,9 @@ export class AppShellComponent {
   readonly toolbarState$ = this.toolbar.getStateChanges();
   readonly scrollContainerClass = SCROLL_CONTAINER_CLASS;
   sidenavOpened = false;
+  searchForm = {
+    query: '',
+  };
 
   constructor(
     private iconRegistry: MatIconRegistry,
@@ -70,5 +79,13 @@ export class AppShellComponent {
 
   closeSidenav(): void {
     this.sidenavOpened = false;
+  }
+
+  search(): void {
+    if (this.searchForm.query) {
+      this.router.navigate([`/${this.toolbar.getPlatform() || APIPlatform.WB}`, ROUTE_PATH.CATALOG], {
+        queryParams: { [SEARCH_QUERY_PARAM]: this.searchForm.query },
+      });
+    }
   }
 }

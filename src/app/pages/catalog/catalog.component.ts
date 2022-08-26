@@ -15,6 +15,7 @@ import { Category } from '../../models/categories/category.interface';
 import { Product } from '../../models/product/product.interface';
 import { APIService } from '../../services/api/api.service';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
+import { SEARCH_QUERY_PARAM } from './constants/search-query-param.const';
 import { CatalogViewModel } from './models/catalog-view-model.interface';
 
 @Component({
@@ -111,19 +112,26 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   private getNameChanges(): Observable<string> {
-    return combineLatest([
-      this.API.getCategoriesChanges(),
-      this.route.paramMap
-        .pipe(
-          map((paramMap: ParamMap) => paramMap.get('id')),
-          filterTruthy(),
-        ),
-    ])
+    return this.route.queryParamMap
       .pipe(
-        map(([categories, id]: [Categories, string]) =>
-          treeFind(categories.items, (item: Category) => item.children, (item: Category) => `${item.slug}` === id)
+        map((paramMap: ParamMap) => paramMap.get(SEARCH_QUERY_PARAM)),
+        switchMap((query: string | null) => query
+          ? of('Поиск')
+          : combineLatest([
+            this.API.getCategoriesChanges(),
+            this.route.paramMap
+              .pipe(
+                map((paramMap: ParamMap) => paramMap.get('id')),
+                filterTruthy(),
+              ),
+          ])
+            .pipe(
+              map(([categories, id]: [Categories, string]) =>
+                treeFind(categories.items, (item: Category) => item.children, (item: Category) => `${item.slug}` === id)
+              ),
+              map((category: Category | null) => category?.title ?? 'Каталог'),
+            )
         ),
-        map((category: Category | null) => category?.title ?? 'Каталог'),
       );
   }
 
@@ -143,20 +151,19 @@ export class CatalogComponent implements OnInit, OnDestroy {
       isLoading: false,
       items: [],
     };
+    const queryAndIDTuple$ = combineLatest([
+      this.route.paramMap.pipe(map((paramMap: ParamMap) => paramMap.get('id'))),
+      this.route.queryParamMap.pipe(map((paramMap: ParamMap) => paramMap.get(SEARCH_QUERY_PARAM))),
+    ]);
 
     return retry$
       .pipe(
-        switchMap(() => this.route.paramMap),
-        map((paramMap: ParamMap) => paramMap.get('id')),
-        switchMap((id: string | null) => id
-          ? this.API.getCatalogChanges(id)
+        switchMap(() => queryAndIDTuple$),
+        switchMap(([id, query]: (string | null)[]) => id || query
+          ? (id ? this.API.getCatalogChanges(id) : this.API.getSearchChanges(query))
             .pipe(
               map((items: Partial<Product>[]) => {
-                const viewModel: CatalogViewModel = {
-                  items,
-                  isLoading: false,
-                  hasError: false,
-                };
+                const viewModel: CatalogViewModel = { items, isLoading: false, hasError: false };
 
                 return viewModel;
               }),

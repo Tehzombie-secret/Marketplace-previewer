@@ -48,6 +48,28 @@
         <h1 class="wb-typography-h3">
           {{ toolbarState.title }}
         </h1>
+        <form
+          (ngSubmit)="search()"
+          ngForm
+          class="search-form">
+          <label class="search-label">
+            <div class="wb-typography-caption">
+              Поиск
+            </div>
+            <div class="search-row">
+              <input
+                [(ngModel)]="searchForm.query"
+                name="query"
+                type="text"
+                class="search-input">
+              <button
+                type="submit"
+                class="submit-button">
+                <mat-icon svgIcon="search"></mat-icon>
+              </button>
+            </div>
+          </label>
+        </form>
       </div>
       <div [ngClass]="scrollContainerClass">
         <router-outlet></router-outlet>
