@@ -32,6 +32,7 @@ import { ToolbarService } from '../../services/toolbar/toolbar.service';
 export class AppShellComponent {
 
   readonly historyPagePath = [`/${ROUTE_PATH.HISTORY}`];
+  readonly FAQPagePath = [`/${ROUTE_PATH.FAQ}`];
   readonly toolbarState$ = this.toolbar.getStateChanges();
   readonly scrollContainerClass = SCROLL_CONTAINER_CLASS;
   sidenavOpened = false;

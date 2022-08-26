@@ -32,6 +32,10 @@ export const APP_ROUTES: Routes = [
     path: ROUTE_PATH.HISTORY,
     loadComponent: () => import('./pages/history/history.component').then(c => c.HistoryComponent),
   },
+  {
+    path: ROUTE_PATH.FAQ,
+    loadComponent: () => import('./pages/faq/faq.component').then(c => c.FAQComponent),
+  },
   ...COMMON_ROUTES,
   {
     path: ':platform',

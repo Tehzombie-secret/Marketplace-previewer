@@ -3,4 +3,5 @@ export const ROUTE_PATH = {
   PRODUCT: 'product',
   PERSON: 'person',
   HISTORY: 'history',
+  FAQ: 'faq',
 }
