@@ -7,23 +7,24 @@ import 'zone.js/dist/zone-node';
 import { documentController } from './controllers/document.controller';
 import { reverseProxyController } from './controllers/reverse-proxy.controller';
 import { robotsController } from './controllers/robots.controller';
+import { staticAssetsController } from './controllers/static-assets.controller';
 import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
 import { WBSearchController } from './controllers/wb-search.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
 import { WBUserController } from './controllers/wb-user.controller';
+import { cacheAssets } from './helpers/cache-assets';
+import { generateServerContext } from './helpers/generate-server-context';
 import { listenRuntimeErrors } from './helpers/listen-runtime-errors';
 import { VendorPlatform } from './models/image-platform.enum';
+import { ServerContext } from './models/server-context.interface';
 
 // The Express app is exported so that it can be used by serverless Functions.
-export async function app(): Promise<express.Express> {
-  listenRuntimeErrors();
-
-  const distFolder = join(process.cwd(), 'dist/wb/browser');
-  const indexHTMLPath = existsSync(join(distFolder, 'index.original.html'))
-    ? join(distFolder, 'index.original.html')
-    : join(distFolder, 'index.html');
+export async function app(context: ServerContext): Promise<express.Express> {
+  const indexHTMLPath = existsSync(join(context.browserFolder, 'index.original.html'))
+    ? join(context.browserFolder, 'index.original.html')
+    : join(context.browserFolder, 'index.html');
   const indexHTML = await readFile(indexHTMLPath, { encoding: 'utf8' });
 
   return express()
@@ -40,19 +41,24 @@ export async function app(): Promise<express.Express> {
       )
       .use('/common', express.Router()
         .get('/rp', reverseProxyController)
+        .get('/meta', (req: express.Request, res: express.Response) => res.send({ l: context.launchTime }))
       )
     )
-    .get('*.*', express.static(distFolder, { maxAge: '3d' }))
+    .get('*.*', staticAssetsController(context))
     .get('*', documentController(indexHTML));
 }
 
 async function run(): Promise<void> {
+  listenRuntimeErrors();
+
   const ports = (process.env['PORT'] || '443,80')?.split(',') || [4000];
-  const server = await app();
+  const context = generateServerContext();
+  const server = await app(context);
   ports.forEach((port: string | number) => {
     // Start up the Node server
     server.listen(port, () => {
       console.log(`Node Express server listening on http://localhost:${port}`);
+      cacheAssets(context.browserFolder, context.assetMemCache);
     });
   });
 }

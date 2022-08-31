@@ -36,6 +36,12 @@ export async function reverseProxyController(request: Request, response: Respons
     }
     response.setHeader(key, value);
   });
+  if (!response.getHeader('Access-Control-Expose-Headers')) {
+    response.setHeader('Access-Control-Expose-Headers', 'content-type');
+  }
+  if (!response.getHeader('Access-Control-Allow-Origin')) {
+    response.setHeader('Access-Control-Allow-Origin', '*');
+  }
   const arrayBuffer = await proxyResponse.arrayBuffer();
   const imageBuffer = Buffer.from(arrayBuffer);
   if (useBrotli) {
