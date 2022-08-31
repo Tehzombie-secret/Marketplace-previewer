@@ -15,9 +15,7 @@ import { ServerContext } from '../models/server-context.interface';
     const acceptEncoding = request.header('Accept-Encoding') || '';
     const useBrotli = acceptEncoding.includes('br') || acceptEncoding.includes('*');
     const contentType = getType(request.url) ?? 'text/plain';
-    console.log('1');
     const asset = await readAsset(request, useBrotli, context);
-    console.log('2');
     // If no asset is found in memory or filesystem,
     // we mark it as missing in memcache so we don't request it anymore
     if (!asset) {
