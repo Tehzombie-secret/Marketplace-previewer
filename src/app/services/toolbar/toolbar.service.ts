@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { asyncScheduler, BehaviorSubject, Observable, scheduled } from 'rxjs';
+import { PLATFORM_TO_COLOR_STRATEGY } from '../../constants/platform-to-color-strategy.const';
 import { APIPlatform } from '../api/models/api-platform.enum';
 import { ToolbarState } from './models/toolbar-state.interface';
 
@@ -19,10 +20,7 @@ export class ToolbarService {
   }
 
   setPlatform(platform: APIPlatform | null): void {
-    const platformToColor: Record<APIPlatform, string> = {
-      [APIPlatform.WB]: '#cb11ab',
-    };
-    const platformColor = platform ? (platformToColor[platform] ?? null) : null;
+    const platformColor = platform ? (PLATFORM_TO_COLOR_STRATEGY[platform] ?? null) : null;
     const newState: ToolbarState = {
       ...this.state$.getValue(),
       platform,

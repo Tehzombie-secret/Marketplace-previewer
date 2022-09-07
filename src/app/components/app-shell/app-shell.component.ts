@@ -16,6 +16,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { SEARCH_QUERY_PARAM } from '../../pages/catalog/constants/search-query-param.const';
+import { VersionStorageService } from '../../services/version-storage.service';
 
 @Component({
   standalone: true,
@@ -52,6 +53,7 @@ export class AppShellComponent {
     private domSanitizer: DomSanitizer,
     private toolbar: ToolbarService,
     private router: Router,
+    private versionStorage: VersionStorageService,
   ) {
     // Necessary to define in constructor, since any registry changes are not reactive
     this.iconRegistry.addSvgIconResolver((name: string) =>
@@ -60,6 +62,7 @@ export class AppShellComponent {
   }
 
   ngOnInit(): void {
+    this.versionStorage.set(1);
     this.router.events
       .pipe(
         filter((event: Event) => event instanceof NavigationEnd),

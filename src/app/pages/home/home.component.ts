@@ -1,4 +1,4 @@
-import { NgForOf } from '@angular/common';
+import { NgForOf, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterLinkWithHref } from '@angular/router';
@@ -15,6 +15,7 @@ import { PlatformNavigation } from './models/platform-navigation.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgForOf,
+    NgIf,
     RouterLinkWithHref,
   ],
 })
@@ -43,6 +44,7 @@ export class HomeComponent implements OnInit {
       const item: PlatformNavigation = {
         color: PLATFORM_TO_COLOR_STRATEGY[platform],
         url: [`/${platform}`],
+        blocked: platform === APIPlatform.ETSY,
       };
 
       return item;

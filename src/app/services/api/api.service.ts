@@ -7,6 +7,7 @@ import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.inter
 import { Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
 import { Product } from '../../models/product/product.interface';
+import { EtsyAPIService } from './etsy-api.service';
 import { APIBridge } from './models/api-bridge.interface';
 import { APIPlatform } from './models/api-platform.enum';
 import { WBAPIService } from './wb-api.service';
@@ -19,6 +20,7 @@ export class APIService implements APIBridge {
   constructor(
     private router: Router,
     private WBAPI: WBAPIService,
+    private etsyAPI: EtsyAPIService,
   ) {
   }
 
@@ -57,6 +59,7 @@ export class APIService implements APIBridge {
   private request<T>(fn: (service: APIBridge) => Observable<T>): Observable<T> {
     const strategy: Record<APIPlatform, APIBridge> = {
       [APIPlatform.WB]: this.WBAPI,
+      [APIPlatform.ETSY]: this.etsyAPI,
     };
 
     return (this.router.routerState.root.firstChild?.paramMap ?? NEVER)
