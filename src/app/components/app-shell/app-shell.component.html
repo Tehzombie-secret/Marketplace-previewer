@@ -32,22 +32,24 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="sidenav-content">
-      <div
-        *ngIf="(toolbarState$ | async) as toolbarState"
-        class="mat-elevation-z3 toolbar-block">
-        <button
-          (click)="openSidenav()"
-          mat-icon-button>
-          <mat-icon svgIcon="menu"></mat-icon>
-        </button>
+      <div class="mat-elevation-z3 toolbar-block">
         <div
-          *ngIf="toolbarState.platformColor"
-          [style.background-color]="toolbarState.platformColor"
-          class="platform-circle">
+          *ngIf="(toolbarState$ | async) as toolbarState"
+          class="title-block">
+          <button
+            (click)="openSidenav()"
+            mat-icon-button>
+            <mat-icon svgIcon="menu"></mat-icon>
+          </button>
+          <div
+            *ngIf="toolbarState.platformColor"
+            [style.background-color]="toolbarState.platformColor"
+            class="platform-circle">
+          </div>
+          <h1 class="wb-typography-h3 title-label">
+            {{ toolbarState.title }}
+          </h1>
         </div>
-        <h1 class="wb-typography-h3">
-          {{ toolbarState.title }}
-        </h1>
         <form
           (ngSubmit)="search()"
           ngForm

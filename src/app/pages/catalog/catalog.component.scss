@@ -48,6 +48,10 @@
     list-style: none;
     padding: 0;
     margin: 0;
+
+    @media (max-width: 1080px) {
+      justify-content: center;
+    }
   }
 
   .load-more-button {

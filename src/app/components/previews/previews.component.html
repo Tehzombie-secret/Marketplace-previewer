@@ -1,20 +1,19 @@
 <div
+  #scrollContainer
   [class.ui-previews-vertical]="vertical"
   [class.ui-previews-centered]="centered"
   class="ui-previews">
-  <div
-    *ngFor="let preview of items; index as loopSectionIndex; trackBy: trackByChunk;"
-    [class.ui-previews-vertical]="vertical"
-    [class.ui-previews-centered]="centered"
-    class="ui-preview-chunks">
+  <ng-container *ngFor="let preview of items; index as loopSectionIndex; trackBy: trackByChunk;">
     <button
       *ngFor="let image of preview.photos; index as loopPhotoIndex; trackBy: trackByPhoto;"
+      #image
       [class.active]="sectionIndex === loopSectionIndex && photoIndex === loopPhotoIndex"
+      [class.ui-previews-button-horizontal]="!vertical"
+      [class.ui-previews-button-vertical]="vertical"
       (click)="emitChange(loopSectionIndex, loopPhotoIndex)"
       (dblclick)="emitOpenUrge()"
       class="ui-previews-button">
       <img
-        #image
         [class.ui-previews-image-vertical]="vertical"
         [class.ui-previews-image-horizontal]="!vertical"
         [src]="image.small"
@@ -23,5 +22,5 @@
         referrerpolicy="no-referrer"
         class="ui-previews-image">
     </button>
-  </div>
+  </ng-container>
 </div>

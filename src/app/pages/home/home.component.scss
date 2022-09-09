@@ -6,6 +6,12 @@
   align-items: center;
   justify-content: center;
   gap: 24px;
+  padding: 24px;
+  box-sizing: border-box;
+
+  .title-label {
+    text-align: center;
+  }
 
   .platforms-block {
     display: flex;

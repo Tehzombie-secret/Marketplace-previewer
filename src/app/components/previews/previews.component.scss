@@ -15,6 +15,7 @@ $gallery-border: 3px;
 
 .ui-previews-vertical {
   width: 100%;
+  height: 100%;
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
@@ -22,26 +23,31 @@ $gallery-border: 3px;
   overflow-y: auto;
 }
 
-.ui-preview-chunks {
-  display: flex;
-  gap: 16px;
-}
-
 .ui-previews-button {
   @include debuttonify;
 
+  flex-shrink: 0;
   position: relative; // For pseudo-element styling
   border: $gallery-border solid transparent;
   border-radius: 6px;
   transition: border-color 160ms ease;
+  box-sizing: border-box;
+}
+
+.ui-previews-button-horizontal {
+  width: 62px;
+}
+
+.ui-previews-button-vertical {
+  height: 100px;
 }
 
 .ui-previews-image {
   display: block;
   object-fit: cover;
   border-radius: 4px;
-  height: 100px;
-  width: auto;
+  height: 100%;
+  width: 100%;
   transform: translate(0);
 }
 

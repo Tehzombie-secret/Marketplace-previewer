@@ -2,6 +2,8 @@
 @import 'variables';
 @import 'debuttonify';
 
+$breakpoint: 600px;
+
 .app-shell-body {
   height: 100%;
 
@@ -36,7 +38,20 @@
     padding: 0 16px;
     background: white;
     box-sizing: border-box;
-    z-index: 1;
+    z-index: 1; // For shadow to work
+
+    @media (max-width: $breakpoint) {
+      flex-direction: column;
+      align-items: flex-start;
+      height: auto;
+      padding: 16px;
+    }
+  }
+
+  .title-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .platform-circle {
@@ -45,10 +60,19 @@
     border-radius: 12px;
   }
 
+  .title-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .search-form {
-    max-width: 240px;
     width: 100%;
-    margin-left: auto;
+
+    @media (min-width: $breakpoint + 1) {
+      max-width: 240px;
+      margin-left: auto;
+    }
   }
 
   .search-label {
@@ -66,6 +90,7 @@
   }
 
   .search-input {
+    min-width: 0;
     flex-grow: 1;
     height: 16px;
     border: none;
@@ -79,6 +104,7 @@
   .submit-button {
     @include debuttonify;
 
+    flex-shrink: 0;
     width: 28px;
     height: 28px;
     display: flex;

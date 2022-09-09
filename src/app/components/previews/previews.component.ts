@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChild, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { asyncScheduler } from 'rxjs';
 import { Photo } from '../../models/photo/photo.interface';
 import { PreviewChunk } from './models/previews-chunk.interface';
@@ -17,6 +17,7 @@ import { PreviewChunk } from './models/previews-chunk.interface';
 })
 export class PreviewsComponent implements OnChanges, AfterViewInit {
 
+  @ViewChild('scrollContainer') scrollContainer: ElementRef<HTMLElement> | null = null;
   @ViewChildren('image') imagesRef: QueryList<ElementRef<HTMLElement>> | null = null;
 
   @Input() items?: PreviewChunk[] | null = null;
@@ -28,6 +29,12 @@ export class PreviewsComponent implements OnChanges, AfterViewInit {
   @Output() readonly openInsist = new EventEmitter<[number, number]>();
 
   lastClickedIndex: [number, number] = [this.sectionIndex, this.photoIndex];
+  private viewInitiated = false;
+
+  constructor(
+    private elementRef: ElementRef,
+  ) {
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const indexChanged = Boolean(changes['photoIndex'] || changes['sectionIndex']);
@@ -39,7 +46,10 @@ export class PreviewsComponent implements OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.scrollToElement();
+    setTimeout(() => { // NgFor doesn't work instantly
+      this.viewInitiated = true;
+      this.scrollToElement();
+    }, 600);
   }
 
   trackByChunk(_index: number, item: PreviewChunk): string {
@@ -60,6 +70,10 @@ export class PreviewsComponent implements OnChanges, AfterViewInit {
   }
 
   private scrollToElement(): void {
+    if (!this.viewInitiated) {
+
+      return;
+    }
     let imageIndex = 0;
     let sectionIndex = 0;
     while (sectionIndex <= this.sectionIndex && sectionIndex <= (this.items?.length ?? 0) - 1) {
@@ -69,7 +83,25 @@ export class PreviewsComponent implements OnChanges, AfterViewInit {
       sectionIndex++;
     }
     asyncScheduler.schedule(() => { // W/o scheduler, keyboard gallery navigation won't work
-      this.imagesRef?.get?.(imageIndex)?.nativeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'center', inline: 'center' });
+      // We don't use scrollIntoView since it centers position on every scroll container in viewport,
+      // but we need to modify only this component's scroll container
+      const elRect = this.imagesRef?.get?.(imageIndex)?.nativeElement?.getBoundingClientRect?.();
+      const container = this.elementRef?.nativeElement;
+      const containerRect = container?.getBoundingClientRect?.();
+      if (!containerRect?.width || !elRect?.width) {
+
+        return;
+      }
+      const opts: ScrollToOptions = {
+        behavior: 'smooth',
+        left: this.vertical ? undefined : (elRect?.x ?? 0) - (container?.clientWidth ?? 0) / 2 + (elRect?.width ?? 0) / 2,
+        top: this.vertical ? (elRect?.y ?? 0) - (container?.clientHeight ?? 0) / 2 : undefined,
+      };
+      if (!opts.left && !opts.top) {
+
+        return;
+      }
+      this.scrollContainer?.nativeElement?.scrollBy?.(opts);
     });
   }
 }

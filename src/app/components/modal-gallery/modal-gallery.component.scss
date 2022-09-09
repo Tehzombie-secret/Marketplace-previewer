@@ -3,6 +3,7 @@
 
 $feedbackPhotoHeight: 120px;
 $feedbackPhotoGap: 4px;
+$breakpoint: 1000px;
 
 @mixin paginationButton {
   @include debuttonify;
@@ -31,21 +32,60 @@ $feedbackPhotoGap: 4px;
 .ui-gallery {
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(386px, 25%) 1fr auto;
   min-height: 0;
   height: 100%;
+
+  @media (max-width: $breakpoint) {
+    grid-template-areas:
+      "toolbar"
+      "image"
+      "paginator"
+      "previews"
+      "info";
+    grid-template-rows: repeat(3, auto);
+  }
+
+  @media (min-width: $breakpoint + 1) {
+    grid-template-areas:
+      "info image toolbar"
+      "info image previews"
+      "info image paginator";
+    grid-template-columns: minmax(386px, 25%) 1fr auto;
+  }
 }
 
 .ui-gallery-two-column {
-  grid-template-columns: 1fr auto;
+  @media (max-width: 1000px) {
+    grid-template-areas:
+      "toolbar"
+      "image"
+      "paginator"
+      "previews";
+  }
+
+  @media (min-width: $breakpoint + 1) {
+    grid-template-areas:
+      "image toolbar"
+      "image previews"
+      "image paginator";
+    grid-template-columns: 1fr auto;
+  }
 }
 
 .ui-gallery-left-column {
+  grid-area: info;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 16px;
-  padding-left: 16px;
+
+  @media (max-width: $breakpoint) {
+    padding: 0 16px 24px 16px;
+  }
+
+  @media (min-width: $breakpoint + 1) {
+    padding-left: 16px;
+  }
 }
 
 .ui-gallery-author-block {
@@ -68,7 +108,9 @@ $feedbackPhotoGap: 4px;
 }
 
 .ui-gallery-author-block + .ui-gallery-quote {
-  min-height: 100px;
+  @media (min-width: $breakpoint + 1) {
+    min-height: 100px;
+  }
 }
 
 .ui-gallery-reference {
@@ -116,23 +158,41 @@ $feedbackPhotoGap: 4px;
 }
 
 .ui-gallery-reference-feedback-photos {
-  height: $feedbackPhotoHeight * 2 + $feedbackPhotoGap;
-  display: flex;
-  flex-wrap: wrap;
   gap: 4px;
+
+  @media (max-width: $breakpoint) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 120px));
+  }
+
+  @media (min-width: $breakpoint + 1) {
+    display: flex;
+    flex-wrap: wrap;
+    height: $feedbackPhotoHeight * 2 + $feedbackPhotoGap;
+  }
 }
 
 .ui-gallery-reference-feedback-photo {
-  height: $feedbackPhotoHeight;
-  width: calc(25% - $feedbackPhotoGap);
+  width: 100%;
   object-fit: cover;
   border-radius: 2px;
+
+  @media (min-width: $breakpoint + 1) {
+    height: $feedbackPhotoHeight;
+    width: calc(25% - $feedbackPhotoGap);
+  }
 }
 
 .ui-gallery-image-wrapper-cell {
+  grid-area: image;
   position: relative; // For image positioning
   height: 100%;
   width: 100%;
+
+  @media (max-width: $breakpoint) {
+    height: 80vh;
+    min-height: 540px;
+  }
 }
 
 .ui-gallery-prev-button {
@@ -215,34 +275,53 @@ $feedbackPhotoGap: 4px;
   z-index: 2; // To be above navigation buttons
 }
 
-.ui-gallery-right-column {
-  max-height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 16px;
-}
-
 .ui-gallery-app-bar {
+  grid-area: toolbar;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
   padding: 4px;
   box-sizing: border-box;
+
+  @media (max-width: $breakpoint) {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1; // To be above image paginator buttons
+  }
 }
 
 .ui-gallery-previews {
-  height: 100%;
-  width: 120px;
+  grid-area: previews;
   display: block;
-  overflow-y: auto;
-  overflow-x: hidden;
   z-index: 1;
+
+  &.mobile {
+    height: 126px;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    @media (min-width: $breakpoint + 1) {
+      display: none;
+    }
+  }
+
+  &.desktop {
+    width: 120px;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    @media (max-width: $breakpoint) {
+      display: none;
+    }
+  }
 }
 
 .ui-gallery-paginator {
+  grid-area: paginator;
   display: flex;
   justify-content: center;
   align-items: center;

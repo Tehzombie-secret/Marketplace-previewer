@@ -162,80 +162,86 @@
     </button>
   </div>
 
-  <!-- RIGHT BAR -->
-  <div class="ui-gallery-right-column">
-    <!-- TOP (APP) BAR -->
-    <div class="ui-gallery-app-bar">
-      <button
-        (click)="rotate()"
-        mat-icon-button
-        aria-label="Повернуть вправо на 90 градусов (хоткей: клавиша r)"
-        matTooltip="Повернуть вправо (R)">
-        <mat-icon svgIcon="rotate"></mat-icon>
-      </button>
-      <button
-        (click)="download()"
-        mat-icon-button
-        aria-label="Скачать (хоткей: клавиша d)"
-        matTooltip="Скачать (D)">
-        <mat-icon svgIcon="download"></mat-icon>
-      </button>
-      <button
-        (click)="openInNewTab()"
-        mat-icon-button
-        aria-label="Открыть в новом окне (хоткей: клавиша o)"
-        matTooltip="Открыть в новом окне (O)">
-        <mat-icon svgIcon="external"></mat-icon>
-      </button>
-      <button
-        mat-dialog-close
-        mat-icon-button
-        aria-label="Закрыть (хоткей: клавиша escape)"
-        matTooltip="Закрыть (Esc)"
-        class="ui-gallery-close">
-        <mat-icon svgIcon="close"></mat-icon>
-      </button>
-    </div>
+  <!-- TOP (APP) BAR -->
+  <div class="ui-gallery-app-bar">
+    <button
+      (click)="rotate()"
+      mat-icon-button
+      aria-label="Повернуть вправо на 90 градусов (хоткей: клавиша r)"
+      matTooltip="Повернуть вправо (R)">
+      <mat-icon svgIcon="rotate"></mat-icon>
+    </button>
+    <button
+      (click)="download()"
+      mat-icon-button
+      aria-label="Скачать (хоткей: клавиша d)"
+      matTooltip="Скачать (D)">
+      <mat-icon svgIcon="download"></mat-icon>
+    </button>
+    <button
+      (click)="openInNewTab()"
+      mat-icon-button
+      aria-label="Открыть в новом окне (хоткей: клавиша o)"
+      matTooltip="Открыть в новом окне (O)">
+      <mat-icon svgIcon="external"></mat-icon>
+    </button>
+    <button
+      mat-dialog-close
+      mat-icon-button
+      aria-label="Закрыть (хоткей: клавиша escape)"
+      matTooltip="Закрыть (Esc)"
+      class="ui-gallery-close">
+      <mat-icon svgIcon="close"></mat-icon>
+    </button>
+  </div>
 
-    <!-- PREVIEWS -->
+  <!-- PREVIEWS -->
+  <ng-container *ngIf="imagesLength > 1">
     <ui-previews
-      *ngIf="imagesLength > 1"
       [items]="previews"
       [sectionIndex]="currentPhoto.sectionIndex"
       [photoIndex]="currentPhoto.photoIndex"
-      [centered]="true"
       [vertical]="true"
       (indexChange)="selectSection($event[0], $event[1])"
-      class="ui-gallery-previews">
+      class="ui-gallery-previews desktop">
     </ui-previews>
+    <ui-previews
+      [items]="previews"
+      [sectionIndex]="currentPhoto.sectionIndex"
+      [photoIndex]="currentPhoto.photoIndex"
+      [vertical]="false"
+      (indexChange)="selectSection($event[0], $event[1])"
+      class="ui-gallery-previews mobile">
+    </ui-previews>
+  </ng-container>
 
-    <!-- PAGINATOR -->
-    <div class="ui-gallery-paginator">
-      <ng-container *ngIf="imagesLength > 1">
-        <button
-          (click)="prev()"
-          mat-icon-button
-          color="primary"
-          aria-label="Предыдущее изображение">
-          <mat-icon
-            svgIcon="chevron-left"
-            class="ui-gallery-chevron-icon">
-          </mat-icon>
-        </button>
-        <span class="wb-typography-body ui-gallery-paginator-label">
-          {{ currentPhoto.globalIndex + 1 }} из {{ imagesLength }}
-        </span>
-        <button
-          (click)="next()"
-          mat-icon-button
-          color="primary"
-          aria-label="Следующее изображение">
-          <mat-icon
-            svgIcon="chevron-right"
-            class="ui-gallery-chevron-icon">
-          </mat-icon>
-        </button>
-      </ng-container>
-    </div>
+
+  <!-- PAGINATOR -->
+  <div class="ui-gallery-paginator">
+    <ng-container *ngIf="imagesLength > 1">
+      <button
+        (click)="prev()"
+        mat-icon-button
+        color="primary"
+        aria-label="Предыдущее изображение">
+        <mat-icon
+          svgIcon="chevron-left"
+          class="ui-gallery-chevron-icon">
+        </mat-icon>
+      </button>
+      <span class="wb-typography-body ui-gallery-paginator-label">
+        {{ currentPhoto.globalIndex + 1 }} из {{ imagesLength }}
+      </span>
+      <button
+        (click)="next()"
+        mat-icon-button
+        color="primary"
+        aria-label="Следующее изображение">
+        <mat-icon
+          svgIcon="chevron-right"
+          class="ui-gallery-chevron-icon">
+        </mat-icon>
+      </button>
+    </ng-container>
   </div>
 </div>

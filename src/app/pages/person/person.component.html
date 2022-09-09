@@ -46,7 +46,7 @@
 
   <!-- CARD MODE -->
   <ul
-    [class.gallery-mode]="galleryMode$ | async"
+    *ngIf="!(galleryMode$ | async); else galleryTemplate;"
     class="feedback-list">
     <li
       *ngFor="let feedback of person?.feedbackViewModels; trackBy: trackByFeedback;"
@@ -85,3 +85,24 @@
     </li>
   </ul>
 </div>
+
+<ng-template #galleryTemplate>
+  <ul class="gallery-list">
+    <ng-container *ngFor="let item of (person$ | async)?.feedbackViewModels; trackBy: trackByFeedback;">
+      <li
+        *ngFor="let photo of item.photoViewModels; last as isLast; trackBy: trackByPhoto;"
+        [class.gallery-gap]="isLast">
+        <a
+          [href]="photo.photo.big"
+          (click)="openGallery($event, photo.gallery)"
+          class="photo-button">
+          <img
+            [src]="photo.photo.small"
+            alt=""
+            referrerpolicy="no-referrer"
+            class="photo-preview">
+        </a>
+      </li>
+    </ng-container>
+  </ul>
+</ng-template>

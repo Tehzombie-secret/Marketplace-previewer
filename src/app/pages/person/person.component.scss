@@ -7,6 +7,7 @@
 
   .profile-block {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     padding: 0 16px;
     gap: 24px;
@@ -45,18 +46,11 @@
 
   .feedback-list {
     display: flex;
+    flex-direction: column;
     padding: 0 16px;
     margin: 0;
     list-style: none;
     gap: 24px;
-
-    &.gallery-mode {
-      flex-wrap: wrap;
-    }
-
-    &:not(.gallery-mode) {
-      flex-direction: column;
-    }
   }
 
   .feedback-entry {
@@ -67,10 +61,6 @@
 
   .product-photo-wrapper {
     width: 75px;
-  }
-
-  .gallery-mode .product-photo-wrapper {
-    display: none;
   }
 
   .product-photo {
@@ -96,13 +86,22 @@
     }
   }
 
-  .gallery-mode .feedback-product,
-  .gallery-mode .feedback-text {
-    display: none;
-  }
-
   .feedback-photo {
     display: block;
     border-radius: 4px;
+  }
+
+  .gallery-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    gap: 24px 8px;
+    padding: 0 16px;
+  }
+
+  .gallery-gap {
+    margin-right: 16px;
   }
 }

@@ -8,20 +8,34 @@ $image-width: 400px;
   align-items: flex-start;
   gap: 40px;
 
-  .image-block {
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+
+  .image-button {
     @include debuttonify;
 
     flex-shrink: 0;
+
+    @media (min-width: 481px) and (max-width: 980px) {
+      width: 50%;
+    }
+
+    @media (max-width: 480px) {
+      width: 100%;
+    }
   }
 
   .overview-image {
+    width: 100%;
     display: block;
     max-height: 540px;
-    width: auto;
+    width: 100%;
     object-fit: contain;
   }
 
   .overview-side {
+    max-width: 100%;
     min-width: 0;
     display: flex;
     flex-direction: column;

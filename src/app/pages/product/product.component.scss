@@ -39,5 +39,10 @@
     padding: 24px 40px 80px 16px;
     overflow-x: hidden;
     gap: 60px;
+
+    @media (max-width: 640px) {
+      padding: 24px 16px;
+      gap: 24px;
+    }
   }
 }
