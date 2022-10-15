@@ -16,34 +16,6 @@ export function getWBImage(id: number, name: string | number, size: ImageSize): 
   return url;
 }
 
-function getHostV1(volume: number): string {
-  if (volume >= 0 && volume <= 287) {
-
-    return 'basket01';
-  } else if (volume >= 288 && volume <= 575) {
-
-    return 'basket02';
-  } else if (volume >= 576 && volume <= 863) {
-
-    return 'basket03';
-  } else if (volume >= 864 && volume <= 1007) {
-
-    return 'basket04';
-  } else if (volume >= 1008 && volume <= 1061) {
-
-    return 'basket05';
-  } else if (volume >= 1062 && volume <= 1115) {
-
-    return 'basket06';
-  } else if (volume >= 1116 && volume <= 1169) {
-
-    return 'basket07';
-  } else {
-
-    return 'basket08';
-  }
-}
-
 function getHostV2(volume: number): string {
   if (volume >= 0 && volume <= 143) {
 
@@ -69,8 +41,11 @@ function getHostV2(volume: number): string {
   } else if (volume >= 1116 && volume <= 1169) {
 
     return 'basket-08';
+  } else if (volume >= 1170 && volume <= 1313) {
+
+    return 'basket-09';
   } else {
 
-    return 'basket-00';
+    return 'basket-10';
   }
 }
