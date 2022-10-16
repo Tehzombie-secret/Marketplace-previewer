@@ -76,15 +76,25 @@ $breakpoint: 1000px;
   grid-area: info;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 16px;
+  overflow: auto;
+  box-sizing: border-box;
 
   @media (max-width: $breakpoint) {
     padding: 0 16px 24px 16px;
   }
 
   @media (min-width: $breakpoint + 1) {
-    padding-left: 16px;
+    height: 100%;
+    padding: 16px;
+
+    & > :first-child {
+      margin-top: auto;
+    }
+
+    & > :last-child {
+      margin-bottom: auto;
+    }
   }
 }
 
@@ -92,6 +102,11 @@ $breakpoint: 1000px;
   display: flex;
   align-items: center;
   gap: 16px;
+
+  @media (max-width: $breakpoint) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .ui-gallery-author {
