@@ -29,7 +29,7 @@ export class WBAPIService implements APIBridge {
   private readonly productIdToFeedbacksMap = new Map<string, Observable<ProductFeedbacks>>();
   private readonly userIdToPersonMap = new Map<string, Observable<Partial<Person>>>();
   private readonly productIdToSimilarMap = new Map<string, Observable<Partial<Product>[]>>();
-  private readonly maxFeedbacks = 5000; // Seems like there's a vendor hard stop on feedback size
+  private readonly maxFeedbacks = 500; // Seems like there's a vendor hard stop on feedback size
 
   constructor(
     private http: HttpClient,
@@ -76,7 +76,7 @@ export class WBAPIService implements APIBridge {
 
       return NEVER;
     }
-    const existingStream$ = this.categoryIdToCatalogMap.get(query);
+    const existingStream$ = this.queryToCatalogMap.get(query);
     if (existingStream$) {
 
       return existingStream$;
@@ -86,7 +86,7 @@ export class WBAPIService implements APIBridge {
         map((dto: WBSimilar) => mapProductsFromSimilarWB(dto)),
         shareReplay(1),
       );
-    this.categoryIdToCatalogMap.set(query, stream$);
+    this.queryToCatalogMap.set(query, stream$);
 
     return stream$;
   }
