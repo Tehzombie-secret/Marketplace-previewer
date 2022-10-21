@@ -77,7 +77,6 @@ $breakpoint: 1000px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  overflow: auto;
   box-sizing: border-box;
 
   @media (max-width: $breakpoint) {
@@ -87,6 +86,7 @@ $breakpoint: 1000px;
   @media (min-width: $breakpoint + 1) {
     height: 100%;
     padding: 16px;
+    overflow: auto;
 
     & > :first-child {
       margin-top: auto;
