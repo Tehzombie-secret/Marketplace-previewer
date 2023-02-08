@@ -1,7 +1,7 @@
 import { AsyncPipe, DOCUMENT, Location, NgForOf, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, RouterLinkWithHref } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 import { PaginatorComponent } from '../../components/paginator/paginator.component';
 import { SCROLL_CONTAINER_CLASS } from '../../constants/scroll-container-class.const';
@@ -24,7 +24,7 @@ import { VisitedEntryLinkPipe } from './pipes/visited-entry-link.pipe';
     NgForOf,
     NgIf,
     AsyncPipe,
-    RouterLinkWithHref,
+    RouterLink,
     VisitedEntryLinkPipe,
     VisitedEntryLabelPipe,
     FriendlyDatePipe,

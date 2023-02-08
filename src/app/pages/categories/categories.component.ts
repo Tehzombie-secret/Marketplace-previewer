@@ -2,7 +2,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Title } from '@angular/platform-browser';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { Categories } from '../../models/categories/categories.interface';
@@ -21,7 +21,7 @@ import { CategoryListComponent } from './views/category-list/category-list.compo
   imports: [
     NgIf,
     AsyncPipe,
-    RouterLinkWithHref,
+    RouterLink,
     MatIconModule,
     CategoryListComponent,
   ],

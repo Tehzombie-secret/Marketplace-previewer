@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
@@ -12,7 +12,7 @@ import { ToolbarService } from '../../services/toolbar/toolbar.service';
   styleUrls: ['./faq.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    RouterLinkWithHref,
+    RouterLink,
   ],
 })
 export class FAQComponent implements OnInit {

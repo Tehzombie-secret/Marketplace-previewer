@@ -1,11 +1,11 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyDialogModule as MatDialogModule, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterLinkWithHref } from '@angular/router';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { RouterLink } from '@angular/router';
 import { asyncScheduler, BehaviorSubject, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { download } from '../../helpers/download';
@@ -50,7 +50,7 @@ import { ModalGallery } from './models/modal-gallery.interface';
     PreviewsComponent,
     PluralPipe,
     FriendlyDatePipe,
-    RouterLinkWithHref,
+    RouterLink,
   ],
 })
 export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceType> {

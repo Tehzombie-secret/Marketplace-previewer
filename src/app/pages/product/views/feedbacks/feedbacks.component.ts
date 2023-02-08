@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterLinkWithHref } from '@angular/router';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { RouterLink } from '@angular/router';
 import { ModalGalleryComponent } from '../../../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../../../components/modal-gallery/models/modal-gallery.interface';
@@ -29,7 +29,7 @@ import { ProductPhotoViewModel } from './models/product-photo-view-model.interfa
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
-    RouterLinkWithHref,
+    RouterLink,
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,

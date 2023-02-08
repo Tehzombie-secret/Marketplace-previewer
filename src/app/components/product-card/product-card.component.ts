@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterLinkWithHref } from '@angular/router';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { RouterLink } from '@angular/router';
 import { BehaviorSubject, map, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { truthy } from '../../helpers/truthy';
@@ -25,7 +25,7 @@ import { VisitedEntry } from '../../services/history/models/visited-entry.interf
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
-    RouterLinkWithHref,
+    RouterLink,
     MatIconModule,
     MatProgressSpinnerModule,
     PluralPipe,

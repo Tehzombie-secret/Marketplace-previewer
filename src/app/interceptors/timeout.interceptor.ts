@@ -3,8 +3,6 @@ import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
 import { Inject, Injectable } from '@angular/core';
 import { Observable, throwError, timeout } from 'rxjs';
 
-type Connection = NetworkInformation & { effectiveType: string };
-
 @Injectable()
 export class TimeoutInterceptor implements HttpInterceptor {
 
@@ -23,7 +21,7 @@ export class TimeoutInterceptor implements HttpInterceptor {
     return next.handle(request)
       .pipe(
         timeout({
-          each: this.slowConnections.includes((this.navigator?.connection as Connection)?.effectiveType?.toLowerCase?.())
+          each: this.slowConnections.includes((this.navigator as any)?.connection?.effectiveType?.toLowerCase?.())
             ? 45_000
             : 25_000,
           with: () => throwError(() => new HttpErrorResponse({
