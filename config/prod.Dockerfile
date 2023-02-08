@@ -1,4 +1,4 @@
-FROM node:18.6.0-alpine AS build
+FROM node:18.14.0-alpine AS build
 # Create build directory
 WORKDIR /src/app
 # Bundle app source
@@ -11,7 +11,7 @@ RUN npm install -g @angular/cli
 RUN npm run build:ssr:production
 
 # Release container
-FROM node:18.6.0-alpine
+FROM node:18.14.0-alpine
 # Expose the port that the application runs on
 EXPOSE 443
 EXPOSE 80
