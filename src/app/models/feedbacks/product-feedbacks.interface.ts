@@ -1,5 +1,6 @@
-import { WBFeedbacks } from '../../services/api/models/wb/feedback/wb-feedbacks.interface';
-import { Feedback, getFeedbackListFromWB } from './feedback.interface';
+import { WBFeedbacks } from '../../services/api/models/wb/feedback/v1/wb-feedbacks.interface';
+import { WBFeedbacksV2 } from '../../services/api/models/wb/feedback/v2/wb-feedbacks-v2.interface';
+import { Feedback, getFeedbackListFromWB, getFeedbackListFromWBV2 } from './feedback.interface';
 
 export interface ProductFeedbacks {
   /** Loading progress from 0 to 100 */
@@ -24,6 +25,19 @@ export function getProductFeedbacksFromWB(
     feedbacks: getFeedbackListFromWB(id, dto),
     hasError: false,
     requestsMade,
+  };
+
+  return item;
+}
+
+export function getProductFeedbacksFromWBV2(id: number | undefined, dto?: WBFeedbacksV2 | null): ProductFeedbacks {
+  const item: ProductFeedbacks = {
+    progress: 100,
+    size: dto?.feedbackCount ?? 0,
+    withPhotosSize: dto?.feedbackCountWithPhoto ?? 0,
+    feedbacks: getFeedbackListFromWBV2(id, dto),
+    hasError: false,
+    requestsMade: 1,
   };
 
   return item;

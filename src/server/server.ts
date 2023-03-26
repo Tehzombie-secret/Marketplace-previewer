@@ -1,5 +1,6 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
+import * as compression from 'compression';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -10,6 +11,7 @@ import { robotsController } from './controllers/robots.controller';
 import { staticAssetsController } from './controllers/static-assets.controller';
 import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
+import { WBFeedbackControllerV2 } from './controllers/wb-feedback-v2.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
 import { WBSearchController } from './controllers/wb-search.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
@@ -30,6 +32,7 @@ export async function app(context: ServerContext): Promise<express.Express> {
   return express()
     .get('/healthcheck', (req: express.Request, res: express.Response) => res.send('OK'))
     .get('/robots.txt', robotsController)
+    .use(compression())
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
         .get('/categories', WBCategoriesController)
@@ -38,6 +41,7 @@ export async function app(context: ServerContext): Promise<express.Express> {
         .get('/product/:id/similar', WBSimilarProductsController)
         .get('/user/:id', WBUserController)
         .post('/feedback', bodyParser.json(), WBFeedbackController)
+        .get('/v2/feedback/:id', WBFeedbackControllerV2)
       )
       .use('/common', express.Router()
         .get('/rp', reverseProxyController)
