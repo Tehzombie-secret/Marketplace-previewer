@@ -5,14 +5,16 @@ import { catchError, delay, expand, shareReplay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { Categories } from '../../models/categories/categories.interface';
-import { getErrorProductFeedback, getProductFeedbacksFromWB, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
+import { getErrorProductFeedback, getProductFeedbacksFromWB, getProductFeedbacksFromWBV2, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { getPersonFromWB, Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
 import { mapProductFromWB, mapProductsFromSimilarWB, Product } from '../../models/product/product.interface';
 import { APIBridge } from './models/api-bridge.interface';
 import { getCategoriesChunkFromWB, WBCategory } from './models/wb/categories/wb-category.interface';
-import { WBFeedbackRequest } from './models/wb/feedback/wb-feedback-request.interface';
-import { WBFeedbacks } from './models/wb/feedback/wb-feedbacks.interface';
+import { WBFeedbackRequest } from './models/wb/feedback/v1/wb-feedback-request.interface';
+import { WBFeedbacks } from './models/wb/feedback/v1/wb-feedbacks.interface';
+import { WBFeedbackV2 } from './models/wb/feedback/v2/wb-feedback-v2.interface';
+import { WBFeedbacksV2 } from './models/wb/feedback/v2/wb-feedbacks-v2.interface';
 import { WBPersonRoot } from './models/wb/person/wb-person-root.interface';
 import { WBProduct } from './models/wb/product/wb-product.interface';
 import { WBSimilar } from './models/wb/similar/wb-similar.interface';
@@ -151,6 +153,44 @@ export class WBAPIService implements APIBridge {
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
     existingAccumulator?: ProductFeedbacks,
   ): Observable<ProductFeedbacks> {
+    return this.getFeedbackChangesV2(item);
+  }
+
+  private getFeedbackChangesV2(item: Partial<ProductReference> | null | undefined): Observable<ProductFeedbacks> {
+    const id = item?.parentId ?? item?.id;
+    if (!id) {
+      return NEVER;
+    }
+    const idString = `${id}`;
+    const existingStream$ = this.productIdToFeedbacksMap.get(idString);
+    if (existingStream$) {
+
+      return existingStream$;
+    }
+    const stream$ = this.http.get<WBFeedbacks>(`${environment.host}/api/${VendorPlatform.WB}/v2/feedback/${id}`)
+      .pipe(
+        map((item: WBFeedbacks) => {
+          const feedbacks = getProductFeedbacksFromWB(id, 100, 1, item);
+
+          return feedbacks;
+        }),
+        catchError(() => {
+          this.productIdToFeedbacksMap.delete(idString);
+
+          return of(getErrorProductFeedback(1, 0));
+        }),
+        shareReplay(1),
+      );
+    this.productIdToFeedbacksMap.set(idString, stream$);
+
+    return stream$;
+  }
+
+  private getFeedbacksChangesV1(
+    item: Partial<ProductReference> | null | undefined,
+    fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
+    existingAccumulator?: ProductFeedbacks,
+  ): Observable<ProductFeedbacks> {
     if (!item) {
 
       return NEVER;
@@ -218,13 +258,10 @@ export class WBAPIService implements APIBridge {
 
       return existingStream$;
     }
-    const stream$ = this.http.post<WBFeedbacks>(`${environment.host}/api/${VendorPlatform.WB}/feedback`, request)
+    const stream$ = this.http.post<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/feedback`, request)
       .pipe(
-        map((item: WBFeedbacks) => {
-          const progress = item.feedbackCount < request.take || request.skip + request.take > this.maxFeedbacks
-            ? 100
-            : progressBeforeRequest;
-          const feedbacks = getProductFeedbacksFromWB(itemId, progress, requestsMade, item);
+        map((item: WBFeedbacksV2) => {
+          const feedbacks = getProductFeedbacksFromWBV2(itemId, item);
 
           return feedbacks;
         }),

@@ -51,6 +51,7 @@ $breakpoint: 1000px;
       "info image previews"
       "info image paginator";
     grid-template-columns: minmax(386px, 25%) 1fr auto;
+    grid-template-rows: auto 1fr auto;
   }
 }
 
