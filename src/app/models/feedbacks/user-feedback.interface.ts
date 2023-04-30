@@ -1,5 +1,7 @@
+import { ImageSize } from '../../../server/models/image-size.enum';
 import { proxifyLink } from '../../helpers/proxify-link';
 import { getWBProductCategoryId } from '../../helpers/wb/get-product-category-id';
+import { getWBImage } from '../../helpers/wb/get-wb-image';
 import { WBFeedbackPhoto } from '../../services/api/models/wb/person/wb-feedback-photo.interface';
 import { WBPersonFeedback } from '../../services/api/models/wb/person/wb-person-feedback.interface';
 import { Photo } from '../photo/photo.interface';
@@ -20,8 +22,8 @@ export function getUserFeedbackFromWB(dto?: WBPersonFeedback | null): Partial<Us
   const category = getWBProductCategoryId(`${id}`);
   const productPhoto: Photo = {
     name: `product-${id}-1`,
-    big: `https://images.wbstatic.net/big/new/${category}/${id}-1.jpg`,
-    small: `https://images.wbstatic.net/tm/new/${category}/${id}-1.jpg`,
+    big: proxifyLink(getWBImage(id, 1, ImageSize.BIG)),
+    small: proxifyLink(getWBImage(id, 1, ImageSize.SMALL)),
   };
   const item: Partial<UserFeedback> = {
     date: dto?.entity?.postDate,

@@ -26,7 +26,6 @@ export async function reverseProxyController(request: Request, response: Respons
     return;
   }
   const acceptEncoding = request.header('Accept-Encoding') || '';
-  const useBrotli = acceptEncoding.includes('br') || acceptEncoding.includes('*');
   response.status(proxyResponse.status);
   const excludedHeaders = ['content-encoding'];
   proxyResponse.headers.forEach((value: string, key: string) => {
@@ -42,14 +41,19 @@ export async function reverseProxyController(request: Request, response: Respons
   if (!response.getHeader('Access-Control-Allow-Origin')) {
     response.setHeader('Access-Control-Allow-Origin', '*');
   }
+  if (isImage(decoupledURL, response)) {
+    response.setHeader('Cache-Control', `public, max-age=172800`); // 2 days
+  }
   const arrayBuffer = await proxyResponse.arrayBuffer();
   const imageBuffer = Buffer.from(arrayBuffer);
-  if (useBrotli) {
-    const brotliImageBuffer = await getBrotliContent(imageBuffer, 4);
-    response.setHeader('Content-Encoding', 'br');
-    response.removeHeader('Content-Length');
-    response.end(brotliImageBuffer);
-  } else {
-    response.end(imageBuffer);
+  response.end(imageBuffer);
+  // Compression for images is not required, they're already compressed
+}
+
+function isImage(url: string, response: Response): boolean {
+  if (url.endsWith('.jpg') || url.endsWith('.png')) {
+    return true;
   }
+  const contentType = response.getHeader('Content-Type');
+  return typeof contentType === 'string' && (contentType.startsWith('image/') || contentType === 'application/octet-stream');
 }

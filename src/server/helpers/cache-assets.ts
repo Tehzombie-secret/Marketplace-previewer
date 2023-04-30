@@ -11,10 +11,16 @@ import { getBinaryFileChanges } from './observables/get-binary-file-changes';
 import { getBrotliContentChanges } from './observables/get-brotli-file-changes';
 import { getFilePathChanges } from './observables/get-file-path-changes';
 
+let assetsCached = false;
+
 export async function cacheAssets(
   assetsFolder: string,
   memoryCache: AssetMemCacheService,
 ): Promise<void> {
+  if (assetsCached) {
+    return;
+  }
+  assetsCached = true;
   return new Promise<void>((resolve) => {
     getFilePathChanges(assetsFolder, true)
       .pipe(
