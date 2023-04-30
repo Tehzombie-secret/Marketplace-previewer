@@ -5,7 +5,10 @@ const WB_SIZE_TO_PREFIX_STRATEGY: Record<ImageSize, string> = {
   [ImageSize.SMALL]: 'tm',
 };
 
-export function getWBImage(id: number, name: string | number, size: ImageSize): string {
+export function getWBImage(id: number | null | undefined, name: string | number, size: ImageSize): string {
+  if (!id) {
+    return '';
+  }
   // Examples:
   // basket01.wb.ru/vol79/part7908/7908072/images/c246x328/1.jpg
   // basket01.wb.ru/vol79/part7908/7908072/images/big/1.jpg

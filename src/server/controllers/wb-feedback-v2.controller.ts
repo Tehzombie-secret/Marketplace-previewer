@@ -30,7 +30,6 @@ export async function WBFeedbackControllerV2(request: Request, response: Respons
 
     return;
   }
-  console.log(feedbacksResponse.headers, responseBody);
   response.status(feedbacksResponse.status).send(responseBody);
 }
 
