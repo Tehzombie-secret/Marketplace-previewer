@@ -121,7 +121,7 @@ export class WBAPIService implements APIBridge {
 
       return existingStream$;
     }
-    const product$ = this.http.get<WBProduct>(`https://wbx-content-v2.wbstatic.net/ru/${id}.json`)
+    const product$ = this.http.get<WBProduct>(`${environment.host}/api/${VendorPlatform.WB}/v1/product/${id}`)
       .pipe(
         map((dto: WBProduct) => mapProductFromWB(dto)),
         shareReplay(1),
