@@ -3,4 +3,5 @@ export enum ErrorReason {
   ANGULAR = 'angular',
   /** Error in node/express environment */
   EXPRESS = 'express',
+  MONGO = 'mongoDB',
 }

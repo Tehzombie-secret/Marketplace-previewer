@@ -1,39 +1,37 @@
-import { Request, Response } from 'express';
-import { URLSearchParams } from 'url';
-import { treeFind } from '../../app/helpers/tree-find';
-import { WBCategory } from '../../app/services/api/models/wb/categories/wb-category.interface';
-import { caught } from '../helpers/caught/caught';
-import { Caught } from '../helpers/caught/models/caught.type';
-import { emitRequestLog } from '../helpers/emit-request-log';
-import { smartFetch } from '../helpers/smart-fetch';
-import { WB_CATALOG_URL } from './wb-categories.controller';
+import { response } from 'express';
+import { treeFind } from '../../../../app/helpers/tree-find';
+import { WBCategory } from '../../../../app/services/api/models/wb/categories/wb-category.interface';
+import { caught } from '../../../helpers/caught/caught';
+import { Caught } from '../../../helpers/caught/models/caught.type';
+import { smartFetch } from '../../../helpers/smart-fetch';
+import { ProductListResponse } from './models/product-list-response.interface';
 
-export async function WBCatalogController(request: Request, response: Response): Promise<void> {
-  emitRequestLog(request, response);
+export const WB_CATALOG_URL = 'https://www.wildberries.ru/webapi/menu/main-menu-ru-ru.json';
 
-  const id = request.params['id'];
-  if (!id) {
-    response.sendStatus(400);
-
-    return;
-  }
-
+export async function getProductList(id: string): Promise<ProductListResponse> {
   // Get menu
   const menuResponse = await smartFetch(response, WB_CATALOG_URL);
   if (!menuResponse) {
 
-    return;
+    return {
+      hasError: true,
+    };
   }
   const [menuJsonError, menu]: Caught<WBCategory[]> = await caught(menuResponse?.json());
   if (menuJsonError) {
 
-    response.status(500).send(menuJsonError);
+    return {
+      hasError: true,
+      error: menuJsonError,
+    };
   }
   const category = treeFind(menu, (item: WBCategory) => item.childs, (item: WBCategory) => `${item.id}` === id);
   if (!category) {
     response.sendStatus(404);
 
-    return;
+    return {
+      notFound: true,
+    };
   }
 
   // Get items
@@ -52,14 +50,20 @@ export async function WBCatalogController(request: Request, response: Response):
   const catalogResponse = await smartFetch(response, url);
   if (!catalogResponse) {
 
-    return;
+    return {
+      hasError: true,
+    };
   }
   const [catalogJsonError, catalog] = await caught(catalogResponse?.json());
   if (catalogJsonError) {
-    response.status(500).send(catalogJsonError);
 
-    return;
+    return {
+      hasError: true,
+      error: catalogJsonError,
+    };
   }
-  response.send(catalog);
-}
 
+  return {
+    items: catalog,
+  };
+}

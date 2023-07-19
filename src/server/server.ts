@@ -1,6 +1,6 @@
 import * as bodyParser from 'body-parser';
-import * as express from 'express';
 import * as compression from 'compression';
+import * as express from 'express';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -16,6 +16,7 @@ import { WBFeedbackController } from './controllers/wb-feedback.controller';
 import { WBSearchController } from './controllers/wb-search.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
 import { WBUserController } from './controllers/wb-user.controller';
+import { WBCategoriesListController } from './controllers/wb/categories-list/categories-list.controller';
 import { cacheAssets } from './helpers/cache-assets';
 import { generateServerContext } from './helpers/generate-server-context';
 import { listenRuntimeErrors } from './helpers/listen-runtime-errors';
@@ -35,7 +36,10 @@ export async function app(context: ServerContext): Promise<express.Express> {
     .use(compression())
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
-        .get('/categories', WBCategoriesController)
+        .use('/categories', express.Router()
+          .get('/', WBCategoriesController)
+          .get('/all', WBCategoriesListController)
+        )
         .get('/catalog/:id', WBCatalogController)
         .get('/search/:query', WBSearchController)
         .get('/product/:id/similar', WBSimilarProductsController)
@@ -60,7 +64,7 @@ async function run(): Promise<void> {
   const server = await app(context);
   ports.forEach((port: string | number) => {
     // Start up the Node server
-    server.listen(port, () => {
+    server.listen(port, async () => {
       console.log(`Node Express server listening on http://localhost:${port}`);
       cacheAssets(context.browserFolder, context.assetMemCache);
     });
@@ -78,3 +82,4 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
 }
 
 export * from './main.server';
+

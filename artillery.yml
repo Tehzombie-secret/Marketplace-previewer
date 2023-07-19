@@ -1,0 +1,20 @@
+config:
+  target: http://localhost
+  phases:
+    - duration: 20
+      arrivalRate: 1
+      rampTo: 15
+      name: "Warm up the application"
+    - duration: 300
+      arrivalRate: 5
+      maxVusers: 5
+      name: "Sustained max load"
+  defaults:
+    headers:
+      user-agent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
+scenarios:
+  - flow:
+    - get:
+        url: "/wb/person/{{ $randomNumber(20000000, 30000000) }}"
+    - get:
+        url: "/wb/product/{{ $randomNumber(30000000, 40000000) }}"
