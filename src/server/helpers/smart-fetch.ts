@@ -16,7 +16,7 @@ export async function smartFetch(response: Response | null, input: string, init?
     };
     response?.status(500)?.send(error);
 
-    return null;
+    return fetchError;
   }
   if (!fetchResponse) {
     emitErrorLog(ErrorReason.EXPRESS, '', `Subfetch ${input} empty response`);

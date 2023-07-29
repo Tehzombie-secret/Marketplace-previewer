@@ -22,6 +22,7 @@ import { generateServerContext } from './helpers/generate-server-context';
 import { listenRuntimeErrors } from './helpers/listen-runtime-errors';
 import { VendorPlatform } from './models/image-platform.enum';
 import { ServerContext } from './models/server-context.interface';
+import { WBProductController } from './controllers/wb/product/product.controller';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export async function app(context: ServerContext): Promise<express.Express> {
@@ -42,6 +43,7 @@ export async function app(context: ServerContext): Promise<express.Express> {
         )
         .get('/catalog/:id', WBCatalogController)
         .get('/search/:query', WBSearchController)
+        .get('/v1/product/:id', WBProductController)
         .get('/product/:id/similar', WBSimilarProductsController)
         .get('/user/:id', WBUserController)
         .post('/feedback', bodyParser.json(), WBFeedbackController)
