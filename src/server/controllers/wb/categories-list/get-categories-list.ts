@@ -6,7 +6,7 @@ import { caught } from '../../../helpers/caught/caught';
 import { smartFetch } from '../../../helpers/smart-fetch';
 import { CategoriesListResponse } from './models/categories-list-response.interface';
 
-export const WB_CATALOG_URL = 'https://www.wildberries.ru/webapi/menu/main-menu-ru-ru.json';
+export const WB_CATALOG_URL = 'https://static-basket-01.wb.ru/vol0/data/main-menu-ru-ru-v2.json';
 
 export async function getCategoriesList(): Promise<CategoriesListResponse> {
   const categoriesResponse = await smartFetch(response, WB_CATALOG_URL);

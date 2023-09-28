@@ -1,18 +1,37 @@
 import { readFile } from 'fs/promises';
-import { Db, Document, MongoClient, MongoClientOptions, WithId } from 'mongodb';
+import { Db, MongoClient, MongoClientOptions, WithId } from 'mongodb';
 import { join } from 'path';
 import { format } from 'util';
 import { emitErrorLog } from '../../../app/helpers/emit-error-log/emit-error-log';
 import { ErrorReason } from '../../../app/helpers/emit-error-log/models/error-reason.enum';
 import { caught } from '../../helpers/caught/caught';
 import { Caught } from '../../helpers/caught/models/caught.type';
-import type { CollectionToSchemaStrategy } from './constants/collection-to-schema-strategy';
+import { retryable } from '../../helpers/retryable';
+import { CollectionToSchemaStrategy } from './constants/collection-to-schema-strategy';
 import { Credentials } from './models/credentials.interface';
 import { MongoDBCollection } from './models/mongo-db-collection.enum';
 
 export class MongoDBService {
   private readonly dbName = 'feedbacks';
   private client: Db | null = null;
+
+  public async size<T extends MongoDBCollection>(collection: T): Promise<number> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return -1;
+    }
+    const result = await client.collection(collection).estimatedDocumentCount();
+    return result;
+  }
+
+  public async clearTable<T extends MongoDBCollection>(collection: T): Promise<boolean> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return false;
+    }
+    const result = await client.collection(collection).deleteMany({});
+    return result.acknowledged;
+  }
 
   public async set<T extends MongoDBCollection>(
     collection: T,
@@ -28,7 +47,7 @@ export class MongoDBService {
         updateOne: {
           filter: { [key]: item[key] },
           update: {
-            $set: items,
+            $set: item,
           },
           upsert: true
         }
@@ -38,9 +57,42 @@ export class MongoDBService {
     return result.isOk();
   }
 
-  public async readFirst<T extends MongoDBCollection>(collection: T): Promise<Caught<WithId<CollectionToSchemaStrategy[T]> | null>> {
+  public async write<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(
+    collection: T,
+    item: CollectionToSchemaStrategy[T],
+    key: J,
+    value: CollectionToSchemaStrategy[T][J],
+  ): Promise<boolean> {
     const client = await this.setupConnection();
-    return await caught(client?.collection<CollectionToSchemaStrategy[T]>(collection)?.findOne({}));
+    if (!client) {
+      return false;
+    }
+    const result = await client.collection(collection).updateOne({ [key]: value }, { $set: item }, { upsert: true });
+    return result.acknowledged;
+  }
+
+  public async readFirst<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(
+    collection: T,
+    excludeKey?: J,
+    excludeValue?: CollectionToSchemaStrategy[T][J],
+  ): Promise<Caught<WithId<CollectionToSchemaStrategy[T]> | null>> {
+    const client = await this.setupConnection();
+    return await retryable(
+      client
+        ?.collection<CollectionToSchemaStrategy[T]>(collection)
+        ?.findOne(excludeKey && excludeValue ? { [excludeKey]: { $not: { $eq: excludeValue } } } as any : {})
+    );
+  }
+
+  public async delete<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(
+    collection: T,
+    key: J,
+    value: CollectionToSchemaStrategy[T][J],
+  ): Promise<boolean> {
+    const client = await this.setupConnection();
+    const realCollection = client?.collection<CollectionToSchemaStrategy[T]>(collection);
+    const result = await realCollection?.deleteOne({ [key]: value } as any);
+    return result?.acknowledged ?? false;
   }
 
   private async setupConnection(): Promise<Db | null> {
@@ -70,7 +122,6 @@ export class MongoDBService {
       ca: certificate,
       authSource: this.dbName,
     };
-    console.log(options, url);
 
     // Receive client
     const [connectionError, client] = await caught(MongoClient.connect(url, options));
@@ -79,6 +130,7 @@ export class MongoDBService {
       return null;
     }
     const db = client.db(this.dbName);
+    this.client = db;
     return db;
   }
 

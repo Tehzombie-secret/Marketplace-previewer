@@ -2,6 +2,7 @@ import { getCategoriesList } from '../../controllers/wb/categories-list/get-cate
 import { MongoDBCollection } from '../../services/mongodb/models/mongo-db-collection.enum';
 import { TraverseStatus } from '../../services/mongodb/models/traverse-status.enum';
 import { MongoDBService } from '../../services/mongodb/mongodb.service';
+import { updateStatus } from './update-status';
 
 export async function updateCategories(mongoDB: MongoDBService): Promise<boolean> {
   const categoriesResponse = await getCategoriesList();
@@ -13,9 +14,6 @@ export async function updateCategories(mongoDB: MongoDBService): Promise<boolean
   if (!insertResult) {
     return false;
   }
-  const stateChangeResult = await mongoDB.set(MongoDBCollection.TRAVERSE_STATUS, [{ status: TraverseStatus.FEEDBACKS }], 'status');
-  if (!stateChangeResult) {
-    return false;
-  }
-  return true;
+  const statusChangeResult = updateStatus(mongoDB, TraverseStatus.PRODUCTS);
+  return statusChangeResult;
 }

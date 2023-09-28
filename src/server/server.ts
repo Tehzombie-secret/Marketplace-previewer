@@ -9,7 +9,6 @@ import { documentController } from './controllers/document.controller';
 import { reverseProxyController } from './controllers/reverse-proxy.controller';
 import { robotsController } from './controllers/robots.controller';
 import { staticAssetsController } from './controllers/static-assets.controller';
-import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
 import { WBFeedbackControllerV2 } from './controllers/wb-feedback-v2.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
@@ -23,6 +22,7 @@ import { listenRuntimeErrors } from './helpers/listen-runtime-errors';
 import { VendorPlatform } from './models/image-platform.enum';
 import { ServerContext } from './models/server-context.interface';
 import { WBProductController } from './controllers/wb/product/product.controller';
+import { WBProductListController } from './controllers/wb/product-list/product-list.controller';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export async function app(context: ServerContext): Promise<express.Express> {
@@ -41,7 +41,7 @@ export async function app(context: ServerContext): Promise<express.Express> {
           .get('/', WBCategoriesController)
           .get('/all', WBCategoriesListController)
         )
-        .get('/catalog/:id', WBCatalogController)
+        .get('/catalog/:id', WBProductListController)
         .get('/search/:query', WBSearchController)
         .get('/v1/product/:id', WBProductController)
         .get('/product/:id/similar', WBSimilarProductsController)

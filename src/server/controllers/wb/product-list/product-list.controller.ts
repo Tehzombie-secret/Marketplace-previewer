@@ -6,13 +6,8 @@ export async function WBProductListController(request: Request, response: Respon
   emitRequestLog(request, response);
 
   const id = request.params['id'];
-  const result = await getProductList(id);
-  if (result.hasError) {
-    response.status(500).send(result.error ?? '');
-  } else if (result.notFound) {
-    response.sendStatus(404);
-  } else {
-    response.send(result.items);
-  }
+  const page = `${request.query['page']}`;
+  const result = await getProductList(id, page);
+  response.status(result.status).send(result.error ?? result.items);
 }
 
