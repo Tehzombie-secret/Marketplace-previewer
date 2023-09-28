@@ -1,6 +1,6 @@
 import * as bodyParser from 'body-parser';
-import * as express from 'express';
 import * as compression from 'compression';
+import * as express from 'express';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -9,19 +9,20 @@ import { documentController } from './controllers/document.controller';
 import { reverseProxyController } from './controllers/reverse-proxy.controller';
 import { robotsController } from './controllers/robots.controller';
 import { staticAssetsController } from './controllers/static-assets.controller';
-import { WBCatalogController } from './controllers/wb-catalog.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
 import { WBFeedbackControllerV2 } from './controllers/wb-feedback-v2.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
 import { WBSearchController } from './controllers/wb-search.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
 import { WBUserController } from './controllers/wb-user.controller';
+import { WBCategoriesListController } from './controllers/wb/categories-list/categories-list.controller';
 import { cacheAssets } from './helpers/cache-assets';
 import { generateServerContext } from './helpers/generate-server-context';
 import { listenRuntimeErrors } from './helpers/listen-runtime-errors';
 import { VendorPlatform } from './models/image-platform.enum';
 import { ServerContext } from './models/server-context.interface';
 import { WBProductController } from './controllers/wb/product/product.controller';
+import { WBProductListController } from './controllers/wb/product-list/product-list.controller';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export async function app(context: ServerContext): Promise<express.Express> {
@@ -36,8 +37,11 @@ export async function app(context: ServerContext): Promise<express.Express> {
     .use(compression())
     .use('/api', express.Router()
       .use(`/${VendorPlatform.WB}`, express.Router()
-        .get('/categories', WBCategoriesController)
-        .get('/catalog/:id', WBCatalogController)
+        .use('/categories', express.Router()
+          .get('/', WBCategoriesController)
+          .get('/all', WBCategoriesListController)
+        )
+        .get('/catalog/:id', WBProductListController)
         .get('/search/:query', WBSearchController)
         .get('/v1/product/:id', WBProductController)
         .get('/product/:id/similar', WBSimilarProductsController)
@@ -62,7 +66,7 @@ async function run(): Promise<void> {
   const server = await app(context);
   ports.forEach((port: string | number) => {
     // Start up the Node server
-    server.listen(port, () => {
+    server.listen(port, async () => {
       console.log(`Node Express server listening on http://localhost:${port}`);
       cacheAssets(context.browserFolder, context.assetMemCache);
     });
@@ -80,3 +84,4 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
 }
 
 export * from './main.server';
+

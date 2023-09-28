@@ -4,7 +4,10 @@ import { timeout } from './timeout';
 
 const RETRY_TIMEOUT = [100, 600, 1000, 2000];
 
-export async function retryable<T>(promise: Promise<T>): Promise<Caught<T, any>> {
+export async function retryable<T>(promise?: Promise<T>): Promise<Caught<T, any>> {
+  if (!promise) {
+    return [null, null];
+  }
   let retries = 0;
   let lastError: any = null;
   do {

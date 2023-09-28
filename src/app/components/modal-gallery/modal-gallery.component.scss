@@ -329,6 +329,7 @@ $breakpoint: 1000px;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-left: auto;
 
     @media (max-width: $breakpoint) {
       display: none;

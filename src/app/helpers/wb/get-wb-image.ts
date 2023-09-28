@@ -19,7 +19,7 @@ export function getWBImage(id: number | null | undefined, name: string | number,
   return url;
 }
 
-function getHostV2(volume: number): string {
+export function getHostV2(volume: number): string {
   if (volume >= 0 && volume <= 143) {
 
     return 'basket-01';
@@ -47,8 +47,20 @@ function getHostV2(volume: number): string {
   } else if (volume >= 1170 && volume <= 1313) {
 
     return 'basket-09';
-  } else {
+  } else if (volume >= 1314 && volume <= 1601) {
 
     return 'basket-10';
+  } else if (volume >= 1602 && volume <= 1655) {
+
+    return 'basket-11';
+  } else if (volume >= 1656 && volume <= 1919) {
+
+    return 'basket-12';
+  } else if (volume >= 1920 && volume <= 2045) {
+
+    return 'basket-13';
+  } else {
+
+    return 'basket-14';
   }
 }

@@ -73,7 +73,6 @@ export class ProductSimilarComponent implements OnChanges, OnDestroy {
         this.isLoading = false;
         this.canLoadMore = this.items.length < items.length;
         this.page++;
-        console.log(items);
         this.cdr.markForCheck();
       });
     this.subscriptions$.add(fetchSubscription$);

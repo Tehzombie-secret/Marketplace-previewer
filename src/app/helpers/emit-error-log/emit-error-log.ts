@@ -4,7 +4,7 @@ import { ErrorReason } from './models/error-reason.enum';
 
 export function emitErrorLog(
   reason: ErrorReason,
-  error: Error | {} | null,
+  error: Error | {} | null | unknown,
   description?: string,
 ): void {
   environment.jsonLogs
@@ -17,5 +17,5 @@ export function emitErrorLog(
       code: (error as { code: string })?.code ?? '',
       description,
     }))
-    : console.error('Error emitted:', error || description);
+    : console.error('Error emitted:', !error ? description : '', error);
 }

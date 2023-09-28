@@ -2,8 +2,7 @@ import { Request, Response } from 'express';
 import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
 import { smartFetch } from '../helpers/smart-fetch';
-
-export const WB_CATALOG_URL = 'https://www.wildberries.ru/webapi/menu/main-menu-ru-ru.json';
+import { WB_CATALOG_URL } from './wb/categories-list/get-categories-list';
 
 export async function WBCategoriesController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
