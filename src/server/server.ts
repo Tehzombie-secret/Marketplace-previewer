@@ -64,11 +64,16 @@ async function run(): Promise<void> {
   const ports = (process.env['PORT'] || '443,80')?.split(',') || [4000];
   const context = generateServerContext();
   const server = await app(context);
+  let sideEffectsInitialized = false;
   ports.forEach((port: string | number) => {
+    const shouldUseSideEffect = !sideEffectsInitialized;
+    sideEffectsInitialized = true;
     // Start up the Node server
     server.listen(port, async () => {
       console.log(`Node Express server listening on http://localhost:${port}`);
-      cacheAssets(context.browserFolder, context.assetMemCache);
+      if (shouldUseSideEffect) {
+        cacheAssets(context.browserFolder, context.assetMemCache);
+      }
     });
   });
 }
