@@ -16,27 +16,32 @@ export async function WBSearchController(request: Request, response: Response): 
 
   // Get items
   const params = new URLSearchParams({
-    regions: '68,64,83,4,38,80,33,70,82,86,30,69,22,66,31,40,1,48',
     appType: '1',
     curr: 'rub',
-    dest: '-1216601,-337422,-1114354,-1181032',
-    lang: 'ru',
-    locale: 'ru',
-    pricemarginCoeff: '1.0',
+    dest: '-1181032',
+    regions: '80,38,83,4,64,33,68,70,30,40,86,69,1,31,66,48,22,114',
     resultset: 'catalog',
-    spp: '26',
+    sort: 'popular',
+    spp: '32',
     suppressSpellcheck: 'false',
+    uclusters: '1',
     query: decodeURIComponent(query),
   });
   const url = `https://search.wb.ru/exactmatch/ru/common/v4/search?${params}`;
   const catalogResponse = await smartFetch(response, url);
   if (!catalogResponse) {
+    response.status(500).send({
+      error: 'No catalog response',
+    });
 
     return;
   }
   const [catalogJsonError, catalog] = await caught(catalogResponse?.json());
   if (catalogJsonError) {
-    response.status(500).send(catalogJsonError);
+    response.status(500).send({
+      error: 'Catalog json parse error',
+      body: catalogJsonError
+    });
 
     return;
   }
