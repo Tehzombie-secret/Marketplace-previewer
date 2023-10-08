@@ -186,7 +186,8 @@ export class MongoDBService {
     if (this.client) {
       return this.client;
     }
-    // Read local credentials
+
+    // Read credentials
     const [credentialsError, credentials] = await this.getCredentials();
     if (!credentials || credentialsError) {
       emitErrorLog(ErrorReason.MONGO, credentialsError, 'mongo credentials');
@@ -194,8 +195,7 @@ export class MongoDBService {
     }
 
     // Read certificate
-    const certificatePath = join(process.cwd(), '.mongodb/root.crt');
-    const [certificateError, certificate] = await caught(readFile(certificatePath));
+    const [certificateError, certificate] = await this.getCertificate();
     if (!certificate || certificateError) {
       emitErrorLog(ErrorReason.MONGO, credentialsError, 'mongo certificate');
       return null;
@@ -222,6 +222,13 @@ export class MongoDBService {
   }
 
   private async getCredentials(): Promise<Caught<Credentials>> {
+    if (process.env['MONGODB_USER'] && process.env['MONGODB_PASSWORD']) {
+      return [null, {
+        user: process.env['MONGODB_USER'],
+        password: process.env['MONGODB_PASSWORD'],
+      }];
+    }
+
     const localPath = join(process.cwd(), '.mongodb/credentials.json');
     const [error, file] = await caught(readFile(localPath));
     if (file) {
@@ -234,6 +241,14 @@ export class MongoDBService {
       }
     }
     return [error, null];
+  }
+
+  private async getCertificate(): Promise<Caught<Buffer>> {
+    if (process.env['MONGODB_CERT']) {
+      return [null, Buffer.from(process.env['MONGODB_CERT'])];
+    }
+    const certificatePath = join(process.cwd(), '.mongodb/root.crt');
+    return await caught(readFile(certificatePath));
   }
 
 }

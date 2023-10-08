@@ -9,7 +9,6 @@ import { UserResponse } from './models/user-response.interface';
 
 export async function getWBUserV2(mongoDB: MongoDBService, id: string): Promise<UserResponse> {
   const dbFeedbacks = await mongoDB.read(MongoDBCollection.FEEDBACKS, 'uId', id);
-  console.log(dbFeedbacks);
   const feedbacks = dbFeedbacks
     .sort((a, b) => a.v - b.v)
     .map((item) => {

@@ -60,7 +60,6 @@ export async function getProductList(id: string): Promise<ProductListResponse> {
       }
     };
   }
-  console.log(catalogResponse.status, url);
   const [catalogJsonError, catalog] = await caught(catalogResponse?.json());
   if (catalogJsonError) {
 
