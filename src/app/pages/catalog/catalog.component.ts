@@ -78,7 +78,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.subscription$.unsubscribe();
   }
 
-  trackByProduct(_index: number, item: Partial<Product>): number | null {
+  trackByProduct(_index: number, item: Partial<Product>): string | number | null {
     return item.id ?? null;
   }
 

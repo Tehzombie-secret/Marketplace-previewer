@@ -11,27 +11,25 @@ import { Photo } from '../photo/photo.interface';
 import { WBPhotoSize } from './wb/wb-photo-size.enum';
 
 export interface Feedback {
-  productId: number;
-  userId: number;
+  productId: string;
+  userId: string;
   date: string;
   name: string;
-  photo: string;
-  country: string;
+  photo: string | null;
   feedback: string;
   feedbackPhotos: Photo[];
 }
 
-export function getFeedbackListFromWB(id: number | undefined, dto?: WBFeedbacks | null): Partial<Feedback>[] {
+export function getFeedbackListFromWB(id: string | number | undefined, dto?: WBFeedbacks | null): Partial<Feedback>[] {
   const items: Partial<Feedback>[] = (dto?.feedbacks || [])
     .filter((feedback: WBFeedback) => (feedback?.photos?.length ?? 0) > 0)
     .map((feedback: WBFeedback) => {
       const item: Partial<Feedback> = {
-        productId: id,
+        productId: `${id}`,
         feedback: feedback?.text,
-        userId: feedback?.wbUserId,
+        userId: `${feedback?.wbUserId}`,
         date: feedback?.createdDate,
         name: feedback?.wbUserDetails?.name || 'Без имени',
-        country: feedback?.wbUserDetails?.country,
         photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback.wbUserId),
         feedbackPhotos: (feedback?.photos || []).map((photoDTO: WBPhoto, index: number) => {
           const photo: Photo = {
@@ -50,22 +48,21 @@ export function getFeedbackListFromWB(id: number | undefined, dto?: WBFeedbacks 
   return items;
 }
 
-export function getFeedbackListFromWBV2(id: number | undefined, dto?: WBFeedbacksV2 | null): Partial<Feedback>[] {
+export function getFeedbackListFromWBV2(id: string | number | undefined, dto?: WBFeedbacksV2 | null): Partial<Feedback>[] {
   const items: Partial<Feedback>[] = (dto?.feedbacks || [])
     .filter((feedback: WBFeedbackV2) => (feedback?.photos?.length ?? 0) > 0)
     .sort((a: WBFeedbackV2, b: WBFeedbackV2) => (a.votes.pluses - a.votes.minuses / 2) - (b.votes.pluses - b.votes.minuses / 2))
     .map((feedback: WBFeedbackV2) => {
       const item: Partial<Feedback> = {
-        productId: id,
+        productId: `${id}`,
         feedback: feedback?.text,
-        userId: feedback?.wbUserId,
+        userId: feedback?.globalUserId,
         date: feedback?.createdDate,
         name: feedback?.wbUserDetails?.name || 'Без имени',
-        country: feedback?.wbUserDetails?.country,
-        photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback.wbUserId),
+        photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback.globalUserId),
         feedbackPhotos: (feedback?.photo || []).map((photoId: number, index: number) => {
           const photo: Photo = {
-            name: `feedback-${feedback?.wbUserId}-${id}-${index + 1}`,
+            name: `feedback-${feedback?.globalUserId}-${id}-${index + 1}`,
             small: getWBFeedbackImage(photoId, ImageSize.SMALL),
             big: getWBFeedbackImage(photoId, ImageSize.BIG),
           };

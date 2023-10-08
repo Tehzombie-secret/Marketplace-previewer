@@ -2,7 +2,7 @@ import { APIPlatform } from '../../services/api/models/api-platform.enum';
 
 export interface ProductReference {
   platform: APIPlatform;
-  id: number;
+  id: string;
   parentId: number;
   brand: string | null;
   title: string | null;

@@ -1,59 +1,123 @@
-import { WBFeedback } from '../../../app/services/api/models/wb/feedback/v1/wb-feedback.interface';
-import { WBFeedbacks } from '../../../app/services/api/models/wb/feedback/v1/wb-feedbacks.interface';
-import { WBPhoto } from '../../../app/services/api/models/wb/feedback/v1/wb-photo.interface';
-import { WBFeedbacksV2 } from '../../../app/services/api/models/wb/feedback/v2/wb-feedbacks-v2.interface';
-import { getFeedbackV2 } from '../../controllers/wb/feedback-v2/get-feedbacks-v2';
 import { FeedbacksSchema } from '../../services/mongodb/models/collection-schemas/feedbacks-schema.interface';
 import { ProductsSchema } from '../../services/mongodb/models/collection-schemas/products-schema.interface';
 import { MongoDBCollection } from '../../services/mongodb/models/mongo-db-collection.enum';
 import { TraverseStatus } from '../../services/mongodb/models/traverse-status.enum';
 import { MongoDBService } from '../../services/mongodb/mongodb.service';
+import { caught } from '../caught/caught';
+import { smartFetch } from '../smart-fetch';
+import { TaskMark, TaskQueue } from '../task-queue';
+import { PartialFeedbacksSchema } from './models/partial-feedbacks-schema.interface';
 import { updateStatus } from './update-status';
 
 export async function updateFeedbacks(mongoDB: MongoDBService): Promise<boolean> {
-  let product: string | undefined;
-  do {
-    const [productError, productResponse] = await mongoDB.readFirst(MongoDBCollection.PRODUCTS);
-    if (productError) {
-      return false;
+  const idIndexResult = await mongoDB.createIndexIfNone(MongoDBCollection.FEEDBACKS, 'id');
+  if (!idIndexResult) {
+    return false;
+  }
+  const uidIndexResult = await mongoDB.createIndexIfNone(MongoDBCollection.FEEDBACKS, 'uId');
+  if (!uidIndexResult) {
+    return false;
+  }
+  return new Promise(async (resolve) => {
+    while (await mongoDB.size(MongoDBCollection.PRODUCTS)) {
+      await fetchPack(mongoDB);
     }
-    console.log('requested product', productResponse?.slug);
-    if (!productResponse?.slug) {
-      break;
-    }
-    const feedbackList = await getFeedbackV2(productResponse.slug);
-    if (feedbackList.hasError) {
-      return false;
-    } else {
-      const list = feedbackList.response?.feedbacks?.filter((item) => item.photos.length) ?? [];
-      const result = await mongoDB.set(
-        MongoDBCollection.FEEDBACKS,
-        list.map((item: WBFeedback) => mapProductFromFeedback(productResponse, item)),
-        'id'
-      );
-      if (result) {
-        await mongoDB.delete(MongoDBCollection.PRODUCTS, 'slug', productResponse.slug);
-      }
-    }
-  } while (product);
-  console.log('update status to DONE');
-  const statusChangeResult = updateStatus(mongoDB, TraverseStatus.DONE);
-  return statusChangeResult;
+    const statusChangeResult = updateStatus(mongoDB, TraverseStatus.DONE);
+    resolve(statusChangeResult);
+  });
 }
 
-function mapProductFromFeedback(product: ProductsSchema, feedback: WBFeedback): FeedbacksSchema {
+export async function fetchPack(mongoDB: MongoDBService): Promise<void> {
+  return new Promise(async (resolve) => {
+    const size = await mongoDB.size(MongoDBCollection.PRODUCTS);
+    console.log('will fetch', size, 'products');
+    const cursor = await mongoDB.readAll(MongoDBCollection.PRODUCTS);
+    const pageQueue = new TaskQueue<string>(20);
+
+    // Log
+    pageQueue.listenQueueChanges((status) => {
+      if (status.status === 'COMPLETE') {
+        const markersRecord = status.markers.reduce((acc: Record<string, number[]>, curr: TaskMark) => {
+          return {
+            ...acc,
+            [curr.name]: (acc[curr.name] ?? []).concat([curr.duration]),
+          };
+        }, {} as Record<string, number[]>);
+        const markers = Object.entries(markersRecord).map(([key, value]) =>
+          `${key}: ${Math.round(value.reduce((acc: number, curr: number) => acc + curr, 0) / value.length)}ms`
+        ).join(', ');
+        const eventsRecord = status.results.reduce((acc: Record<string, number>, curr: string | undefined) => {
+          if (!curr) {
+            return acc;
+          }
+          return {
+            ...acc,
+            [curr]: (acc[curr] ?? 0) + 1,
+          };
+        }, {} as Record<string, number>);
+        const events = Object.entries(eventsRecord).map(([key, value]) => `${key}: ${value} times`).join(', ');
+        console.log(`Pack finished in`, status.time, `ms. Events: ${events}. Markers: ${markers}.`);
+      }
+    });
+
+    let limit = 500;
+    while (await cursor?.hasNext() && limit > 0) {
+      const element = await cursor?.next();
+      limit--;
+      if (!element) {
+        break;
+      }
+      pageQueue.add(`${element.slug}`, async ({ marker }) => {
+        const params = new URLSearchParams({
+          slug: `${element.parentId}`,
+        });
+        const url = 'https://functions.yandexcloud.net/d4e3id4kd5olr5krqa8j?' + params.toString();
+        while (true) {
+          const fetchResult = await smartFetch(null, url);
+          marker('fetch complete');
+          if (fetchResult?.status !== 200) {
+
+            return `fetch failed ${fetchResult?.status ?? 0}`;
+          }
+          // Add new products
+          const [jsonError, rawFeedbacks] = await caught(fetchResult?.json());
+          if (!rawFeedbacks?.length) {
+            if (element.parentId) {
+              await mongoDB.delete(MongoDBCollection.PRODUCTS, 'parentId', element.parentId);
+            } else {
+              await mongoDB.delete(MongoDBCollection.PRODUCTS, 'slug', element.slug);
+            }
+
+            return 'no feedbacks';
+          }
+          const feedbacks = rawFeedbacks.map((item: PartialFeedbacksSchema) => mapProductFromFeedback(element, item));
+          const pushSuccessful = await mongoDB.set(MongoDBCollection.FEEDBACKS, feedbacks, 'id');
+          marker('db enrich');
+          if (pushSuccessful) {
+            if (element.parentId) {
+              await mongoDB.delete(MongoDBCollection.PRODUCTS, 'parentId', element.parentId);
+            } else {
+              await mongoDB.delete(MongoDBCollection.PRODUCTS, 'slug', element.slug);
+            }
+          }
+
+          return pushSuccessful ? 'success' : 'push unsuccessful';
+        }
+      });
+    }
+    pageQueue.finalize(async () => {
+      resolve();
+    });
+  });
+}
+
+function mapProductFromFeedback(product: ProductsSchema, feedback: PartialFeedbacksSchema): FeedbacksSchema {
   return {
-    id: feedback.id,
+    ...feedback,
     b: product.brand,
     n: product.name,
     pId: product.slug,
     ppId: product.parentId,
     pp: product.photo,
-    t: feedback.text,
-    uId: feedback.wbUserId,
-    d: feedback.createdDate,
-    o: feedback.isObscene,
-    ps: feedback.photos.map((photo: WBPhoto) => photo.minSizeUri),
-    pl: feedback.photos.map((photo: WBPhoto) => photo.fullSizeUri),
   };
 }

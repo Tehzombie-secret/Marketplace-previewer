@@ -21,10 +21,6 @@ import { VendorPlatform } from './models/image-platform.enum';
 import { ServerContext } from './models/server-context.interface';
 import { WBProductController } from './controllers/wb/product/product.controller';
 import { WBProductListController } from './controllers/wb/product-list/product-list.controller';
-import { TraverseStatus } from './services/mongodb/models/traverse-status.enum';
-import { updateStatus } from './helpers/profile-traverser/update-status';
-import { MongoDBCollection } from './services/mongodb/models/mongo-db-collection.enum';
-import { listenOnTraverseDemands } from './helpers/profile-traverser/listen-on-traverse-demands';
 import { WBFeedbackControllerV2 } from './controllers/wb/feedback-v2/feedback-v2.controller';
 import { WBUserController } from './controllers/wb/user/user.controller';
 
@@ -77,9 +73,6 @@ async function run(): Promise<void> {
       console.log(`Node Express server listening on http://localhost:${port}`);
       if (shouldUseSideEffect) {
         cacheAssets(context.browserFolder, context.assetMemCache);
-        // await updateStatus(context.mongoDB, TraverseStatus.CATEGORIES);
-        // const result = await context.mongoDB.readFirst(MongoDBCollection.TRAVERSE_STATUS);
-        // console.log(result);
         // listenOnTraverseDemands(context.mongoDB);
       }
     });

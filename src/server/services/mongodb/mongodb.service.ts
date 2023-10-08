@@ -24,17 +24,45 @@ export class MongoDBService {
     return result;
   }
 
-  public async createIndexIfNone<T extends MongoDBCollection>(
-    collection: T,
-    key: keyof CollectionToSchemaStrategy[T],
+  public async getIndexes<T extends MongoDBCollection>(
+    collection: T
+  ): Promise<Document[] | null> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return null;
+    }
+    const indexes = await client
+      .collection<CollectionToSchemaStrategy[T]>(collection)
+      .indexes();
+    return indexes;
+  }
+
+  public async clearIndexes<T extends MongoDBCollection>(
+    collection: T
   ): Promise<boolean> {
     const client = await this.setupConnection();
     if (!client) {
       return false;
     }
-    const hasIndex = await client.collection<CollectionToSchemaStrategy[T]>(collection).indexExists(String(key));
+    const result = await client
+      .collection<CollectionToSchemaStrategy[T]>(collection)
+      .dropIndexes();
+    return result;
+  }
+
+  public async createIndexIfNone<T extends MongoDBCollection>(
+    collection: T,
+    key: (keyof CollectionToSchemaStrategy[T]) | (keyof CollectionToSchemaStrategy[T])[],
+  ): Promise<boolean> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return false;
+    }
+    const hasIndex = await client
+      .collection<CollectionToSchemaStrategy[T]>(collection)
+      .indexExists(Array.isArray(key) ? key.map((item) => String(item)) : String(key));
     if (!hasIndex) {
-      await client.collection<CollectionToSchemaStrategy[T]>(collection).createIndex(String(key));
+      await client.collection<CollectionToSchemaStrategy[T]>(collection).createIndex(Array.isArray(key) ? key.map((item) => String(item)) : String(key));
     }
     return true;
   }
@@ -84,6 +112,9 @@ export class MongoDBService {
     const deleteResult = await client.collection(collection).deleteMany();
     if (!deleteResult.acknowledged) {
       return false;
+    }
+    if (!items.length) {
+      return true;
     }
     const insertResult = await client.collection(collection).insertMany(items);
     return insertResult.acknowledged;

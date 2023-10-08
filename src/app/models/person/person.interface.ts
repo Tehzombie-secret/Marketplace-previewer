@@ -6,11 +6,10 @@ import { Photo } from '../photo/photo.interface';
 
 export interface Person {
   platform: APIPlatform;
-  id: number;
+  id: string;
   externalURL: string;
   name: string;
-  photo: string;
-  country: string;
+  photo?: string | null;
   feedbacks: Partial<UserFeedback>[];
   mergedPhotos: Photo[];
 }
@@ -22,11 +21,10 @@ export function getPersonFromWB(id: number | string, dto?: WBPersonRoot): Partia
     .map((feedback: WBPersonFeedback) => getUserFeedbackFromWB(feedback));
   const item: Partial<Person> = {
     platform: APIPlatform.WB,
-    id: +id,
+    id: `${id}`,
     externalURL: `https://www.wildberries.ru${dto?.path}`,
     name: data?.profile?.userName || 'Без имени',
     photo: data?.profile?.userPhotoLink,
-    country: data?.profile?.country,
     feedbacks,
     mergedPhotos: feedbacks.flatMap((value: Partial<UserFeedback>) => value.photos || []),
   };

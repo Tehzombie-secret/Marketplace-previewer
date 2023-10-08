@@ -246,7 +246,7 @@ export class WBAPIService implements APIBridge {
   }
 
   private getFeedbackChanges(
-    itemId: number | undefined,
+    itemId: string | number | undefined,
     request: WBFeedbackRequest,
     progressBeforeRequest: number,
     requestsMade: number,

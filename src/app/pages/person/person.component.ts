@@ -127,7 +127,6 @@ export class PersonComponent implements OnInit, OnDestroy {
               const gallery: ModalGallerySection<ReferenceType.PRODUCT> = {
                 author: {
                   quote: feedback.text,
-                  country: item.country,
                   date: feedback.date,
                   name: item.name,
                   photo: item.photo,
@@ -136,7 +135,7 @@ export class PersonComponent implements OnInit, OnDestroy {
                   type: ReferenceType.PRODUCT,
                   item: {
                     platform: item.platform,
-                    id: feedback.productId,
+                    id: `${feedback.productId}`,
                     parentId: feedback.parentProductId,
                     brand: feedback.productBrand,
                     title: feedback.productName,
