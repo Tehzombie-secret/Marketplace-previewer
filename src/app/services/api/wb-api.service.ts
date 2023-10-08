@@ -166,10 +166,10 @@ export class WBAPIService implements APIBridge {
 
       return existingStream$;
     }
-    const stream$ = this.http.get<WBFeedbacks>(`${environment.host}/api/${VendorPlatform.WB}/v2/feedback/${id}`)
+    const stream$ = this.http.get<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/v2/feedback/${id}`)
       .pipe(
-        map((item: WBFeedbacks) => {
-          const feedbacks = getProductFeedbacksFromWB(id, 100, 1, item);
+        map((item: WBFeedbacksV2) => {
+          const feedbacks = getProductFeedbacksFromWBV2(id, item);
 
           return feedbacks;
         }),

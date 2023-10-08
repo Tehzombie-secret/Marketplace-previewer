@@ -1,4 +1,6 @@
+import { ImageSize } from '../../../server/models/image-size.enum';
 import { proxifyLink } from '../../helpers/proxify-link';
+import { getWBFeedbackImage } from '../../helpers/wb/get-wb-feedback-image';
 import { getWBUserPhoto } from '../../helpers/wb/get-wb-user-photo';
 import { WBFeedback } from '../../services/api/models/wb/feedback/v1/wb-feedback.interface';
 import { WBFeedbacks } from '../../services/api/models/wb/feedback/v1/wb-feedbacks.interface';
@@ -61,11 +63,11 @@ export function getFeedbackListFromWBV2(id: number | undefined, dto?: WBFeedback
         name: feedback?.wbUserDetails?.name || 'Без имени',
         country: feedback?.wbUserDetails?.country,
         photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback.wbUserId),
-        feedbackPhotos: (feedback?.photos || []).map((photoDTO: WBPhoto, index: number) => {
+        feedbackPhotos: (feedback?.photo || []).map((photoId: number, index: number) => {
           const photo: Photo = {
             name: `feedback-${feedback?.wbUserId}-${id}-${index + 1}`,
-            small: photoDTO.minSizeUri ? proxifyLink(`https://feedbackphotos.wbstatic.net/${photoDTO.minSizeUri}`) : null,
-            big: photoDTO.fullSizeUri ? proxifyLink(`https://feedbackphotos.wbstatic.net/${photoDTO.fullSizeUri}`) : null,
+            small: getWBFeedbackImage(photoId, ImageSize.SMALL),
+            big: getWBFeedbackImage(photoId, ImageSize.BIG),
           };
 
           return photo;

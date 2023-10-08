@@ -20,7 +20,8 @@ export async function reverseProxyController(request: Request, response: Respons
 
     return;
   }
-  const proxyResponse = await smartFetch(response, decodeURI(decoupledURL));
+  const decodedURL = decodeURI(decoupledURL);
+  const proxyResponse = await smartFetch(response, decodedURL);
   if (!proxyResponse) {
 
     return;
@@ -51,7 +52,7 @@ export async function reverseProxyController(request: Request, response: Respons
 }
 
 function isImage(url: string, response: Response): boolean {
-  if (url.endsWith('.jpg') || url.endsWith('.png')) {
+  if (url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.webp')) {
     return true;
   }
   const contentType = response.getHeader('Content-Type');
