@@ -1,5 +1,3 @@
-import { environment } from '../../../environments/environment';
-import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { ImageSize } from '../../../server/models/image-size.enum';
 import { proxifyLink } from '../../helpers/proxify-link';
 import { getWBImage } from '../../helpers/wb/get-wb-image';
@@ -14,7 +12,7 @@ export interface Product {
   platform: APIPlatform;
   externalURL: string | null;
   parentId: number;
-  id: number;
+  id: string;
   brand: string;
   title: string;
   description: string;
@@ -27,7 +25,7 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
     platform: APIPlatform.WB,
     externalURL: getWBProductURL(id),
     parentId: dto?.imt_id,
-    id,
+    id: `${id}`,
     brand: dto?.selling?.brand_name,
     title: dto?.imt_name,
     description: dto?.description,
@@ -54,7 +52,7 @@ export function mapProductsFromSimilarWB(dto?: WBSimilar | null, referenceId?: s
     const id = dto?.id;
     const product: Partial<Product> = {
       platform: APIPlatform.WB,
-      id,
+      id: `${id}`,
       title: dto?.name,
       brand: dto?.brand,
       description: '',

@@ -30,7 +30,7 @@ export function getProductFeedbacksFromWB(
   return item;
 }
 
-export function getProductFeedbacksFromWBV2(id: number | undefined, dto?: WBFeedbacksV2 | null): ProductFeedbacks {
+export function getProductFeedbacksFromWBV2(id: string | number | undefined, dto?: WBFeedbacksV2 | null): ProductFeedbacks {
   const item: ProductFeedbacks = {
     progress: 100,
     size: dto?.feedbackCount ?? 0,

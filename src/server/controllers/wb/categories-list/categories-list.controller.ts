@@ -4,6 +4,6 @@ import { getCategoriesList } from './get-categories-list';
 
 export async function WBCategoriesListController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
-  const categoriesResponse = await getCategoriesList();
-  response.status(categoriesResponse.status).send(categoriesResponse?.error ?? categoriesResponse?.slugs ?? []);
+  const categoriesResponse = await getCategoriesList(true);
+  response.status(categoriesResponse.status).send(categoriesResponse?.error ?? categoriesResponse?.result ?? []);
 }

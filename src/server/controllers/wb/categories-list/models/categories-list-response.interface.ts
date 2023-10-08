@@ -1,5 +1,5 @@
-export interface CategoriesListResponse {
+export interface CategoriesListResponse<T> {
   status: number;
-  slugs?: string[];
+  result?: T[];
   error?: any;
 }

@@ -104,9 +104,8 @@ export class WBAPIService implements APIBridge {
 
       return existingStream$;
     }
-    const stream$ = this.http.get<WBPersonRoot>(`${environment.host}/api/${VendorPlatform.WB}/user/${id}`)
+    const stream$ = this.http.get<Partial<Person>>(`${environment.host}/api/${VendorPlatform.WB}/user/${id}`)
       .pipe(
-        map((person: WBPersonRoot) => getPersonFromWB(+id, person)),
         shareReplay(1),
       );
     this.userIdToPersonMap.set(idString, stream$);
@@ -247,7 +246,7 @@ export class WBAPIService implements APIBridge {
   }
 
   private getFeedbackChanges(
-    itemId: number | undefined,
+    itemId: string | number | undefined,
     request: WBFeedbackRequest,
     progressBeforeRequest: number,
     requestsMade: number,

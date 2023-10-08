@@ -10,11 +10,9 @@ import { reverseProxyController } from './controllers/reverse-proxy.controller';
 import { robotsController } from './controllers/robots.controller';
 import { staticAssetsController } from './controllers/static-assets.controller';
 import { WBCategoriesController } from './controllers/wb-categories.controller';
-import { WBFeedbackControllerV2 } from './controllers/wb-feedback-v2.controller';
 import { WBFeedbackController } from './controllers/wb-feedback.controller';
 import { WBSearchController } from './controllers/wb-search.controller';
 import { WBSimilarProductsController } from './controllers/wb-similar-products.controller';
-import { WBUserController } from './controllers/wb-user.controller';
 import { WBCategoriesListController } from './controllers/wb/categories-list/categories-list.controller';
 import { cacheAssets } from './helpers/cache-assets';
 import { generateServerContext } from './helpers/generate-server-context';
@@ -23,6 +21,8 @@ import { VendorPlatform } from './models/image-platform.enum';
 import { ServerContext } from './models/server-context.interface';
 import { WBProductController } from './controllers/wb/product/product.controller';
 import { WBProductListController } from './controllers/wb/product-list/product-list.controller';
+import { WBFeedbackControllerV2 } from './controllers/wb/feedback-v2/feedback-v2.controller';
+import { WBUserController } from './controllers/wb/user/user.controller';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export async function app(context: ServerContext): Promise<express.Express> {
@@ -45,7 +45,7 @@ export async function app(context: ServerContext): Promise<express.Express> {
         .get('/search/:query', WBSearchController)
         .get('/v1/product/:id', WBProductController)
         .get('/product/:id/similar', WBSimilarProductsController)
-        .get('/user/:id', WBUserController)
+        .get('/user/:id', (req, res) => WBUserController(req, res, context.mongoDB))
         .post('/feedback', bodyParser.json(), WBFeedbackController)
         .get('/v2/feedback/:id', WBFeedbackControllerV2)
       )
@@ -73,6 +73,7 @@ async function run(): Promise<void> {
       console.log(`Node Express server listening on http://localhost:${port}`);
       if (shouldUseSideEffect) {
         cacheAssets(context.browserFolder, context.assetMemCache);
+        // listenOnTraverseDemands(context.mongoDB);
       }
     });
   });

@@ -22,11 +22,6 @@
           {{ currentPhoto?.section?.author?.name }}
         </span>
         <span
-          *ngIf="currentPhoto?.section?.author?.country"
-          class="wb-typography-body">
-          {{ currentPhoto?.section?.author?.country }}
-        </span>
-        <span
           *ngIf="currentPhoto?.section?.author?.date"
           class="wb-typography-caption">
           {{ currentPhoto?.section?.author?.date | wbFriendlyDate }}
@@ -48,6 +43,7 @@
         [routerLink]="reference?.path"
         class="ui-gallery-reference">
         <img
+          *ngIf="reference?.photo"
           [src]="reference?.photo"
           alt=""
           referrerpolicy="no-referrer"

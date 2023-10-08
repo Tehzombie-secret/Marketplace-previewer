@@ -5,15 +5,18 @@ import { getCategoriesChunkFromWB, WBCategory } from '../../../../app/services/a
 import { caught } from '../../../helpers/caught/caught';
 import { smartFetch } from '../../../helpers/smart-fetch';
 import { CategoriesListResponse } from './models/categories-list-response.interface';
+import { FlatCategory } from './models/flat-category.interface';
 
 export const WB_CATALOG_URL = 'https://static-basket-01.wb.ru/vol0/data/main-menu-ru-ru-v2.json';
 
-export async function getCategoriesList(): Promise<CategoriesListResponse> {
+export async function getCategoriesList(extractSlugs: false): Promise<CategoriesListResponse<FlatCategory>>;
+export async function getCategoriesList(extractSlugs: true): Promise<CategoriesListResponse<string>>;
+export async function getCategoriesList(extractSlugs: boolean): Promise<CategoriesListResponse<string | FlatCategory>> {
   const categoriesResponse = await smartFetch(response, WB_CATALOG_URL);
   if (!categoriesResponse) {
     return {
       status: 200,
-      slugs: [],
+      result: [],
     };
   }
   const [jsonError, responseBody] = await caught(categoriesResponse.json());
@@ -24,11 +27,29 @@ export async function getCategoriesList(): Promise<CategoriesListResponse> {
     };
   }
   const categories = getCategoriesChunkFromWB(responseBody as WBCategory[]);
-  const slugs = [...new Set(categories.items.flatMap((category: Category) => getSlugs(category)))];
-  return {
-    status: categoriesResponse.status,
-    slugs,
+  if (extractSlugs) {
+    const result = [...new Set(categories.items.flatMap((category: Category) => getSlugs(category)))];
+
+    return {
+      status: categoriesResponse.status,
+      result,
+    };
+  } else {
+    const tuples: [string, FlatCategory][] = categories.items.flatMap((item) => getCategories(item)).map((item) => [item.slug, item]);
+    const result = Array.from(new Map<string, FlatCategory>(tuples).values());
+
+    return {
+      status: categoriesResponse.status,
+      result,
+    };
   }
+}
+
+function getCategories(category: Category): FlatCategory[] {
+  return [
+    !category.children.length ? { slug: `${category.slug}`, shard: category.shard, query: category.query } : null,
+    ...category.children.flatMap((item) => getCategories(item))
+  ].filter(truthy);
 }
 
 function getSlugs(category: Category): string[] {

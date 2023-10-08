@@ -55,7 +55,7 @@ export class ProductSimilarComponent implements OnChanges, OnDestroy {
     this.subscriptions$.unsubscribe();
   }
 
-  trackByProduct(_index: number, item: Partial<Product>): number | null {
+  trackByProduct(_index: number, item: Partial<Product>): string | number | null {
     return item.id ?? null;
   }
 

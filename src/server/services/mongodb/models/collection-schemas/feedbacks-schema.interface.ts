@@ -2,7 +2,9 @@ export interface FeedbacksSchema {
   /** Feedback id */
   id: string;
   /** User id */
-  uId: number;
+  uId: string;
+  /** User name */
+  un: string;
   /** Post date */
   d: string;
   /** Feedback post */
@@ -17,10 +19,8 @@ export interface FeedbacksSchema {
   n: string;
   /** Product photo */
   pp: string;
-  /** Feedback photos (small) */
-  ps: string[];
-  /** Feedback photos (large) */
-  pl: string[];
-  /** Is obscene */
-  o: boolean;
+  /** Feedback photo ids */
+  p: number[];
+  /** Feedback score (used for feedback sorting) */
+  v: number;
 }

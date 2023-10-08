@@ -30,6 +30,8 @@ export function getCategoriesFromWB(categories?: WBCategory[] | null): Category[
       const item: Category = {
         platform: APIPlatform.WB,
         title: dto?.name,
+        shard: dto?.shard,
+        query: dto?.query,
         slug: !dto?.landing && dto?.query ? dto?.id : null,
         children: getCategoriesFromWB(dto?.childs),
       };

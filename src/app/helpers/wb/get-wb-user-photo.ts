@@ -6,11 +6,11 @@ const SIZE_TO_SUFFIX_STRATEGY: Record<WBPhotoSize, string> = {
   [WBPhotoSize.SMALL]: 'small',
 }
 
-export function getWBUserPhoto(size: WBPhotoSize, details: WBUserDetails, id?: number | null): string {
+export function getWBUserPhoto(size: WBPhotoSize, details: WBUserDetails, id?: number | string | null): string | null {
   const suffix = SIZE_TO_SUFFIX_STRATEGY[size];
   const photo = details.hasPhoto && id
     ? `https://photos.wbstatic.net/img/${id}/${suffix}/PersonalPhoto.jpg`
-    : `https://images.wbstatic.net/img/0/${suffix}/PersonalPhoto.png?2`;
+    : null;
 
   return photo;
 }
