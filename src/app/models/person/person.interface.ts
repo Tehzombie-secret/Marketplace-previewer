@@ -15,14 +15,14 @@ export interface Person {
   mergedPhotos: Photo[];
 }
 
-export function getPersonFromWB(id: number, dto?: WBPersonRoot): Partial<Person> {
+export function getPersonFromWB(id: number | string, dto?: WBPersonRoot): Partial<Person> {
   const data = dto?.Value?.data ?? dto?.value?.data;
   const feedbacks: Partial<UserFeedback>[] = (data?.profile?.feedbacks || [])
     .filter((feedback: WBPersonFeedback) => (feedback?.entity?.photos?.length || 0) > 0)
     .map((feedback: WBPersonFeedback) => getUserFeedbackFromWB(feedback));
   const item: Partial<Person> = {
     platform: APIPlatform.WB,
-    id,
+    id: +id,
     externalURL: `https://www.wildberries.ru${dto?.path}`,
     name: data?.profile?.userName || 'Без имени',
     photo: data?.profile?.userPhotoLink,

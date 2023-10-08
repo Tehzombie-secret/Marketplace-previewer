@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises';
-import { Db, MongoClient, MongoClientOptions, WithId } from 'mongodb';
+import { Db, Document, FindCursor, MongoClient, MongoClientOptions, WithId } from 'mongodb';
 import { join } from 'path';
 import { format } from 'util';
 import { emitErrorLog } from '../../../app/helpers/emit-error-log/emit-error-log';
@@ -24,12 +24,27 @@ export class MongoDBService {
     return result;
   }
 
+  public async createIndexIfNone<T extends MongoDBCollection>(
+    collection: T,
+    key: keyof CollectionToSchemaStrategy[T],
+  ): Promise<boolean> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return false;
+    }
+    const hasIndex = await client.collection<CollectionToSchemaStrategy[T]>(collection).indexExists(String(key));
+    if (!hasIndex) {
+      await client.collection<CollectionToSchemaStrategy[T]>(collection).createIndex(String(key));
+    }
+    return true;
+  }
+
   public async clearTable<T extends MongoDBCollection>(collection: T): Promise<boolean> {
     const client = await this.setupConnection();
     if (!client) {
       return false;
     }
-    const result = await client.collection(collection).deleteMany({});
+    const result = await client.collection<CollectionToSchemaStrategy[T]>(collection).deleteMany({});
     return result.acknowledged;
   }
 
@@ -42,6 +57,7 @@ export class MongoDBService {
     if (!client) {
       return false;
     }
+    await client.collection(collection)
     const operations = items.map((item) => {
       return {
         updateOne: {
@@ -55,6 +71,22 @@ export class MongoDBService {
     })
     const result = await client.collection(collection).bulkWrite(operations, { ordered: false });
     return result.isOk();
+  }
+
+  public async clearAndSet<T extends MongoDBCollection>(
+    collection: T,
+    items: CollectionToSchemaStrategy[T][],
+  ): Promise<boolean> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return false;
+    }
+    const deleteResult = await client.collection(collection).deleteMany();
+    if (!deleteResult.acknowledged) {
+      return false;
+    }
+    const insertResult = await client.collection(collection).insertMany(items);
+    return insertResult.acknowledged;
   }
 
   public async write<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(
@@ -71,6 +103,23 @@ export class MongoDBService {
     return result.acknowledged;
   }
 
+  public async read<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(
+    collection: T,
+    key: J,
+    value: CollectionToSchemaStrategy[T][J],
+  ): Promise<WithId<CollectionToSchemaStrategy[T]>[]> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return [];
+    }
+    const result = await client
+      .collection<CollectionToSchemaStrategy[T]>(collection)
+      .find({ [key]: value } as any)
+      .toArray();
+
+    return result;
+  }
+
   public async readFirst<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(
     collection: T,
     excludeKey?: J,
@@ -82,6 +131,13 @@ export class MongoDBService {
         ?.collection<CollectionToSchemaStrategy[T]>(collection)
         ?.findOne(excludeKey && excludeValue ? { [excludeKey]: { $not: { $eq: excludeValue } } } as any : {})
     );
+  }
+
+  public async readAll<T extends MongoDBCollection>(
+    collection: T,
+  ): Promise<FindCursor<WithId<CollectionToSchemaStrategy[T]>> | null> {
+    const client = await this.setupConnection();
+    return client?.collection<CollectionToSchemaStrategy[T]>(collection)?.find() ?? null;
   }
 
   public async delete<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(

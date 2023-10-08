@@ -1,5 +1,7 @@
 import { WBFeedback } from '../../../app/services/api/models/wb/feedback/v1/wb-feedback.interface';
+import { WBFeedbacks } from '../../../app/services/api/models/wb/feedback/v1/wb-feedbacks.interface';
 import { WBPhoto } from '../../../app/services/api/models/wb/feedback/v1/wb-photo.interface';
+import { WBFeedbacksV2 } from '../../../app/services/api/models/wb/feedback/v2/wb-feedbacks-v2.interface';
 import { getFeedbackV2 } from '../../controllers/wb/feedback-v2/get-feedbacks-v2';
 import { FeedbacksSchema } from '../../services/mongodb/models/collection-schemas/feedbacks-schema.interface';
 import { ProductsSchema } from '../../services/mongodb/models/collection-schemas/products-schema.interface';

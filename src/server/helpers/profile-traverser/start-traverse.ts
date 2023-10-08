@@ -17,7 +17,7 @@ export async function startTraverse(mongoDB: MongoDBService): Promise<void> {
   if (queueError) {
     return;
   }
-  console.log('got status', queueStatus);
+  console.log('got status', queueStatus?.status);
   const statusToTraverserStrategy: Record<TraverseStatus, () => (Promise<void> | void)> = {
     [TraverseStatus.CATEGORIES]: async () => {
       console.log('update: categories');

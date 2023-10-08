@@ -7,7 +7,7 @@ import { smartFetch } from '../../../helpers/smart-fetch';
 import { WB_CATALOG_URL } from '../categories-list/get-categories-list';
 import { ProductListResponse } from './models/product-list-response.interface';
 
-export async function getProductList(id: string, page: string): Promise<ProductListResponse> {
+export async function getProductList(id: string): Promise<ProductListResponse> {
   // Get menu
   const menuResponse = await smartFetch(response, WB_CATALOG_URL);
   if (!menuResponse) {
