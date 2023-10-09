@@ -10,6 +10,7 @@ import { getPersonFromWB, Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
 import { mapProductFromWB, mapProductsFromSimilarWB, Product } from '../../models/product/product.interface';
 import { APIBridge } from './models/api-bridge.interface';
+import { FeedbackHint } from './models/feedback-hint.interface';
 import { getCategoriesChunkFromWB, WBCategory } from './models/wb/categories/wb-category.interface';
 import { WBFeedbackRequest } from './models/wb/feedback/v1/wb-feedback-request.interface';
 import { WBFeedbacks } from './models/wb/feedback/v1/wb-feedbacks.interface';
@@ -93,7 +94,7 @@ export class WBAPIService implements APIBridge {
     return stream$;
   }
 
-  getUserChanges(id?: number | string | null): Observable<Partial<Person>> {
+  getUserChanges(id?: number | string | null, hint?: FeedbackHint): Observable<Partial<Person>> {
     if (!id) {
 
       return NEVER;
@@ -104,7 +105,9 @@ export class WBAPIService implements APIBridge {
 
       return existingStream$;
     }
-    const stream$ = this.http.get<Partial<Person>>(`${environment.host}/api/${VendorPlatform.WB}/user/${id}`)
+    const stream$ = this.http.get<Partial<Person>>(`${environment.host}/api/${VendorPlatform.WB}/user/${id}`, {
+      params: typeof hint?.useGlobalId === 'boolean' ? { global: hint?.useGlobalId } : {},
+    })
       .pipe(
         shareReplay(1),
       );

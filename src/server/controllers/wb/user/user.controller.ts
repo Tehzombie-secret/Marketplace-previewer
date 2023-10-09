@@ -12,7 +12,8 @@ export async function WBUserController(request: Request, response: Response, mon
 
     return;
   }
+  const useGlobalId = request.query['global'];
 
-  const result = await getWBUserV2(mongoDB, id);
+  const result = await getWBUserV2(mongoDB, id, useGlobalId ? useGlobalId === 'true' : undefined);
   response.status(result.status).send(result.error ?? result.response);
 }

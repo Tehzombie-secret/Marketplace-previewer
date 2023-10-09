@@ -18,6 +18,10 @@ export async function updateFeedbacks(mongoDB: MongoDBService): Promise<boolean>
   if (!uidIndexResult) {
     return false;
   }
+  const uwidIndexResult = await mongoDB.createIndexIfNone(MongoDBCollection.FEEDBACKS, 'uWId');
+  if (!uwidIndexResult) {
+    return false;
+  }
   return new Promise(async (resolve) => {
     while (await mongoDB.size(MongoDBCollection.PRODUCTS)) {
       await fetchPack(mongoDB);

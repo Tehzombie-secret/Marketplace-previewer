@@ -41,6 +41,7 @@
         *ngIf="(reference$ | async) as reference"
         mat-dialog-close
         [routerLink]="reference?.path"
+        [queryParams]="reference?.params"
         class="ui-gallery-reference">
         <img
           *ngIf="reference?.photo"

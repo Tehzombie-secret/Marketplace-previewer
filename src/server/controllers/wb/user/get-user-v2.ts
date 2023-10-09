@@ -8,10 +8,14 @@ import { MongoDBCollection } from '../../../services/mongodb/models/mongo-db-col
 import { MongoDBService } from '../../../services/mongodb/mongodb.service';
 import { UserResponse } from './models/user-response.interface';
 
-export async function getWBUserV2(mongoDB: MongoDBService, id: string): Promise<UserResponse> {
-  const dbFeedbacks = await mongoDB.read(MongoDBCollection.FEEDBACKS, 'uId', id);
+export async function getWBUserV2(mongoDB: MongoDBService, id: string, useGlobalId?: boolean): Promise<UserResponse> {
+  const dbFeedbacks = typeof useGlobalId !== 'boolean'
+    ? [
+      ...await mongoDB.read(MongoDBCollection.FEEDBACKS, 'uId', id),
+      ...await mongoDB.read(MongoDBCollection.FEEDBACKS, 'uWId', id),
+    ]
+    : await mongoDB.read(MongoDBCollection.FEEDBACKS, useGlobalId ? 'uId' : 'uWId', id);
   const feedbacks = dbFeedbacks
-    .sort((a, b) => a.v - b.v)
     .map((item) => {
       const feedback: UserFeedback = {
         date: item.d,

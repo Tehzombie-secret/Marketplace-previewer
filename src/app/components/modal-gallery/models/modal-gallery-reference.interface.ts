@@ -1,7 +1,6 @@
-import { Params } from '@angular/router';
-
 export interface ModalGalleryReference {
   path: string;
+  params?: Record<string, string>;
   photo: string | null;
   title: string | null;
 }

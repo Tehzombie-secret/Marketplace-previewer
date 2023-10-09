@@ -10,6 +10,7 @@ import { Product } from '../../models/product/product.interface';
 import { EtsyAPIService } from './etsy-api.service';
 import { APIBridge } from './models/api-bridge.interface';
 import { APIPlatform } from './models/api-platform.enum';
+import { FeedbackHint } from './models/feedback-hint.interface';
 import { WBAPIService } from './wb-api.service';
 
 @Injectable({
@@ -36,8 +37,8 @@ export class APIService implements APIBridge {
     return this.request((service: APIBridge) => service.getSearchChanges(query));
   }
 
-  getUserChanges(id?: number | string | null): Observable<Partial<Person>> {
-    return this.request((service: APIBridge) => service.getUserChanges(id));
+  getUserChanges(id?: number | string | null, hint?: FeedbackHint): Observable<Partial<Person>> {
+    return this.request((service: APIBridge) => service.getUserChanges(id, hint));
   }
 
   getProductChanges(id: number | string): Observable<Partial<Product>> {

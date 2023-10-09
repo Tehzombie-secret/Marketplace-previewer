@@ -4,6 +4,7 @@ import { APIPlatform } from '../../services/api/models/api-platform.enum';
 export interface PersonReference {
   platform: APIPlatform;
   id: string;
+  wId: string;
   name: string | null;
   photo: string | null;
 }

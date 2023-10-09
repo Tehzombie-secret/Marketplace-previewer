@@ -7,6 +7,7 @@ import { WBFeedbackVotesV2 } from './wb-feedback-votes-v2.interface';
 export interface WBFeedbackV2 {
   id: string;
   globalUserId: string;
+  wbUserId: number;
   wbUserDetails: WBFeedbackUserV2;
   text: string;
   matchingSize: string;

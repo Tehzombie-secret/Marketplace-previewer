@@ -3,6 +3,8 @@ export interface FeedbacksSchema {
   id: string;
   /** User id */
   uId: string;
+  /** Another user id, either one of IDs should be present */
+  uWId: string;
   /** User name */
   un: string;
   /** Post date */

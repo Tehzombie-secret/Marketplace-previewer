@@ -115,11 +115,21 @@ export class PersonComponent implements OnInit, OnDestroy {
   }
 
   private getPersonChanges(): Observable<Partial<PersonViewModel>> {
-    return this.activatedRoute.paramMap
+    return combineLatest([
+      this.activatedRoute.paramMap
+        .pipe(
+          map((paramMap: ParamMap) => paramMap.get('id')),
+          filterTruthy(),
+        ),
+      this.activatedRoute.queryParamMap
+        .pipe(
+          map((paramMap: ParamMap) => paramMap.get('global')),
+          map((global: string | null) => typeof global === 'string' ? global === 'true' : undefined),
+          filterTruthy()
+        ),
+    ])
       .pipe(
-        map((paramMap: ParamMap) => paramMap.get('id')),
-        filterTruthy(),
-        switchMap((id: string) => this.API.getUserChanges(id)),
+        switchMap(([id, global]: [string, boolean | undefined]) => this.API.getUserChanges(id, { useGlobalId: global })),
         map((item: Partial<Person>) => {
           const images: ModalGallerySection<ReferenceType.PRODUCT>[] = (item.feedbacks || [])
             .filter((feedback: Partial<UserFeedback>) => (feedback.photos?.length ?? 0) > 0)
