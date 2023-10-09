@@ -60,7 +60,7 @@ export async function fetchPack(mongoDB: MongoDBService): Promise<void> {
           };
         }, {} as Record<string, number>);
         const events = Object.entries(eventsRecord).map(([key, value]) => `${key}: ${value} times`).join(', ');
-        console.log(`Pack finished in`, status.time, `ms. Events: ${events}. Markers: ${markers}.`);
+        console.log(`Pack finished in`, Math.round(status.time / 1000), `s. Events: ${events}. Markers: ${markers}.`);
       }
     });
 
