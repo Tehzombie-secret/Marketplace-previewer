@@ -23,6 +23,7 @@ import { WBProductController } from './controllers/wb/product/product.controller
 import { WBProductListController } from './controllers/wb/product-list/product-list.controller';
 import { WBFeedbackControllerV2 } from './controllers/wb/feedback-v2/feedback-v2.controller';
 import { WBUserController } from './controllers/wb/user/user.controller';
+import { listenOnTraverseDemands } from './helpers/profile-traverser/listen-on-traverse-demands';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export async function app(context: ServerContext): Promise<express.Express> {

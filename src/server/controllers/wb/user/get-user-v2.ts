@@ -1,4 +1,5 @@
 import { getWBFeedbackImage } from '../../../../app/helpers/wb/get-wb-feedback-image';
+import { getWBImage } from '../../../../app/helpers/wb/get-wb-image';
 import { UserFeedback } from '../../../../app/models/feedbacks/user-feedback.interface';
 import { Person } from '../../../../app/models/person/person.interface';
 import { APIPlatform } from '../../../../app/services/api/models/api-platform.enum';
@@ -19,9 +20,9 @@ export async function getWBUserV2(mongoDB: MongoDBService, id: string): Promise<
         productBrand: item.b,
         productName: item.n,
         productPhoto: {
-          big: item.pp,
-          small: item.pp,
-          name: `product-${item.pId}`,
+          big: getWBImage(item.pId, '1', ImageSize.BIG),
+          small: getWBImage(item.pId, '1', ImageSize.SMALL),
+          name: `product-${item.pId}-1`,
         },
         text: item.t,
         photos: item.p.map((photo: number, index: number) => ({

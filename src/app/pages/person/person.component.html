@@ -5,6 +5,7 @@
   <!-- PROFILE INFO -->
   <div class="profile-block">
     <img
+      *ngIf="person?.photo"
       [src]="person.photo"
       alt=""
       referrerpolicy="no-referrer"
