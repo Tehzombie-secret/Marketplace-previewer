@@ -13,6 +13,4 @@ export interface PartialFeedbacksSchema {
   t: string;
   /** Feedback photo ids */
   p: number[];
-  /** Feedback score (used for feedback sorting) */
-  v: number;
 }

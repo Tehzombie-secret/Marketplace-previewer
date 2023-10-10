@@ -19,10 +19,6 @@ export interface FeedbacksSchema {
   b: string;
   /** Product name */
   n: string;
-  /** Product photo */
-  pp: string;
   /** Feedback photo ids */
   p: number[];
-  /** Feedback score (used for feedback sorting) */
-  v: number;
 }
