@@ -3,7 +3,7 @@ html, body {
   height: 100%;
 }
 
-.wb-dialog-container .mat-dialog-container {
+.wb-dialog-container .mat-mdc-dialog-container {
   position: relative; // For close button positioning
   height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
