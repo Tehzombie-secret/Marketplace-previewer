@@ -139,7 +139,7 @@ export class TaskQueue<T> {
         }));
         this.markers.push(...markers);
         this.ongoingTasks = Math.max(0, this.ongoingTasks - 1);
-        if (this.closed && this.closeFn && this.taskQueue.length === 0 && this.ongoingTasks === 0) {
+        if (this.closed && this.taskQueue.length === 0 && this.ongoingTasks === 0) {
           this.close();
         }
         this.start();
