@@ -8,4 +8,5 @@ export interface VisitedEntry {
   type: VisitedEntryType;
   title?: string;
   photo?: string | null;
+  sortByDate?: boolean;
 }

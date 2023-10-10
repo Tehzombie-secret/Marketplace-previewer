@@ -81,6 +81,7 @@ export class PersonComponent implements OnInit, OnDestroy {
           platform: person.platform ?? APIPlatform.WB,
           ids: [person.id],
           photo: person.photo,
+          sortByDate: false,
         };
         this.history.visit(entry);
       }

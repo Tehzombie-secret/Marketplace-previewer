@@ -11,7 +11,8 @@
     *ngIf="canLoadMore"
     (click)="loadMore()"
     mat-stroked-button
-    color="primary">
+    color="primary"
+    class="load-button">
     {{ hasItems ? 'Загрузить следующие' : 'Загрузить похожие' }}
     <mat-icon svgIcon="arrow-down"></mat-icon>
   </button>

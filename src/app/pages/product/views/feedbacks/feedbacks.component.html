@@ -52,7 +52,9 @@
     <li
       *ngFor="let item of feedbacks; trackBy: trackByFeedback;"
       class="feedback-card">
-      <div class="feedback-photo-wrapper">
+      <div
+        *ngIf="item.item.photo"
+        class="feedback-photo-wrapper">
         <img
           [src]="item.item.photo"
           alt=""

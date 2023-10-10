@@ -2,11 +2,12 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, startWith, Subject, Subscription, switchMap, withLatestFrom } from 'rxjs';
+import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, shareReplay, startWith, Subject, Subscription, switchMap, take, tap, withLatestFrom } from 'rxjs';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { truthy } from '../../helpers/truthy';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
@@ -34,6 +35,7 @@ import { ProductSimilarComponent } from './views/similar/similar.component';
     CommonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatButtonToggleModule,
     ProductOverviewComponent,
     ProductFeedbacksComponent,
     ProductSimilarComponent,
@@ -56,6 +58,7 @@ import { ProductSimilarComponent } from './views/similar/similar.component';
 })
 export class ProductComponent implements OnInit, OnDestroy {
 
+  sortByDate = false;
   readonly id$ = this.getIdChanges();
   readonly product$ = this.getProductChanges(this.id$);
   private readonly retryFeedbacks$ = new Subject<void>();
@@ -76,26 +79,22 @@ export class ProductComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.toolbar.setTitle('Товар');
 
-    const effectsSubscription$ = this.product$.subscribe((item: Partial<ProductViewModel>) => {
-      const title = [item?.item?.brand, item?.item?.title]
-        .filter(truthy)
-        .join(' / ')
-      if (item?.item?.id) {
-        const date = new Date();
-        this.visitDate$.next(date);
-        const visit: VisitRequest = {
-          type: VisitedEntryType.PRODUCT,
-          date,
-          title,
-          platform: item.item.platform ?? APIPlatform.WB,
-          ids: [item.item.id, item.item.parentId],
-          photo: item.item?.images?.[0]?.small,
-        };
-        this.history.visit(visit);
-      }
-      this.title.setTitle(title || 'Товар');
-    });
-    this.subscriptions$.add(effectsSubscription$);
+    const visitSubscription$ = this.product$
+      .pipe(
+        switchMap((product: ProductViewModel) => this.history.hasVisitedChanges(
+          VisitedEntryType.PRODUCT,
+          product.item?.platform ?? APIPlatform.WB,
+          product.item?.parentId
+        )),
+        take(1),
+      )
+      .subscribe((entry: VisitedEntry | null) => {
+        if (entry) {
+          this.sortByDate = entry.sortByDate ?? true;
+        }
+        this.visit(this.sortByDate, true);
+      });
+    this.subscriptions$.add(visitSubscription$);
   }
 
   ngOnDestroy(): void {
@@ -104,6 +103,12 @@ export class ProductComponent implements OnInit, OnDestroy {
 
   retryFeedbacks(): void {
     this.retryFeedbacks$.next();
+  }
+
+  changeSort(newValue: MatButtonToggleChange): void {
+    console.log('change');
+    this.sortByDate = newValue.value;
+    this.visit(this.sortByDate, false);
   }
 
   private getIdChanges(): Observable<string> {
@@ -134,6 +139,7 @@ export class ProductComponent implements OnInit, OnDestroy {
         map((product: Partial<Product>) => ({ isLoading: false, item: product })),
         catchError((error: HttpErrorResponse) => of({ isLoading: false, error })),
         startWith({ isLoading: true }),
+        shareReplay(1),
       );
   }
 
@@ -160,5 +166,40 @@ export class ProductComponent implements OnInit, OnDestroy {
         filterTruthy(),
         switchMap((item: Partial<Product>) => this.API.getFeedbacksChanges(item)),
       );
+  }
+
+  private visit(sortByDate: boolean, updateDate: boolean): void {
+    console.log('visit', sortByDate);
+    const date$ = updateDate ? of(new Date()) : this.visitDate$
+    const effectsSubscription$ = combineLatest([
+      this.product$.pipe(tap((s) => console.log('product', s))),
+      date$.pipe(tap((s) => console.log('date', s))),
+    ])
+      .pipe(
+        take(1),
+      )
+      .subscribe(([item, date]: [Partial<ProductViewModel>, Date]) => {
+        console.log(item, date);
+        const title = [item?.item?.brand, item?.item?.title]
+          .filter(truthy)
+          .join(' / ')
+        if (item?.item?.id) {
+          if (updateDate) {
+            this.visitDate$.next(date);
+          }
+          const visit: VisitRequest = {
+            type: VisitedEntryType.PRODUCT,
+            date,
+            title,
+            platform: item.item.platform ?? APIPlatform.WB,
+            ids: [item.item.id, item.item.parentId],
+            photo: item.item?.images?.[0]?.small,
+            sortByDate,
+          };
+          this.history.visit(visit);
+        }
+        this.title.setTitle(title || 'Товар');
+      });
+    this.subscriptions$.add(effectsSubscription$);
   }
 }

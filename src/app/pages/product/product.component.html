@@ -33,9 +33,28 @@
     <wb-product-similar [item]="product"></wb-product-similar>
 
     <!-- FEEDBACKS -->
+    <div class="sort-block">
+      <div class="wb-typography-body sort-title">
+        <mat-icon svgIcon="sort"></mat-icon>
+        <span>Сортировка</span>
+      </div>
+      <mat-button-toggle-group
+        [value]="sortByDate"
+        (change)="changeSort($event)"
+        name="sort"
+        aria-label="Сортировка">
+        <mat-button-toggle [value]="false">По рейтингу</mat-button-toggle>
+        <mat-button-toggle [value]="true">По дате</mat-button-toggle>
+      </mat-button-toggle-group>
+      <div class="wb-typography-caption">
+        Посещенные товары автоматически сортируются по дате (сначала новые). Выбор сохраняется
+      </div>
+    </div>
+
     <wb-product-feedbacks
       [item]="feedbacks$ | async"
       [product]="product"
+      [sortByDate]="sortByDate"
       (retryFeedbacks)="retryFeedbacks()">
     </wb-product-feedbacks>
   </div>

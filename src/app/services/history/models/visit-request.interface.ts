@@ -8,4 +8,5 @@ export interface VisitRequest {
   title?: string;
   photo?: string | null;
   ids?: (string | number | undefined)[] | null;
+  sortByDate: boolean;
 }

@@ -106,6 +106,7 @@ export class HistoryService {
           platform: maybeEntry?.platform || request.platform,
           title: request.title || maybeEntry?.title,
           photo: request.photo || maybeEntry?.photo,
+          sortByDate: request?.sortByDate ?? true,
         };
         entry.date.push(request.date.toISOString());
         await this.visitedEntries.setItem(key, entry);

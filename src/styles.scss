@@ -26,6 +26,7 @@
 @include mat.dialog-theme($wb-theme);
 @include mat.tooltip-theme($wb-theme);
 @include mat.progress-spinner-theme($wb-theme);
+@include mat.button-toggle-theme($wb-theme);
 
 @include previews.theme($wb-theme);
 @include paginator.theme($wb-theme);

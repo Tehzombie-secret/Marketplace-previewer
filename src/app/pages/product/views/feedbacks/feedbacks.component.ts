@@ -5,6 +5,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
+import { compareAsc, isBefore } from 'date-fns';
 import { ModalGalleryComponent } from '../../../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../../../components/modal-gallery/models/modal-gallery.interface';
@@ -42,6 +43,7 @@ export class ProductFeedbacksComponent {
 
   @Input() product?: ProductViewModel | null = null;
   @Input() item?: ProductFeedbacks | null = null;
+  @Input() sortByDate?: boolean | null = false;
   @Output() readonly retryFeedbacks = new EventEmitter<void>();
 
   galleryMode$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
@@ -62,7 +64,16 @@ export class ProductFeedbacksComponent {
     this.isLoading = (this.item?.progress ?? 0) < 100;
     this.progress = this.item?.progress ?? 12;
     this.hasError = this.item?.hasError ?? false;
-    const gallery = (this.item?.feedbacks ?? [])
+    const feedbacks: Partial<Feedback>[] = this.sortByDate
+      ? [...(this.item?.feedbacks ?? [])].sort((a, b) => {
+        if (a?.date && b?.date) {
+          return compareAsc(new Date(a.date), new Date(b.date));
+        } else {
+          return 0;
+        }
+      })
+      : (this.item?.feedbacks ?? []);
+    const gallery = feedbacks
       .filter((item: Partial<Feedback>) => (item.feedbackPhotos?.length ?? 0) > 0)
       .map((item: Partial<Feedback>) => {
         const section: ModalGallerySection<ReferenceType.PERSON> = {
@@ -83,8 +94,9 @@ export class ProductFeedbacksComponent {
         };
 
         return section;
-      });
-    this.feedbacks = (this.item?.feedbacks ?? [])
+      })
+      .sort();
+    this.feedbacks = feedbacks
       .filter((item: Partial<Feedback>) => (item.feedbackPhotos?.length ?? 0) > 0)
       .map((item: Partial<Feedback>, sectionIndex: number) => {
         const photos = (item.feedbackPhotos || []).map((photo: Photo, photoIndex: number) => {
