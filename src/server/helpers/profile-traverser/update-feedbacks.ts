@@ -24,14 +24,17 @@ export async function updateFeedbacks(mongoDB: MongoDBService): Promise<boolean>
   }
   return new Promise(async (resolve) => {
     while (await mongoDB.size(MongoDBCollection.PRODUCTS)) {
-      await fetchPack(mongoDB);
+      const result = await fetchPack(mongoDB);
+      if (result) {
+        break;
+      }
     }
     const statusChangeResult = updateStatus(mongoDB, TraverseStatus.DONE);
     resolve(statusChangeResult);
   });
 }
 
-export async function fetchPack(mongoDB: MongoDBService): Promise<void> {
+export async function fetchPack(mongoDB: MongoDBService): Promise<boolean> {
   return new Promise(async (resolve) => {
     const size = await mongoDB.size(MongoDBCollection.PRODUCTS);
     console.log('will fetch', size, 'products');
@@ -61,6 +64,11 @@ export async function fetchPack(mongoDB: MongoDBService): Promise<void> {
         }, {} as Record<string, number>);
         const events = Object.entries(eventsRecord).map(([key, value]) => `${key}: ${value} times`).join(', ');
         console.log(`Pack finished in`, Math.round(status.time / 1000), `s. Events: ${events}. Markers: ${markers}.`);
+        if (status.results.every((item) => item?.startsWith('fetch failed 5')) && size <= 50) {
+          resolve(true);
+        } else {
+          resolve(size <= 0);
+        }
       }
     });
 
@@ -109,9 +117,7 @@ export async function fetchPack(mongoDB: MongoDBService): Promise<void> {
         }
       });
     }
-    pageQueue.finalize(async () => {
-      resolve();
-    });
+    pageQueue.finalize();
   });
 }
 

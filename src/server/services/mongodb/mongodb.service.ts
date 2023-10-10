@@ -62,7 +62,11 @@ export class MongoDBService {
       .collection<CollectionToSchemaStrategy[T]>(collection)
       .indexExists(Array.isArray(key) ? key.map((item) => String(item)) : String(key));
     if (!hasIndex) {
-      await client.collection<CollectionToSchemaStrategy[T]>(collection).createIndex(Array.isArray(key) ? key.map((item) => String(item)) : String(key));
+      await client
+        .collection<CollectionToSchemaStrategy[T]>(collection)
+        .createIndex(Array.isArray(key) ? key.map((item) => String(item)) : String(key), {
+          background: true,
+        });
     }
     return true;
   }
