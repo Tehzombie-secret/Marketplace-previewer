@@ -5,7 +5,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
-import { compareAsc, isBefore } from 'date-fns';
+import { compareDesc } from 'date-fns';
 import { ModalGalleryComponent } from '../../../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../../../components/modal-gallery/models/modal-gallery.interface';
@@ -67,7 +67,7 @@ export class ProductFeedbacksComponent {
     const feedbacks: Partial<Feedback>[] = this.sortByDate
       ? [...(this.item?.feedbacks ?? [])].sort((a, b) => {
         if (a?.date && b?.date) {
-          return compareAsc(new Date(a.date), new Date(b.date));
+          return compareDesc(new Date(a.date), new Date(b.date));
         } else {
           return 0;
         }
