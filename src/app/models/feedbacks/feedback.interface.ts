@@ -53,16 +53,17 @@ export function getFeedbackListFromWBV2(id: string | number | undefined, dto?: W
     .filter((feedback: WBFeedbackV2) => (feedback?.photos?.length ?? 0) > 0)
     .sort((a: WBFeedbackV2, b: WBFeedbackV2) => a.rank - b.rank)
     .map((feedback: WBFeedbackV2) => {
+      const userId = feedback?.globalUserId || `${feedback.wbUserId || ''}`;
       const item: Partial<Feedback> = {
         productId: `${id}`,
         feedback: feedback?.text,
-        userId: feedback?.globalUserId,
+        userId,
         date: feedback?.createdDate,
         name: feedback?.wbUserDetails?.name || 'Без имени',
-        photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback.globalUserId),
+        photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, userId),
         feedbackPhotos: (feedback?.photo || []).map((photoId: number, index: number) => {
           const photo: Photo = {
-            name: `feedback-${feedback?.globalUserId}-${id}-${index + 1}`,
+            name: `feedback-${userId}-${id}-${index + 1}`,
             small: getWBFeedbackImage(photoId, ImageSize.SMALL),
             big: getWBFeedbackImage(photoId, ImageSize.BIG),
           };

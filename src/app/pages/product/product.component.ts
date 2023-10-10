@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, shareReplay, startWith, Subject, Subscription, switchMap, take, tap, withLatestFrom } from 'rxjs';
+import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, shareReplay, startWith, Subject, Subscription, switchMap, take, withLatestFrom } from 'rxjs';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { truthy } from '../../helpers/truthy';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
@@ -106,7 +106,6 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   changeSort(newValue: MatButtonToggleChange): void {
-    console.log('change');
     this.sortByDate = newValue.value;
     this.visit(this.sortByDate, false);
   }
@@ -169,17 +168,15 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   private visit(sortByDate: boolean, updateDate: boolean): void {
-    console.log('visit', sortByDate);
     const date$ = updateDate ? of(new Date()) : this.visitDate$
     const effectsSubscription$ = combineLatest([
-      this.product$.pipe(tap((s) => console.log('product', s))),
-      date$.pipe(tap((s) => console.log('date', s))),
+      this.product$,
+      date$,
     ])
       .pipe(
         take(1),
       )
       .subscribe(([item, date]: [Partial<ProductViewModel>, Date]) => {
-        console.log(item, date);
         const title = [item?.item?.brand, item?.item?.title]
           .filter(truthy)
           .join(' / ')
