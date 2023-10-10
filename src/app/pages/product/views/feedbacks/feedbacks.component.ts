@@ -94,8 +94,7 @@ export class ProductFeedbacksComponent {
         };
 
         return section;
-      })
-      .sort();
+      });
     this.feedbacks = feedbacks
       .filter((item: Partial<Feedback>) => (item.feedbackPhotos?.length ?? 0) > 0)
       .map((item: Partial<Feedback>, sectionIndex: number) => {

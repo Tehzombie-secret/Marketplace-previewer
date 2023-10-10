@@ -86,13 +86,14 @@ export class ProductComponent implements OnInit, OnDestroy {
           product.item?.platform ?? APIPlatform.WB,
           product.item?.parentId
         )),
-        take(1),
       )
       .subscribe((entry: VisitedEntry | null) => {
-        if (entry) {
+        if (typeof entry?.sortByDate === 'boolean') {
           this.sortByDate = entry.sortByDate ?? true;
+          this.visit(this.sortByDate, true);
+        } else {
+          this.visit(null, true);
         }
-        this.visit(this.sortByDate, true);
       });
     this.subscriptions$.add(visitSubscription$);
   }
@@ -167,7 +168,7 @@ export class ProductComponent implements OnInit, OnDestroy {
       );
   }
 
-  private visit(sortByDate: boolean, updateDate: boolean): void {
+  private visit(sortByDate: boolean | null, updateDate: boolean): void {
     const date$ = updateDate ? of(new Date()) : this.visitDate$
     const effectsSubscription$ = combineLatest([
       this.product$,
