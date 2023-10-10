@@ -1,4 +1,5 @@
 import { Request, Response as ExpressResponse } from 'express';
+import { truthy } from '../../app/helpers/truthy';
 import { caught } from '../helpers/caught/caught';
 import { emitRequestLog } from '../helpers/emit-request-log';
 import { smartFetch } from '../helpers/smart-fetch';
@@ -12,36 +13,35 @@ export async function WBSimilarProductsController(request: Request, response: Ex
 
     return;
   }
-  const headers = { 'x-requested-with': 'XMLHttpRequest' };
-  const [similarResponse, recommendedResponse, seeAlsoResponse] = await Promise.all([
-    smartFetch(response, `https://in-similar.wildberries.ru/?nm=${id}`),
-    smartFetch(response, `https://www.wildberries.ru/webapi/recommendations/recommended-by-nm/${id}`, { headers }),
-    smartFetch(response, `https://www.wildberries.ru/webapi/recommendations/also-buy-by-nm/${id}`, { headers }),
+  const [recommendedResponse, seeAlsoResponse] = await Promise.all([
+    smartFetch(response, `https://rec-goods.wildberries.ru/api/v1/recommendations?nm=${id}`),
+    smartFetch(response, `https://waterfall-card-rec.wildberries.ru/api/v1/recommendations?nm=${id}`),
   ]);
-  if (!similarResponse || !recommendedResponse || !seeAlsoResponse) {
+  if (!recommendedResponse || !seeAlsoResponse) {
     response.sendStatus(500);
 
     return;
   }
   const [
-    [similarError, similar],
     [recommendedError, recommended],
     [seeAlsoError, seeAlso],
   ] = await Promise.all([
-    caught(similarResponse?.json()),
     caught(recommendedResponse?.json()),
     caught(seeAlsoResponse?.json()),
   ]);
-  const ids = shuffle([similar ?? [], recommended?.value?.nmIds ?? [], seeAlso?.value?.nmIds ?? []].flat());
+  const ids = [
+    recommended?.nms ?? [],
+    (seeAlso as {nm: number}[])?.map((item) => item.nm)?.filter(truthy) ?? [],
+  ].flat();
+  /**
+   *
+   */
   const paramsList = new URLSearchParams({
-    spp: '0',
-    pricemarginCoeff: '1.0',
-    reg: '0',
     appType: '1',
-    emp: '0',
-    locale: 'ru',
-    lang: 'ru',
     curr: 'rub',
+    dest: '-1181032',
+    regions: '80,83,38,4,64,33,68,70,30,40,86,69,1,66,22,48,31,112,114',
+    spp: '29',
     nm: ids.join(';'),
   });
   const params = decodeURIComponent(`${paramsList}`);
