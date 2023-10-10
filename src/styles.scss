@@ -7,7 +7,8 @@
 @import 'fonts';
 @import 'typography';
 
-@include mat.all-legacy-component-themes($wb-theme);
+@include mat.core();
+// @include mat.all-legacy-component-themes($wb-theme);
 // TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
 //  The following line adds:
 //    1. Default typography styles for all components
@@ -16,7 +17,15 @@
 //  If you don't need the default component typographies but still want the hierarchy styles,
 //  you can delete this line and instead use:
 //    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
-@include mat.all-legacy-component-typographies();
-@include mat.legacy-core();
+// @include mat.all-legacy-component-typographies();
+// @include mat.legacy-core();
+@include mat.button-theme($wb-theme);
+@include mat.icon-theme($wb-theme);
+@include mat.list-theme($wb-theme);
+@include mat.sidenav-theme($wb-theme);
+@include mat.dialog-theme($wb-theme);
+@include mat.tooltip-theme($wb-theme);
+@include mat.progress-spinner-theme($wb-theme);
+
 @include previews.theme($wb-theme);
 @include paginator.theme($wb-theme);

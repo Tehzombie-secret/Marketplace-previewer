@@ -1,9 +1,9 @@
 import { AsyncPipe, NgClass, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import { MatLegacyListModule as MatListModule } from '@angular/material/legacy-list';
+import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Event, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -11,11 +11,9 @@ import { filter } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ROUTE_PATH } from '../../constants/route-path.const';
 import { SCROLL_CONTAINER_CLASS } from '../../constants/scroll-container-class.const';
-import { ToolbarService } from '../../services/toolbar/toolbar.service';
-import {MatLegacyInputModule as MatInputModule} from '@angular/material/legacy-input';
-import {MatLegacyFormFieldModule as MatFormFieldModule} from '@angular/material/legacy-form-field';
-import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { SEARCH_QUERY_PARAM } from '../../pages/catalog/constants/search-query-param.const';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
+import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { VersionStorageService } from '../../services/version-storage.service';
 
 @Component({
