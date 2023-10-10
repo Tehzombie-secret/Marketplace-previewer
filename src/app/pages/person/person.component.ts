@@ -125,7 +125,6 @@ export class PersonComponent implements OnInit, OnDestroy {
         .pipe(
           map((paramMap: ParamMap) => paramMap.get('global')),
           map((global: string | null) => typeof global === 'string' ? global === 'true' : undefined),
-          filterTruthy()
         ),
     ])
       .pipe(
