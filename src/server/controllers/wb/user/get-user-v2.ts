@@ -54,7 +54,7 @@ export async function getWBUserV2(mongoDB: MongoDBService, id: string, useGlobal
 
 async function fetchAllFeedbacks(mongoDB: MongoDBService, id: string): Promise<FeedbacksSchema[]> {
   const dbFeedbacks = [
-    ...await mongoDB.read(MongoDBCollection.FEEDBACKS, 'uWId', id),
+    ...await mongoDB.read(MongoDBCollection.FEEDBACKS, 'uId', id),
     ...await mongoDB.read(MongoDBCollection.FEEDBACKS, 'uWId', id),
   ];
   const idToFeedbackMap = new Map<string, FeedbacksSchema>(dbFeedbacks.map((item) => [item.id, item]));
