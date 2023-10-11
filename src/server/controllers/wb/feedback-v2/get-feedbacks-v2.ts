@@ -1,10 +1,12 @@
-import { mapProductFromWB } from '../../../../app/models/product/product.interface';
+import { mapProductFromWB, mapProductsFromSimilarWB } from '../../../../app/models/product/product.interface';
 import { WBFeedbacksV2 } from '../../../../app/services/api/models/wb/feedback/v2/wb-feedbacks-v2.interface';
 import { caught } from '../../../helpers/caught/caught';
 import { smartFetch } from '../../../helpers/smart-fetch';
 import { FeedbacksSchema } from '../../../services/mongodb/models/collection-schemas/feedbacks-schema.interface';
 import { MongoDBCollection } from '../../../services/mongodb/models/mongo-db-collection.enum';
 import { MongoDBService } from '../../../services/mongodb/mongodb.service';
+import { getWBProductListByNM } from '../product-list-by-nm/product-list-by-nm';
+import { getProductList } from '../product-list/get-product-list';
 import { getWBProduct } from '../product/get-product';
 import { FeedbacksV2Response } from './models/feedbacks-v2-response.interface';
 
@@ -29,9 +31,10 @@ export async function getFeedbackV2(id: string | number, mongoDB?: MongoDBServic
 
   if (mongoDB) {
     new Promise(async () => {
-      const productDTO = await getWBProduct(`${id}`);
-      const product = mapProductFromWB(productDTO.result);
-      if (!product?.id) {
+      const list = await getWBProductListByNM(['52545299']);
+      const products = mapProductsFromSimilarWB(list);
+      const product = products?.[0];
+      if (!product) {
         return;
       }
       const dbFeedbacks = ((responseBody as WBFeedbacksV2)?.feedbacks ?? [])
@@ -49,7 +52,6 @@ export async function getFeedbackV2(id: string | number, mongoDB?: MongoDBServic
             pId: `${product.id}`,
             ppId: product.parentId ? `${product.parentId}` : null,
             p: item.photo || [],
-            f: true,
           };
 
           return result;

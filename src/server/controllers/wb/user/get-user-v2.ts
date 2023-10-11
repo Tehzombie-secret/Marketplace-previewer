@@ -32,7 +32,6 @@ export async function getWBUserV2(mongoDB: MongoDBService, id: string, useGlobal
           big: getWBFeedbackImage(photo, ImageSize.BIG),
           name: `feedback-${id}-${item.pId}-${index + 1}`,
         })),
-        f: item?.f,
       };
 
       return feedback;

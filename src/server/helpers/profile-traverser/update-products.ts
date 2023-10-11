@@ -1,3 +1,4 @@
+import { ProductsSchema } from '../../services/mongodb/models/collection-schemas/products-schema.interface';
 import { MongoDBCollection } from '../../services/mongodb/models/mongo-db-collection.enum';
 import { TraverseStatus } from '../../services/mongodb/models/traverse-status.enum';
 import { MongoDBService } from '../../services/mongodb/mongodb.service';
@@ -86,7 +87,9 @@ async function fetchPack(mongoDB: MongoDBService): Promise<void> {
 
             return 'no items';
           }
-          const pushSuccessful = await mongoDB.set(MongoDBCollection.PRODUCTS, products, 'slug');
+          const validProducts = (products as ProductsSchema[])
+            .filter((item) => (item.slug || item.parentId) && item.brand && item.name);
+          const pushSuccessful = await mongoDB.set(MongoDBCollection.PRODUCTS, validProducts, 'slug');
           marker('db enrich');
           if (pushSuccessful) {
             await mongoDB.delete(MongoDBCollection.CATEGORIES, 'id', element.id);
