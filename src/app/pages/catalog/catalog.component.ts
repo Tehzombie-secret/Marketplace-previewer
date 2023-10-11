@@ -6,17 +6,24 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
-import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, map, Observable, of, startWith, Subscription, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, filter, map, Observable, of, shareReplay, startWith, Subscription, switchMap, tap } from 'rxjs';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { treeFind } from '../../helpers/tree-find';
+import { truthy } from '../../helpers/truthy';
 import { Categories } from '../../models/categories/categories.interface';
 import { Category } from '../../models/categories/category.interface';
 import { Product } from '../../models/product/product.interface';
 import { APIService } from '../../services/api/api.service';
+import { APIPlatform } from '../../services/api/models/api-platform.enum';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { SEARCH_QUERY_PARAM } from './constants/search-query-param.const';
 import { CatalogViewModel } from './models/catalog-view-model.interface';
+
+const PAGE_CAP_STRATEGY: Record<APIPlatform, number> = {
+  [APIPlatform.WB]: 50,
+  [APIPlatform.ETSY]: 5,
+};
 
 @Component({
   standalone: true,
@@ -52,26 +59,29 @@ import { CatalogViewModel } from './models/catalog-view-model.interface';
 })
 export class CatalogComponent implements OnInit, OnDestroy {
 
-  private readonly itemsPerPage = 7;
-  visibleItems = this.itemsPerPage;
   readonly title$ = this.getNameChanges();
+  readonly page$ = new BehaviorSubject<number>(1);
   private readonly retry$ = new BehaviorSubject<void>(void 0);
-  readonly page$ = this.getCatalogChanges(this.retry$);
-  private readonly subscription$ = new Subscription();
+  readonly items$ = new BehaviorSubject<CatalogViewModel>({ isLoading: false, items: [], hasError: false });
+  readonly itemsToShow$ = new BehaviorSubject<number>(0);
+  readonly visibleItems$ = this.getVisibleItemsChanges(this.items$, this.itemsToShow$);
+  readonly canShowMore$ = this.canShowMoreChanges(this.itemsToShow$, this.items$, this.page$);
   readonly menuPath$ = this.getMenuPathChanges();
+  private readonly itemsPerPage = 14;
+  private readonly subscription$ = new Subscription();
 
   constructor(
     private API: APIService,
     private route: ActivatedRoute,
     private title: Title,
-    private cdr: ChangeDetectorRef,
     private toolbar: ToolbarService,
   ) {
   }
 
   ngOnInit(): void {
-    this.listenPaginationResetChanges();
     this.listenTitleChanges();
+    this.listenPageChanges();
+    this.listenCatalogChanges();
   }
 
   ngOnDestroy(): void {
@@ -87,20 +97,7 @@ export class CatalogComponent implements OnInit, OnDestroy {
   }
 
   nextPage(): void {
-    this.visibleItems += this.itemsPerPage;
-  }
-
-  private listenPaginationResetChanges(): void {
-    const paginationSubscription$ = this.route.paramMap
-      .pipe(
-        map((paramMap: ParamMap) => paramMap.get('id')),
-        distinctUntilChanged(),
-      )
-      .subscribe(() => {
-        this.visibleItems = this.itemsPerPage;
-        this.cdr.markForCheck();
-      });
-    this.subscription$.add(paginationSubscription$);
+    this.itemsToShow$.next(this.itemsToShow$.value + this.itemsPerPage);
   }
 
   private listenTitleChanges(): void {
@@ -135,44 +132,21 @@ export class CatalogComponent implements OnInit, OnDestroy {
       );
   }
 
-  private getCatalogChanges(retry$: Observable<void>): Observable<CatalogViewModel> {
-    const errorResponse: CatalogViewModel = {
-      hasError: true,
-      isLoading: false,
-      items: [],
-    };
-    const isLoadingResponse: CatalogViewModel = {
-      hasError: false,
-      isLoading: true,
-      items: [],
-    };
-    const emptyResponse: CatalogViewModel = {
-      hasError: false,
-      isLoading: false,
-      items: [],
-    };
-    const queryAndIDTuple$ = combineLatest([
-      this.route.paramMap.pipe(map((paramMap: ParamMap) => paramMap.get('id'))),
-      this.route.queryParamMap.pipe(map((paramMap: ParamMap) => paramMap.get(SEARCH_QUERY_PARAM))),
-    ]);
-
-    return retry$
+  private listenCatalogChanges(): void {
+    const pingSubscription$ = this.retry$
       .pipe(
-        switchMap(() => queryAndIDTuple$),
-        switchMap(([id, query]: (string | null)[]) => id || query
-          ? (id ? this.API.getCatalogChanges(id) : this.API.getSearchChanges(query))
-            .pipe(
-              map((items: Partial<Product>[]) => {
-                const viewModel: CatalogViewModel = { items, isLoading: false, hasError: false };
-
-                return viewModel;
-              }),
-              startWith(isLoadingResponse),
-            )
-          : of(emptyResponse)
-        ),
-        catchError(() => of(errorResponse)),
-      );
+        switchMap(() => combineLatest([
+          this.route.paramMap.pipe(map((paramMap: ParamMap) => paramMap.get('id'))),
+          this.route.queryParamMap.pipe(map((paramMap: ParamMap) => paramMap.get(SEARCH_QUERY_PARAM))),
+          this.getMaxPageChanges(),
+        ])),
+        filter(([id, query, maxPage]: [string | null, string | null, number]) => Boolean(id || query))
+      )
+      .subscribe(([id, query, maxPage]: [string | null, string | null, number]) => {
+        this.itemsToShow$.next(this.itemsPerPage);
+        this.fetch(maxPage, 1);
+      });
+    this.subscription$.add(pingSubscription$);
   }
 
   private getMenuPathChanges(): Observable<string[]> {
@@ -182,4 +156,97 @@ export class CatalogComponent implements OnInit, OnDestroy {
       );
   }
 
+  private fetch(maxPage: number, page: number): void {
+    if (this.items$.value.isLoading) {
+      return;
+    }
+    const id = this.route.snapshot.paramMap.get('id');
+    const query = this.route.snapshot.queryParamMap.get(SEARCH_QUERY_PARAM);
+    const loading: CatalogViewModel = { ...this.items$.value, isLoading: true, hasError: false };
+    this.items$.next(loading);
+    this.page$.next(page);
+    const pages$ = new Array(Math.min(maxPage, page)).fill(0).map((_, index: number) => {
+      return (id || query)
+        ? (id ? this.API.getCatalogChanges(id, index + 1) : this.API.getSearchChanges(query, index + 1))
+        : of(null)
+    });
+    const fetchSubscription$ = combineLatest(pages$)
+      .pipe(
+        map((items: (Partial<Product>[] | null)[]) => items.flat().filter(truthy)),
+      )
+      .subscribe({
+        next: (catalog: Partial<Product>[]) => this.items$.next({
+          items: catalog,
+          isLoading: false,
+          hasError: false,
+        }),
+        error: () => this.items$.next({
+          ...this.items$.value,
+          isLoading: false,
+          hasError: true,
+        }),
+      });
+    this.subscription$.add(fetchSubscription$);
+  }
+
+  private canShowMoreChanges(
+    visibleItems$: Observable<number>,
+    items$: Observable<CatalogViewModel>,
+    page$: Observable<number>,
+  ): Observable<boolean> {
+    return combineLatest([
+      this.getMaxPageChanges(),
+      visibleItems$,
+      items$,
+      page$,
+    ])
+      .pipe(
+        map(([maxPage, visibleItems, items, page]: [number, number, CatalogViewModel, number]) =>
+          !(maxPage >= page && visibleItems >= items.items.length)
+        ),
+      );
+  }
+
+  private listenPageChanges(): void {
+    const pageSubscription$ = combineLatest([
+      this.itemsToShow$.pipe(tap((s) => console.log('items to show change', s))),
+      this.items$,
+      this.page$.pipe(tap((s) => console.log('page change', s))),
+      this.getMaxPageChanges().pipe(tap((s) => console.log('max page change', s))),
+    ])
+      .pipe(
+        filter(([visibleItems, items, page, maxPage]: [number, CatalogViewModel, number, number]) =>
+          visibleItems >= items.items.length - this.itemsPerPage * 2
+          && items.items.length > 0
+          && !items.isLoading
+          && !items.hasError
+          && page < maxPage
+        ),
+      )
+      .subscribe(([visibleItems, items, page, maxPage]) => {
+        this.fetch(maxPage, page + 1);
+      });
+    this.subscription$.add(pageSubscription$);
+  }
+
+  private getMaxPageChanges(): Observable<number> {
+    return this.route.paramMap
+      .pipe(
+        map((paramMap: ParamMap) => paramMap.get('platform') as (APIPlatform | null)),
+        map((platform: APIPlatform | null) => PAGE_CAP_STRATEGY[platform ?? APIPlatform.WB]),
+      );
+  }
+
+  private getVisibleItemsChanges(items$: Observable<CatalogViewModel>, itemsToShow$: Observable<number>): Observable<CatalogViewModel> {
+    return combineLatest([
+      items$,
+      itemsToShow$,
+    ])
+      .pipe(
+        map(([items, itemsToShow]: [CatalogViewModel, number]) => ({
+          ...items,
+          items: items.items.slice(0, itemsToShow),
+        })),
+      );
+  }
 }

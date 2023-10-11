@@ -53,18 +53,21 @@ export class WBAPIService implements APIBridge {
     return this.categories$;
   }
 
-  getCatalogChanges(id?: number | string | null): Observable<Partial<Product>[]> {
+  getCatalogChanges(id?: number | string | null, page?: number | null): Observable<Partial<Product>[]> {
     if (!id) {
 
       return NEVER;
     }
-    const idString = `${id}`;
+    const idString = `${id}~~~${page}`;
     const existingStream$ = this.categoryIdToCatalogMap.get(idString);
     if (existingStream$) {
 
       return existingStream$;
     }
-    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/catalog/${id}`)
+    const params = {
+      ...(page ? { page } : {}),
+    };
+    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/catalog/${id}`, { params })
       .pipe(
         map((dto: WBSimilar) => mapProductsFromSimilarWB(dto)),
         shareReplay(1),
@@ -74,22 +77,26 @@ export class WBAPIService implements APIBridge {
     return stream$;
   }
 
-  getSearchChanges(query?: string | null): Observable<Partial<Product>[]> {
+  getSearchChanges(query?: string | null, page?: number | null): Observable<Partial<Product>[]> {
     if (!query) {
 
       return NEVER;
     }
-    const existingStream$ = this.queryToCatalogMap.get(query);
+    const idString = `${query}~~~${page}`;
+    const existingStream$ = this.queryToCatalogMap.get(idString);
     if (existingStream$) {
 
       return existingStream$;
     }
-    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/search/${query}`)
+    const params = {
+      ...(page ? { page } : {}),
+    };
+    const stream$ = this.http.get<WBSimilar>(`${environment.host}/api/${VendorPlatform.WB}/search/${query}`, { params })
       .pipe(
         map((dto: WBSimilar) => mapProductsFromSimilarWB(dto)),
         shareReplay(1),
       );
-    this.queryToCatalogMap.set(query, stream$);
+    this.queryToCatalogMap.set(idString, stream$);
 
     return stream$;
   }

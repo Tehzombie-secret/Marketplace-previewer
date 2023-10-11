@@ -1,5 +1,5 @@
 <div
-  *ngIf="(page$ | async) as page"
+  *ngIf="(visibleItems$ | async) as page"
   class="catalog-body">
 
   <a
@@ -15,12 +15,12 @@
   <div class="content-block">
     <div class="cards-block">
       <ul class="cards-list">
-        <li *ngFor="let item of page.items | slice:0:visibleItems; trackBy: trackByProduct;">
+        <li *ngFor="let item of page.items; trackBy: trackByProduct;">
           <wb-product-card [item]="item"></wb-product-card>
         </li>
       </ul>
       <button
-        *ngIf="visibleItems < page.items.length"
+        *ngIf="canShowMore$ | async"
         (click)="nextPage()"
         mat-stroked-button
         color="primary"

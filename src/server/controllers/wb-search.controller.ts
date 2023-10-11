@@ -13,6 +13,7 @@ export async function WBSearchController(request: Request, response: Response): 
 
     return;
   }
+  const page = request.query['page'];
 
   // Get items
   const params = new URLSearchParams({
@@ -26,6 +27,7 @@ export async function WBSearchController(request: Request, response: Response): 
     suppressSpellcheck: 'false',
     uclusters: '1',
     query: decodeURIComponent(query),
+    ...(typeof page === 'string' && +page > 1 ? { page } : null),
   });
   const url = `https://search.wb.ru/exactmatch/ru/common/v4/search?${params}`;
   const catalogResponse = await smartFetch(response, url);

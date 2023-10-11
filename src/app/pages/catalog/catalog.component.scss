@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 24px 16px;
+  padding: 24px 16px 120px;
   box-sizing: border-box;
 
   .back-anchor {
@@ -30,7 +30,6 @@
     width: 100%;
     flex-grow: 1;
     display: grid;
-    overflow-x: hidden; // Due to scale animations
   }
 
   .cards-block {

@@ -7,7 +7,7 @@ import { smartFetch } from '../../../helpers/smart-fetch';
 import { WB_CATALOG_URL } from '../categories-list/get-categories-list';
 import { ProductListResponse } from './models/product-list-response.interface';
 
-export async function getProductList(id: string): Promise<ProductListResponse> {
+export async function getProductList(id: string, page?: number | null): Promise<ProductListResponse> {
   // Get menu
   const menuResponse = await smartFetch(response, WB_CATALOG_URL);
   if (!menuResponse) {
@@ -47,7 +47,8 @@ export async function getProductList(id: string): Promise<ProductListResponse> {
     dest: '-1181032',
     regions: '80,38,83,4,64,33,68,70,30,40,86,69,1,31,66,48,22,114',
     sort: 'popular',
-    uclusters: '1'
+    uclusters: '1',
+    ...((page ?? 0) > 1 ? { page: `${page ?? 0}` } : {}),
   });
   const url = `https://catalog.wb.ru/catalog/${category.shard}/catalog?${[params, category.query].join('&')}`;
   const catalogResponse = await smartFetch(response, url);

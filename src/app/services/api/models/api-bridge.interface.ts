@@ -9,8 +9,8 @@ import { FeedbackHint } from './feedback-hint.interface';
 export interface APIBridge {
 
   getCategoriesChanges(): Observable<Categories>;
-  getCatalogChanges(id?: number | string | null): Observable<Partial<Product>[]>;
-  getSearchChanges(query?: string | null): Observable<Partial<Product>[]>;
+  getCatalogChanges(id?: number | string | null, page?: number | null): Observable<Partial<Product>[]>;
+  getSearchChanges(query?: string | null, page?: number | null): Observable<Partial<Product>[]>;
   getUserChanges(id?: number | string | null, hint?: FeedbackHint | null): Observable<Partial<Person>>;
   getProductChanges(id: number | string): Observable<Partial<Product>>;
   getSimilarChanges(id: number | string): Observable<Partial<Product>[]>;

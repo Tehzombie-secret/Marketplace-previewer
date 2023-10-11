@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { emitRequestLog } from '../helpers/emit-request-log';
-import { getBrotliContent } from '../helpers/get-brotli-content';
 import { smartFetch } from '../helpers/smart-fetch';
 
 export async function reverseProxyController(request: Request, response: Response): Promise<void> {
@@ -22,14 +21,14 @@ export async function reverseProxyController(request: Request, response: Respons
   }
   const decodedURL = decodeURI(decoupledURL);
   const proxyResponse = await smartFetch(response, decodedURL);
-  if (!proxyResponse) {
+  response.status(proxyResponse?.status ?? 500);
+  const excludedHeaders = ['content-encoding'];
+  if (!proxyResponse?.headers) {
+    response.send(proxyResponse);
 
     return;
   }
-  const acceptEncoding = request.header('Accept-Encoding') || '';
-  response.status(proxyResponse.status);
-  const excludedHeaders = ['content-encoding'];
-  proxyResponse.headers.forEach((value: string, key: string) => {
+  proxyResponse?.headers?.forEach((value: string, key: string) => {
     if (!key || !value || excludedHeaders.includes(key.toLowerCase())) {
 
       return;

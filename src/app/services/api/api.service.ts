@@ -29,12 +29,12 @@ export class APIService implements APIBridge {
     return this.request((service: APIBridge) => service.getCategoriesChanges());
   }
 
-  getCatalogChanges(id?: number | string | null): Observable<Partial<Product>[]> {
-    return this.request((service: APIBridge) => service.getCatalogChanges(id));
+  getCatalogChanges(id?: number | string | null, page?: number | null): Observable<Partial<Product>[]> {
+    return this.request((service: APIBridge) => service.getCatalogChanges(id, page));
   }
 
-  getSearchChanges(query?: string | null): Observable<Partial<Product>[]> {
-    return this.request((service: APIBridge) => service.getSearchChanges(query));
+  getSearchChanges(query?: string | null, page?: number | null): Observable<Partial<Product>[]> {
+    return this.request((service: APIBridge) => service.getSearchChanges(query, page));
   }
 
   getUserChanges(id?: number | string | null, hint?: FeedbackHint): Observable<Partial<Person>> {
