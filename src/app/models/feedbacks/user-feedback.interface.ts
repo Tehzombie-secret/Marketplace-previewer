@@ -15,6 +15,7 @@ export interface UserFeedback {
   text: string;
   date: string;
   photos: Photo[];
+  f?: boolean;
 }
 
 export function getUserFeedbackFromWB(dto?: WBPersonFeedback | null): Partial<UserFeedback> {

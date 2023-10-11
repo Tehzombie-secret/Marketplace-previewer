@@ -318,7 +318,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
           .pipe(
             map((feedbacks: ProductFeedbacks | null) => ({
               isLoading: false,
-              amount: (feedbacks?.withPhotosSize ?? 1) - 1,
+              amount: Math.max((feedbacks?.withPhotosSize ?? 1) - 1, 0),
               photos: (feedbacks?.feedbacks || [])
                 .filter((feedback: Partial<Feedback>) => feedback.feedback !== item.section.author?.quote)
                 .map((feedback: Partial<Feedback>) => feedback.feedbackPhotos?.[0]?.small || null)

@@ -166,7 +166,7 @@ export class WBAPIService implements APIBridge {
   }
 
   private getFeedbackChangesV2(item: Partial<ProductReference> | null | undefined): Observable<ProductFeedbacks> {
-    const id = item?.parentId ?? item?.id;
+    const id = item?.parentId || item?.id;
     if (!id) {
       return NEVER;
     }

@@ -21,4 +21,6 @@ export interface FeedbacksSchema {
   n: string;
   /** Feedback photo ids */
   p: number[];
+  /** Whether entry is from user input */
+  f: boolean;
 }

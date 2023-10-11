@@ -49,6 +49,7 @@ export async function getFeedbackV2(id: string | number, mongoDB?: MongoDBServic
             pId: `${product.id}`,
             ppId: product.parentId ? `${product.parentId}` : null,
             p: item.photo || [],
+            f: true,
           };
 
           return result;
