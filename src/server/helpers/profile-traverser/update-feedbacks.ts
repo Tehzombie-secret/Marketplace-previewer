@@ -126,7 +126,7 @@ function mapProductFromFeedback(product: ProductsSchema, feedback: PartialFeedba
     ...feedback,
     b: product.brand,
     n: product.name,
-    pId: product.slug,
-    ppId: product.parentId,
+    pId: `${product.slug}`,
+    ppId: `${product.parentId}`,
   };
 }

@@ -260,7 +260,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
   private getReferenceChanges(photo$: Observable<ModalGalleryCurrentEntry<T> | null>): Observable<ModalGalleryReference | null> {
     const typeToReferenceStrategy: ModalGalleryReferenceStrategy<ModalGalleryReference> = {
       [ReferenceType.PERSON]: (item: ModalGalleryCurrentEntry<ReferenceType.PERSON>) => ({
-        path: `/${item.platform}/${ROUTE_PATH.PERSON}/${item.section.reference?.item?.id ?? item.section.reference?.item?.wId}`,
+        path: `/${item.platform}/${ROUTE_PATH.PERSON}/${item.section.reference?.item?.id || item.section.reference?.item?.wId}`,
         params: { global: `${Boolean(item.section.reference?.item?.id)}` },
         photo: item.section.reference?.item?.photo ?? null,
         title: item.section.reference?.item?.name ?? null,
@@ -274,10 +274,11 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
 
     return photo$
       .pipe(
-        map((item: ModalGalleryCurrentEntry<T> | null) => item?.section?.reference
-          ? typeToReferenceStrategy[item.section.reference?.type ?? ReferenceType.PRODUCT as T]?.(item) ?? null
-          : null
-        ),
+        map((item: ModalGalleryCurrentEntry<T> | null) => {
+          return item?.section?.reference
+            ? typeToReferenceStrategy[item.section.reference?.type ?? ReferenceType.PRODUCT as T]?.(item) ?? null
+            : null;
+        }),
       );
   }
 
@@ -286,7 +287,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
       [ReferenceType.PERSON]: (item: ModalGalleryCurrentEntry<ReferenceType.PERSON>) => {
         const id = item.section.reference?.item?.id;
         const wId = item.section.reference?.item?.wId;
-        return this.API.getUserChanges(id ?? wId, { useGlobalId: Boolean(id) })
+        return this.API.getUserChanges(id || wId, { useGlobalId: Boolean(id) })
           .pipe(
             map((person: Partial<Person>) => {
               const isHidden = !(person.feedbacks || []).some((feedback: Partial<UserFeedback>) => feedback.text === item.section.author?.quote);

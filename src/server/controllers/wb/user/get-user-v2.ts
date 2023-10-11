@@ -17,8 +17,8 @@ export async function getWBUserV2(mongoDB: MongoDBService, id: string, useGlobal
     .map((item) => {
       const feedback: UserFeedback = {
         date: item.d,
-        parentProductId: item.ppId,
-        productId: item.pId,
+        parentProductId: item.ppId || '',
+        productId: item.pId || '',
         productBrand: item.b,
         productName: item.n,
         productPhoto: {

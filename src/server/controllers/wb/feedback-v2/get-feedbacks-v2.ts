@@ -1,8 +1,14 @@
+import { mapProductFromWB } from '../../../../app/models/product/product.interface';
+import { WBFeedbacksV2 } from '../../../../app/services/api/models/wb/feedback/v2/wb-feedbacks-v2.interface';
 import { caught } from '../../../helpers/caught/caught';
 import { smartFetch } from '../../../helpers/smart-fetch';
+import { FeedbacksSchema } from '../../../services/mongodb/models/collection-schemas/feedbacks-schema.interface';
+import { MongoDBCollection } from '../../../services/mongodb/models/mongo-db-collection.enum';
+import { MongoDBService } from '../../../services/mongodb/mongodb.service';
+import { getWBProduct } from '../product/get-product';
 import { FeedbacksV2Response } from './models/feedbacks-v2-response.interface';
 
-export async function getFeedbackV2(id: string | number): Promise<FeedbacksV2Response> {
+export async function getFeedbackV2(id: string | number, mongoDB?: MongoDBService): Promise<FeedbacksV2Response> {
   const checksum = crc16(+id) % 100 >= 50 ? '2' : '1';
   const feedbacksResponse = await smartFetch(null, `https://feedbacks${checksum}.wb.ru/feedbacks/v1/${id}`, {
     headers: {
@@ -19,6 +25,36 @@ export async function getFeedbackV2(id: string | number): Promise<FeedbacksV2Res
   if (jsonError) {
 
     return { status: 500, hasError: true, error: jsonError };
+  }
+
+  if (mongoDB) {
+    new Promise(async () => {
+      const productDTO = await getWBProduct(`${id}`);
+      const product = mapProductFromWB(productDTO.result);
+      if (!product?.id) {
+        return;
+      }
+      const dbFeedbacks = ((responseBody as WBFeedbacksV2)?.feedbacks ?? [])
+        .filter((item) => (item.photo?.length ?? 0) > 0)
+        .map((item) => {
+          const result: FeedbacksSchema = {
+            id: item.id,
+            uId: item.globalUserId || null,
+            uWId: item.wbUserId ? `${item.wbUserId}` : null,
+            un: item.wbUserDetails.name,
+            d: item.createdDate,
+            t: item.text,
+            b: product.brand || '',
+            n: product.title || '',
+            pId: `${product.id}`,
+            ppId: product.parentId ? `${product.parentId}` : null,
+            p: item.photo || [],
+          };
+
+          return result;
+        });
+      await mongoDB.set(MongoDBCollection.FEEDBACKS, dbFeedbacks, 'id');
+    });
   }
 
   return {

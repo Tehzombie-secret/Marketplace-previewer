@@ -86,6 +86,7 @@ export class ProductFeedbacksComponent {
             item: {
               platform: this.product?.item?.platform ?? APIPlatform.WB,
               id: item.userId,
+              wId: item.userWId,
               name: item.name,
               photo: item.photo,
             },

@@ -8,6 +8,7 @@ import { WBVotes } from './wb-votes.interface';
 export interface WBFeedback {
   id: string;
   wbUserId: number;
+  globalUserId: string;
   wbUserDetails: WBUserDetails;
   imtId: number;
   nmId: number;

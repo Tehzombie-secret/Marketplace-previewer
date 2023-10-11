@@ -208,7 +208,7 @@ export class WBAPIService implements APIBridge {
     let requestsMade = existingAccumulator?.requestsMade ?? 0;
     let progress = 12;
     const request: WBFeedbackRequest = {
-      imtId: item.parentId ?? 0,
+      imtId: +(item.parentId || 0),
       skip: requestsMade * step,
       take: step,
     };

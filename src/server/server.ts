@@ -24,7 +24,6 @@ import { WBProductListController } from './controllers/wb/product-list/product-l
 import { WBFeedbackControllerV2 } from './controllers/wb/feedback-v2/feedback-v2.controller';
 import { WBUserController } from './controllers/wb/user/user.controller';
 import { listenOnTraverseDemands } from './helpers/profile-traverser/listen-on-traverse-demands';
-import { MongoDBCollection } from './services/mongodb/models/mongo-db-collection.enum';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export async function app(context: ServerContext): Promise<express.Express> {
@@ -49,7 +48,7 @@ export async function app(context: ServerContext): Promise<express.Express> {
         .get('/product/:id/similar', WBSimilarProductsController)
         .get('/user/:id', (req, res) => WBUserController(req, res, context.mongoDB))
         .post('/feedback', bodyParser.json(), WBFeedbackController)
-        .get('/v2/feedback/:id', WBFeedbackControllerV2)
+        .get('/v2/feedback/:id', (req, res) => WBFeedbackControllerV2(req, res, context.mongoDB))
       )
       .use('/common', express.Router()
         .get('/rp', reverseProxyController)

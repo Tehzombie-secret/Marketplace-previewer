@@ -7,8 +7,8 @@ import { WBPersonFeedback } from '../../services/api/models/wb/person/wb-person-
 import { Photo } from '../photo/photo.interface';
 
 export interface UserFeedback {
-  productId: number;
-  parentProductId: number;
+  productId: string;
+  parentProductId: string;
   productBrand: string;
   productName: string;
   productPhoto: Photo;
@@ -28,8 +28,8 @@ export function getUserFeedbackFromWB(dto?: WBPersonFeedback | null): Partial<Us
   const item: Partial<UserFeedback> = {
     date: dto?.entity?.postDate,
     text: dto?.entity?.text,
-    productId: dto?.product?.cod,
-    parentProductId: dto?.product?.link,
+    productId: `${dto?.product?.cod ?? ''}`,
+    parentProductId: `${dto?.product?.link ?? ''}`,
     productBrand: dto?.product?.brand,
     productName: dto?.product?.name,
     productPhoto,

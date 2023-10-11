@@ -13,6 +13,7 @@ import { WBPhotoSize } from './wb/wb-photo-size.enum';
 export interface Feedback {
   productId: string;
   userId: string;
+  userWId: string;
   date: string;
   name: string;
   photo: string | null;
@@ -27,7 +28,8 @@ export function getFeedbackListFromWB(id: string | number | undefined, dto?: WBF
       const item: Partial<Feedback> = {
         productId: `${id}`,
         feedback: feedback?.text,
-        userId: `${feedback?.wbUserId}`,
+        userId: feedback?.globalUserId,
+        userWId: `${feedback.wbUserId}`,
         date: feedback?.createdDate,
         name: feedback?.wbUserDetails?.name || 'Без имени',
         photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback.wbUserId),
@@ -53,17 +55,17 @@ export function getFeedbackListFromWBV2(id: string | number | undefined, dto?: W
     .filter((feedback: WBFeedbackV2) => (feedback?.photos?.length ?? 0) > 0)
     .sort((a: WBFeedbackV2, b: WBFeedbackV2) => b.rank - a.rank)
     .map((feedback: WBFeedbackV2) => {
-      const userId = feedback?.globalUserId || `${feedback.wbUserId || ''}`;
       const item: Partial<Feedback> = {
         productId: `${id}`,
         feedback: feedback?.text,
-        userId,
+        userId: feedback?.globalUserId,
+        userWId: `${feedback.wbUserId}`,
         date: feedback?.createdDate,
         name: feedback?.wbUserDetails?.name || 'Без имени',
-        photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, userId),
+        photo: getWBUserPhoto(WBPhotoSize.MEDIUM, feedback.wbUserDetails, feedback?.globalUserId ?? feedback.wbUserId),
         feedbackPhotos: (feedback?.photo || []).map((photoId: number, index: number) => {
           const photo: Photo = {
-            name: `feedback-${userId}-${id}-${index + 1}`,
+            name: `feedback-${feedback?.globalUserId ?? feedback.wbUserId}-${id}-${index + 1}`,
             small: getWBFeedbackImage(photoId, ImageSize.SMALL),
             big: getWBFeedbackImage(photoId, ImageSize.BIG),
           };

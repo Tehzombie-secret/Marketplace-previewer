@@ -2,9 +2,9 @@ export interface FeedbacksSchema {
   /** Feedback id */
   id: string;
   /** User id */
-  uId: string;
+  uId: string | null;
   /** Another user id, either one of IDs should be present */
-  uWId: string;
+  uWId: string | null;
   /** User name */
   un: string;
   /** Post date */
@@ -12,9 +12,9 @@ export interface FeedbacksSchema {
   /** Feedback post */
   t: string;
   /** Product id */
-  pId: number;
+  pId: string | null;
   /** Product parent id */
-  ppId: number;
+  ppId: string | null;
   /** Product brand */
   b: string;
   /** Product name */

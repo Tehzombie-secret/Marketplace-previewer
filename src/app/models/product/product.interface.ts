@@ -11,7 +11,7 @@ import { Photo } from '../photo/photo.interface';
 export interface Product {
   platform: APIPlatform;
   externalURL: string | null;
-  parentId: number;
+  parentId: string;
   id: string;
   brand: string;
   title: string;
@@ -24,7 +24,7 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
   const item: Partial<Product> = {
     platform: APIPlatform.WB,
     externalURL: getWBProductURL(id),
-    parentId: dto?.imt_id,
+    parentId: `${dto?.imt_id ?? ''}`,
     id: `${id}`,
     brand: dto?.selling?.brand_name,
     title: dto?.imt_name,
@@ -46,7 +46,7 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
 }
 
 export function mapProductsFromSimilarWB(dto?: WBSimilar | null, referenceId?: string | number | null): Partial<Product>[] {
-  const idList = new Set<number>();
+  const idList = new Set<string>();
   const items: Partial<Product>[] = [];
   (dto?.data?.products ?? []).forEach((dto: WBSimilarProduct) => {
     const id = dto?.id;
@@ -57,7 +57,7 @@ export function mapProductsFromSimilarWB(dto?: WBSimilar | null, referenceId?: s
       brand: dto?.brand,
       description: '',
       externalURL: getWBProductURL(id),
-      parentId: dto?.root,
+      parentId: `${dto?.root ?? ''}`,
       images: new Array(dto?.pics ?? 0)
         .fill(null)
         .map((_: void, index: number) => {

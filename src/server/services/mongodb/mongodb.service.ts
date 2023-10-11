@@ -89,7 +89,9 @@ export class MongoDBService {
     if (!client) {
       return false;
     }
-    await client.collection(collection)
+    if (!items.length) {
+      return true;
+    }
     const operations = items.map((item) => {
       return {
         updateOne: {
@@ -100,7 +102,7 @@ export class MongoDBService {
           upsert: true
         }
       };
-    })
+    });
     const result = await client.collection(collection).bulkWrite(operations, { ordered: false });
     return result.isOk();
   }
