@@ -84,8 +84,8 @@
   </ul>
 
   <button
-    *ngIf="(items$ | async)?.length && !hasError"
-    [disabled]="isLoading || !canShowMore"
+    *ngIf="(items$ | async)?.length && !hasError && canShowMore"
+    [disabled]="isLoading"
     (click)="showMore()"
     mat-stroked-button
     color="primary"
