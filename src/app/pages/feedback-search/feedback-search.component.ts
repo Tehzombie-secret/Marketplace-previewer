@@ -85,7 +85,7 @@ export class FeedbackSearchComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.isLoading) {
       return;
     }
     this.canShowMore = true;
@@ -194,6 +194,10 @@ export class FeedbackSearchComponent implements OnInit, OnDestroy {
     const fetchSubscription$ = this.API.getFeedbackSearchChanges(query, page)
       .subscribe({
         next: (items: Partial<UserFeedback>[]) => {
+          if (items.length < 50) {
+            this.canShowMore = false;
+          }
+          this.hasError = false;
           this.isLoading = false;
           this.cdr.markForCheck();
           this.items$.next([...this.items$.value, ...items]);
