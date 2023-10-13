@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { Categories } from '../../../models/categories/categories.interface';
 import { ProductFeedbacks } from '../../../models/feedbacks/product-feedbacks.interface';
+import { UserFeedback } from '../../../models/feedbacks/user-feedback.interface';
 import { Person } from '../../../models/person/person.interface';
 import { ProductReference } from '../../../models/product/product-reference.interface';
 import { Product } from '../../../models/product/product.interface';
@@ -14,6 +15,7 @@ export interface APIBridge {
   getUserChanges(id?: number | string | null, hint?: FeedbackHint | null): Observable<Partial<Person>>;
   getProductChanges(id: number | string): Observable<Partial<Product>>;
   getSimilarChanges(id: number | string): Observable<Partial<Product>[]>;
+  getFeedbackSearchChanges(query?: string | null, page?: string | number | null): Observable<Partial<UserFeedback>[]>;
   getFeedbacksChanges(
     item?: Partial<ProductReference> | null,
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,

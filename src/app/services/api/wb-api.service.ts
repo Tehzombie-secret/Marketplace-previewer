@@ -5,18 +5,17 @@ import { catchError, delay, expand, shareReplay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { Categories } from '../../models/categories/categories.interface';
-import { getErrorProductFeedback, getProductFeedbacksFromWB, getProductFeedbacksFromWBV2, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
-import { getPersonFromWB, Person } from '../../models/person/person.interface';
+import { Feedback } from '../../models/feedbacks/feedback.interface';
+import { getErrorProductFeedback, getProductFeedbacksFromWBV2, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
+import { UserFeedback } from '../../models/feedbacks/user-feedback.interface';
+import { Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
 import { mapProductFromWB, mapProductsFromSimilarWB, Product } from '../../models/product/product.interface';
 import { APIBridge } from './models/api-bridge.interface';
 import { FeedbackHint } from './models/feedback-hint.interface';
 import { getCategoriesChunkFromWB, WBCategory } from './models/wb/categories/wb-category.interface';
 import { WBFeedbackRequest } from './models/wb/feedback/v1/wb-feedback-request.interface';
-import { WBFeedbacks } from './models/wb/feedback/v1/wb-feedbacks.interface';
-import { WBFeedbackV2 } from './models/wb/feedback/v2/wb-feedback-v2.interface';
 import { WBFeedbacksV2 } from './models/wb/feedback/v2/wb-feedbacks-v2.interface';
-import { WBPersonRoot } from './models/wb/person/wb-person-root.interface';
 import { WBProduct } from './models/wb/product/wb-product.interface';
 import { WBSimilar } from './models/wb/similar/wb-similar.interface';
 
@@ -155,6 +154,15 @@ export class WBAPIService implements APIBridge {
     this.productIdToSimilarMap.set(idString, items$);
 
     return items$;
+  }
+
+  getFeedbackSearchChanges(query?: string | null, page?: string | number | null): Observable<Partial<UserFeedback>[]> {
+    const url = `${environment.host}/api/${VendorPlatform.WB}/v1/feedback/search`;
+    const params = {
+      ...(query ? { query } : {}),
+      ...(page ? { page } : { page: 1 }),
+    };
+    return this.http.get<Partial<UserFeedback>[]>(url, { params });
   }
 
   getFeedbacksChanges(

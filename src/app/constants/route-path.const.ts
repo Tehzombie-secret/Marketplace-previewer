@@ -4,4 +4,5 @@ export const ROUTE_PATH = {
   PERSON: 'person',
   HISTORY: 'history',
   FAQ: 'faq',
+  SEARCH_FEEDBACKS: 'fsearch',
 }

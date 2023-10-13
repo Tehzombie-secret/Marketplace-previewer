@@ -1,12 +1,12 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { AsyncPipe, NgForOf, NgIf, SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
-import { BehaviorSubject, catchError, combineLatest, distinctUntilChanged, filter, map, Observable, of, shareReplay, startWith, Subscription, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, of, Subscription, switchMap } from 'rxjs';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { treeFind } from '../../helpers/tree-find';
@@ -209,10 +209,10 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   private listenPageChanges(): void {
     const pageSubscription$ = combineLatest([
-      this.itemsToShow$.pipe(tap((s) => console.log('items to show change', s))),
+      this.itemsToShow$,
       this.items$,
-      this.page$.pipe(tap((s) => console.log('page change', s))),
-      this.getMaxPageChanges().pipe(tap((s) => console.log('max page change', s))),
+      this.page$,
+      this.getMaxPageChanges(),
     ])
       .pipe(
         filter(([visibleItems, items, page, maxPage]: [number, CatalogViewModel, number, number]) =>

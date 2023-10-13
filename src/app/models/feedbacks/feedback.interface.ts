@@ -10,6 +10,7 @@ import { WBFeedbacksV2 } from '../../services/api/models/wb/feedback/v2/wb-feedb
 import { Photo } from '../photo/photo.interface';
 import { WBPhotoSize } from './wb/wb-photo-size.enum';
 
+/** Simple version of feedback that lacks user information */
 export interface Feedback {
   productId: string;
   userId: string;

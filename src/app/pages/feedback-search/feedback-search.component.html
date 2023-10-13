@@ -1,0 +1,111 @@
+<div class="feedback-body">
+  <ul class="wb-typography-body">
+    <li>
+      Поиск осуществляется только при вводе трех символов и более, регистронезависимый
+    </li>
+    <li>
+      Поиск словосочетания полностью: <pre class="code-block">"размер не подошел"</pre>
+    </li>
+    <li>
+      Исключить слово: <pre class="code-block">-круто</pre>
+    </li>
+    <li>
+      ПКМ: сохранить изображение
+    </li>
+  </ul>
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    class="search-form">
+    <label class="search-label">
+      <div class="wb-typography-caption">
+        Поиск
+      </div>
+      <div class="search-row">
+        <input
+          formControlName="search"
+          name="query"
+          type="text"
+          class="search-input">
+        <button
+          type="submit"
+          class="submit-button"
+          aria-label="Искать">
+          <mat-icon svgIcon="search"></mat-icon>
+        </button>
+      </div>
+    </label>
+  </form>
+  <ul class="feedbacks-block">
+    <li *ngFor="let feedback of (items$ | async); trackBy: trackById; index as feedbackIndex;">
+      <div class="feedback-row">
+        <a
+          [routerLink]="['/wb/product/' + feedback.productId]"
+          class="product-block">
+          <img
+            *ngIf="feedback.productPhoto?.small"
+            [src]="feedback.productPhoto?.small"
+            alt=""
+            referrerpolicy="no-referrer"
+            class="product-photo">
+          <div class="wb-typography-link">
+            {{ feedback.productName }}
+          </div>
+        </a>
+        <div class="user-block">
+          <a
+            [routerLink]="['/wb/person/' + (feedback.userId || feedback.userWId)]"
+            [queryParams]="{ global: !!feedback.userId }"
+            class="user-anchor">
+            <div class="wb-typography-link">
+              {{ feedback.name }}
+            </div>
+            <div class="wb-typography-caption">
+              {{ feedback.text }}
+            </div>
+          </a>
+          <ul class="photo-list">
+            <li *ngFor="let photo of feedback.photos; index as photoIndex;">
+              <button
+                (click)="openGallery($event, feedback, feedbackIndex, photoIndex)"
+                (contextmenu)="download(photo)"
+                class="feedback-photo-button">
+                <img
+                  [src]="photo.small"
+                  alt=""
+                  referrerpolicy="no-referrer"
+                  class="product-photo">
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <button
+    *ngIf="(items$ | async)?.length && !hasError"
+    [disabled]="isLoading || !canShowMore"
+    (click)="showMore()"
+    mat-stroked-button
+    color="primary"
+    class="load-button">
+    Загрузить еще
+    <mat-icon svgIcon="arrow-down"></mat-icon>
+  </button>
+
+  <div
+    *ngIf="hasError"
+    class="retry-block">
+    <div class="wb-typography-body">
+      Не удалось получить данные
+    </div>
+    <button
+      [disabled]="isLoading"
+      (click)="retry()"
+      mat-stroked-button
+      color="primary">
+      Повторить загрузку
+    </button>
+  </div>
+</div>

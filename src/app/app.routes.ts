@@ -24,6 +24,10 @@ const COMMON_ROUTES: Routes = [
     path: `${ROUTE_PATH.PERSON}/:id`,
     loadComponent: () => import('./pages/person/person.component').then(c => c.PersonComponent),
   },
+  {
+    path: `${ROUTE_PATH.SEARCH_FEEDBACKS}`,
+    loadComponent: () => import('./pages/feedback-search/feedback-search.component').then(c => c.FeedbackSearchComponent),
+  },
 ];
 
 export const APP_ROUTES: Routes = [

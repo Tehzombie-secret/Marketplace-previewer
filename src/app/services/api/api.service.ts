@@ -4,6 +4,7 @@ import { map, NEVER, Observable, switchMap, tap } from 'rxjs';
 import { valueIsInEnum } from '../../helpers/value-is-in-enum';
 import { Categories } from '../../models/categories/categories.interface';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
+import { UserFeedback } from '../../models/feedbacks/user-feedback.interface';
 import { Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
 import { Product } from '../../models/product/product.interface';
@@ -47,6 +48,10 @@ export class APIService implements APIBridge {
 
   getSimilarChanges(id: number | string): Observable<Partial<Product>[]> {
     return this.request((service: APIBridge) => service.getSimilarChanges(id));
+  }
+
+  getFeedbackSearchChanges(query?: string | null, page?: string | number | null): Observable<Partial<UserFeedback>[]> {
+    return this.request((service: APIBridge) => service.getFeedbackSearchChanges(query, page));
   }
 
   getFeedbacksChanges(

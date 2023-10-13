@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises';
-import { Db, Document, FindCursor, MongoClient, MongoClientOptions, WithId } from 'mongodb';
+import { Collection, Db, Document, FindCursor, MongoClient, MongoClientOptions, WithId } from 'mongodb';
 import { join } from 'path';
 import { format } from 'util';
 import { emitErrorLog } from '../../../app/helpers/emit-error-log/emit-error-log';
@@ -14,6 +14,14 @@ import { MongoDBCollection } from './models/mongo-db-collection.enum';
 export class MongoDBService {
   private readonly dbName = 'feedbacks';
   private client: Db | null = null;
+
+  public async collection<T extends MongoDBCollection>(collection: T): Promise<Collection<CollectionToSchemaStrategy[T]> | null> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return null;
+    }
+    return client.collection<CollectionToSchemaStrategy[T]>(collection);
+  }
 
   public async size<T extends MongoDBCollection>(collection: T): Promise<number> {
     const client = await this.setupConnection();
@@ -186,6 +194,36 @@ export class MongoDBService {
     const realCollection = client?.collection<CollectionToSchemaStrategy[T]>(collection);
     const result = await realCollection?.deleteOne({ [key]: value } as any);
     return result?.acknowledged ?? false;
+  }
+
+  public async search<T extends MongoDBCollection>(
+    collection: T,
+    query: string,
+    page: number,
+  ): Promise<WithId<CollectionToSchemaStrategy[T]>[]> {
+    const client = await this.setupConnection();
+    if (!client) {
+      return [];
+    }
+    const pageSize = 50;
+    const result = client
+      .collection<CollectionToSchemaStrategy[T]>(collection)
+      .find({
+        $text: {
+          $search: query,
+          $caseSensitive: false,
+        }
+      })
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+    const products: WithId<CollectionToSchemaStrategy[T]>[] = [];
+    while (await result.hasNext()) {
+      const product = await result.next();
+      if (product) {
+        products.push(product);
+      }
+    }
+    return products;
   }
 
   private async setupConnection(): Promise<Db | null> {

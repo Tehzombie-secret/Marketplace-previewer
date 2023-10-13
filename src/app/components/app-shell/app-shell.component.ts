@@ -37,6 +37,7 @@ import { VersionStorageService } from '../../services/version-storage.service';
 })
 export class AppShellComponent {
 
+  readonly searchPagePath = [`/wb/${ROUTE_PATH.SEARCH_FEEDBACKS}`];
   readonly historyPagePath = [`/${ROUTE_PATH.HISTORY}`];
   readonly FAQPagePath = [`/${ROUTE_PATH.FAQ}`];
   readonly toolbarState$ = this.toolbar.getStateChanges();

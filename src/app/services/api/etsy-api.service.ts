@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Categories } from '../../models/categories/categories.interface';
+import { Feedback } from '../../models/feedbacks/feedback.interface';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { Person } from '../../models/person/person.interface';
 import { ProductReference } from '../../models/product/product-reference.interface';
@@ -34,6 +35,10 @@ export class EtsyAPIService implements APIBridge {
 
   getSimilarChanges(id: string | number): Observable<Partial<Product>[]> {
     throw new Error('Method not implemented.');
+  }
+
+  getFeedbackSearchChanges(query?: string | null): Observable<Partial<Feedback>[]> {
+    throw new Error('Method not implemented');
   }
 
   getFeedbacksChanges(item?: Partial<ProductReference> | null | undefined, fetchWhile?: ((items: ProductFeedbacks) => boolean) | null | undefined, existingAccumulator?: ProductFeedbacks | undefined): Observable<ProductFeedbacks> {

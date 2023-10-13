@@ -1,9 +1,6 @@
-import { getWBFeedbackImage } from '../../../../app/helpers/wb/get-wb-feedback-image';
-import { getWBImage } from '../../../../app/helpers/wb/get-wb-image';
-import { UserFeedback } from '../../../../app/models/feedbacks/user-feedback.interface';
+import { getUserFeedbackFromFeedbacksSchema, UserFeedback } from '../../../../app/models/feedbacks/user-feedback.interface';
 import { Person } from '../../../../app/models/person/person.interface';
 import { APIPlatform } from '../../../../app/services/api/models/api-platform.enum';
-import { ImageSize } from '../../../models/image-size.enum';
 import { FeedbacksSchema } from '../../../services/mongodb/models/collection-schemas/feedbacks-schema.interface';
 import { MongoDBCollection } from '../../../services/mongodb/models/mongo-db-collection.enum';
 import { MongoDBService } from '../../../services/mongodb/mongodb.service';
@@ -13,29 +10,8 @@ export async function getWBUserV2(mongoDB: MongoDBService, id: string, useGlobal
   const dbFeedbacks = typeof useGlobalId !== 'boolean'
     ? await fetchAllFeedbacks(mongoDB, id)
     : await mongoDB.read(MongoDBCollection.FEEDBACKS, useGlobalId ? 'uId' : 'uWId', id);
-  const feedbacks = dbFeedbacks
-    .map((item) => {
-      const feedback: UserFeedback = {
-        date: item.d,
-        parentProductId: item.ppId || '',
-        productId: item.pId || '',
-        productBrand: item.b,
-        productName: item.n,
-        productPhoto: {
-          big: getWBImage(item.pId, '1', ImageSize.BIG),
-          small: getWBImage(item.pId, '1', ImageSize.SMALL),
-          name: `product-${item.pId}-1`,
-        },
-        text: item.t,
-        photos: item.p.map((photo: number, index: number) => ({
-          small: getWBFeedbackImage(photo, ImageSize.SMALL),
-          big: getWBFeedbackImage(photo, ImageSize.BIG),
-          name: `feedback-${id}-${item.pId}-${index + 1}`,
-        })),
-      };
-
-      return feedback;
-    });
+  const feedbacks: Partial<UserFeedback>[] =
+    dbFeedbacks.map((item: FeedbacksSchema) => getUserFeedbackFromFeedbacksSchema(item));
   const result: Partial<Person> = {
     platform: APIPlatform.WB,
     id,
@@ -43,7 +19,7 @@ export async function getWBUserV2(mongoDB: MongoDBService, id: string, useGlobal
     externalURL: '',
     photo: null,
     feedbacks,
-    mergedPhotos: feedbacks.flatMap((item) => item.photos),
+    mergedPhotos: feedbacks.flatMap((item) => item.photos ?? []),
   };
 
   return {

@@ -1,0 +1,140 @@
+@import 'debuttonify';
+@import 'delinkify';
+
+$breakpoint: 900px;
+
+.feedback-body {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 16px 80px;
+  box-sizing: border-box;
+
+  .code-block {
+    display: inline;
+  }
+
+  .search-form {
+    max-width: 300px;
+  }
+
+  .search-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .search-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid gray;
+    border-radius: 2px;
+  }
+
+  .search-input {
+    min-width: 0;
+    flex-grow: 1;
+    height: 16px;
+    border: none;
+    padding: 6px 4px;
+    background: transparent;
+    font-size: 16px;
+    line-height: 16px;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .submit-button {
+    @include debuttonify;
+
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+  }
+
+  .feedbacks-block {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .feedback-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+
+    @media (max-width: $breakpoint) {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  .product-block {
+    @include delinkify;
+
+    display: flex;
+    gap: 16px;
+    min-width: 300px;
+    width: 300px;
+
+    @media (max-width: $breakpoint) {
+      align-items: center;
+    }
+  }
+
+  .product-photo {
+    border-radius: 4px;
+    max-width: 75px;
+    object-fit: contain;
+  }
+
+  .user-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 600px;
+  }
+
+  .user-anchor {
+    @include delinkify;
+
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .photo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .feedback-photo-button {
+    @include debuttonify;
+  }
+
+  .load-button {
+    align-self: center;
+  }
+
+  .retry-block {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+}
