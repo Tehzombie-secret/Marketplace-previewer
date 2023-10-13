@@ -5,7 +5,7 @@ import { MongoDBService } from '../../../services/mongodb/mongodb.service';
 import { FeedbackSearchResponse } from './models/feedback-search-response.interface';
 
 export async function searchWBFeedbacks(mongoDB: MongoDBService, query: string | null, page?: string | number | null): Promise<FeedbackSearchResponse> {
-  if ((query?.length ?? 0) < 3) {
+  if ((query?.length ?? 0) < 2) {
     return {
       status: 400,
       error: {

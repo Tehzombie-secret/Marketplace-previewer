@@ -6,7 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BehaviorSubject, catchError, combineLatest, filter, of, Subscription, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, debounceTime, filter, of, Subscription, switchMap, tap } from 'rxjs';
 import { ModalGalleryComponent } from '../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../components/modal-gallery/models/modal-gallery.interface';
@@ -41,7 +41,7 @@ export class FeedbackSearchComponent implements OnInit, OnDestroy {
   canShowMore = true;
   hasError = false;
   readonly form = new FormGroup({
-    search: new FormControl('', [Validators.minLength(3)]),
+    search: new FormControl('', [Validators.minLength(2)]),
   });
   readonly page$ = new BehaviorSubject<number>(1);
   readonly items$ = new BehaviorSubject<Partial<UserFeedback>[]>([]);
@@ -76,7 +76,6 @@ export class FeedbackSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('destroy');
     this.subscriptions$.unsubscribe();
   }
 
@@ -93,7 +92,7 @@ export class FeedbackSearchComponent implements OnInit, OnDestroy {
     this.page$.next(1);
     const query = this.form.value.search || '';
     this.value$.next(query);
-    this.router.navigate(['/fsearch'], { queryParams: { query }, replaceUrl: true });
+    this.router.navigate([`/${APIPlatform.WB}/fsearch`], { queryParams: { query }, replaceUrl: true });
   }
 
   showMore(): void {
@@ -180,7 +179,8 @@ export class FeedbackSearchComponent implements OnInit, OnDestroy {
     const searchSubscription$ = this.retry$
       .pipe(
         switchMap(() => combineLatest([this.page$, this.value$])),
-        filter(([page, query]: [number, string]) => query.length > 3),
+        debounceTime(1),
+        filter(([page, query]: [number, string]) => query.length >= 2),
       )
       .subscribe(([page, query]: [number, string]) => {
         this.fetch(query, page);
