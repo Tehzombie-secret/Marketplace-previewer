@@ -51,7 +51,7 @@ export async function app(context: ServerContext): Promise<express.Express> {
         .get('/product/:id/similar', WBSimilarProductsController)
         .get('/user/:id', (req, res) => WBUserController(req, res, context.mongoDB))
         .post('/feedback', bodyParser.json(), WBFeedbackController)
-        .get('/v2/feedback/:id', (req, res) => WBFeedbackControllerV2(req, res, context.mongoDB))
+        .get('/v2/feedback', (req, res) => WBFeedbackControllerV2(req, res, context.mongoDB))
         .get('/v1/feedback/search', (req, res) => WBFeedbackSearchController(req, res, context.mongoDB))
       )
       .use('/common', express.Router()

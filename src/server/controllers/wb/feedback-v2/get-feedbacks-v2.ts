@@ -1,4 +1,4 @@
-import { mapProductsFromSimilarWB } from '../../../../app/models/product/product.interface';
+import { mapProductFromWB, mapProductsFromSimilarWB } from '../../../../app/models/product/product.interface';
 import { WBFeedbacksV2 } from '../../../../app/services/api/models/wb/feedback/v2/wb-feedbacks-v2.interface';
 import { caught } from '../../../helpers/caught/caught';
 import { smartFetch } from '../../../helpers/smart-fetch';
@@ -6,11 +6,12 @@ import { FeedbacksSchema } from '../../../services/mongodb/models/collection-sch
 import { MongoDBCollection } from '../../../services/mongodb/models/mongo-db-collection.enum';
 import { MongoDBService } from '../../../services/mongodb/mongodb.service';
 import { getWBProductListByNM } from '../product-list-by-nm/product-list-by-nm';
+import { getWBProduct } from '../product/get-product';
 import { FeedbacksV2Response } from './models/feedbacks-v2-response.interface';
 
-export async function getFeedbackV2(id: string | number, mongoDB?: MongoDBService): Promise<FeedbacksV2Response> {
-  const checksum = crc16(+id) % 100 >= 50 ? '2' : '1';
-  const feedbacksResponse = await smartFetch(null, `https://feedbacks${checksum}.wb.ru/feedbacks/v1/${id}`, {
+export async function getFeedbackV2(imtId?: string | number | null, nmId?: string | number | null, mongoDB?: MongoDBService): Promise<FeedbacksV2Response> {
+  const checksum = crc16(+(imtId || 0)) % 100 >= 50 ? '2' : '1';
+  const feedbacksResponse = await smartFetch(null, `https://feedbacks${checksum}.wb.ru/feedbacks/v1/${imtId}`, {
     headers: {
       'content-type': 'application/json',
     },
@@ -29,12 +30,14 @@ export async function getFeedbackV2(id: string | number, mongoDB?: MongoDBServic
 
   if (mongoDB) {
     new Promise(async () => {
-      const list = await getWBProductListByNM([`${id}`]);
-      const products = mapProductsFromSimilarWB(list);
-      const product = products?.[0];
-      if (!product) {
+      if (!nmId) {
         return;
       }
+      const productDTO = await getWBProduct(`${nmId}`);
+      if (!productDTO?.result?.imt_id) {
+        return;
+      }
+      const product = mapProductFromWB(productDTO.result);
       const dbFeedbacks = ((responseBody as WBFeedbacksV2)?.feedbacks ?? [])
         .filter((item) => (item.photo?.length ?? 0) > 0)
         .map((item) => {

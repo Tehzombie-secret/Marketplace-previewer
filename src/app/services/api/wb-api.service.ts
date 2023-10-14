@@ -174,31 +174,31 @@ export class WBAPIService implements APIBridge {
   }
 
   private getFeedbackChangesV2(item: Partial<ProductReference> | null | undefined): Observable<ProductFeedbacks> {
-    const id = item?.parentId || item?.id;
-    if (!id) {
-      return NEVER;
-    }
-    const idString = `${id}`;
-    const existingStream$ = this.productIdToFeedbacksMap.get(idString);
+    const params = {
+      ...(item?.parentId ? { imtId: item?.parentId } : {}),
+      ...(item?.id ? { nmId: item?.id } : {}),
+    };
+    const key = `${params.imtId}~~~${params.nmId}`;
+    const existingStream$ = this.productIdToFeedbacksMap.get(key);
     if (existingStream$) {
 
       return existingStream$;
     }
-    const stream$ = this.http.get<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/v2/feedback/${id}`)
+    const stream$ = this.http.get<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/v2/feedback`, { params })
       .pipe(
         map((item: WBFeedbacksV2) => {
-          const feedbacks = getProductFeedbacksFromWBV2(id, item);
+          const feedbacks = getProductFeedbacksFromWBV2(params.imtId, item);
 
           return feedbacks;
         }),
         catchError(() => {
-          this.productIdToFeedbacksMap.delete(idString);
+          this.productIdToFeedbacksMap.delete(key);
 
           return of(getErrorProductFeedback(1, 0));
         }),
         shareReplay(1),
       );
-    this.productIdToFeedbacksMap.set(idString, stream$);
+    this.productIdToFeedbacksMap.set(key, stream$);
 
     return stream$;
   }
