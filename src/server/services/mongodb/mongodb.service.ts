@@ -144,8 +144,12 @@ export class MongoDBService {
     if (!client) {
       return false;
     }
-    const result = await client.collection(collection).updateOne({ [key]: value }, { $set: item }, { upsert: true });
-    return result.acknowledged;
+    try {
+      const result = await client.collection(collection).updateOne({ [key]: value }, { $set: item }, { upsert: true });
+      return result.acknowledged;
+    } catch {
+      return false;
+    }
   }
 
   public async read<T extends MongoDBCollection, J extends keyof CollectionToSchemaStrategy[T]>(

@@ -1,13 +1,14 @@
 import { MongoDBCollection } from '../../services/mongodb/models/mongo-db-collection.enum';
 import { TraverseStatus } from '../../services/mongodb/models/traverse-status.enum';
 import { MongoDBService } from '../../services/mongodb/mongodb.service';
+import { checkNextLoop } from './check-next-loop';
 import { updateCategories } from './update-categories';
 import { updateFeedbacks } from './update-feedbacks';
 import { updateProducts } from './update-products';
 
 let traverseOngoing = false;
 
-export async function startTraverse(mongoDB: MongoDBService): Promise<void> {
+export async function startTraverse(mongoDB: MongoDBService, startWithStatus?: TraverseStatus): Promise<void> {
   if (traverseOngoing) {
     return;
   }
@@ -32,9 +33,9 @@ export async function startTraverse(mongoDB: MongoDBService): Promise<void> {
       await updateFeedbacks(mongoDB);
     },
     [TraverseStatus.DONE]: async () => {
-      await updateCategories(mongoDB);
+      await checkNextLoop(mongoDB);
     },
   };
-  await statusToTraverserStrategy[queueStatus?.status ?? TraverseStatus.CATEGORIES]?.();
+  await statusToTraverserStrategy[startWithStatus ?? queueStatus?.status ?? TraverseStatus.CATEGORIES]?.();
   traverseOngoing = false;
 }

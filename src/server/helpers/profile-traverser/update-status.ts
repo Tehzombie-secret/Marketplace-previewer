@@ -5,7 +5,7 @@ import { MongoDBService } from '../../services/mongodb/mongodb.service';
 export async function updateStatus(mongoDB: MongoDBService, status: TraverseStatus): Promise<boolean> {
   return await mongoDB.write(
     MongoDBCollection.TRAVERSE_STATUS,
-    { status, key: 'status' },
+    { status, key: 'status', date: new Date().toISOString() },
     'key',
     'status'
   );
