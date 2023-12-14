@@ -28,8 +28,8 @@ export function getUserFeedbackFromWB(dto?: WBPersonFeedback | null): Partial<Us
   const category = getWBProductCategoryId(`${id}`);
   const productPhoto: Photo = {
     name: `product-${id}-1`,
-    big: proxifyLink(getWBImage(id, 1, ImageSize.BIG)),
-    small: proxifyLink(getWBImage(id, 1, ImageSize.SMALL)),
+    big: getWBImage(id, 1, ImageSize.BIG),
+    small: getWBImage(id, 1, ImageSize.SMALL),
   };
   const item: Partial<UserFeedback> = {
     userId: dto?.entity?.userId ? `${dto.entity.userId}` : '',
@@ -73,8 +73,8 @@ export function getUserFeedbackFromFeedbacksSchema(dto?: FeedbacksSchema): Parti
     name: dto?.un || 'Без имени',
     text: dto?.t ?? '',
     photos: (dto?.p ?? []).map((photo: number, index: number) => ({
-      small: proxifyLink(getWBFeedbackImage(photo, ImageSize.SMALL)),
-      big: proxifyLink(getWBFeedbackImage(photo, ImageSize.BIG)),
+      small: getWBFeedbackImage(photo, ImageSize.SMALL),
+      big: getWBFeedbackImage(photo, ImageSize.BIG),
       name: `feedback-${dto?.uId || dto?.uWId}-${dto?.pId}-${index + 1}`,
     })),
   };

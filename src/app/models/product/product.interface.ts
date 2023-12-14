@@ -34,8 +34,8 @@ export function mapProductFromWB(dto?: WBProduct | null): Partial<Product> {
       .map((_: void, index: number) => {
         const image: Photo = {
           name: `product-${id}-${index + 1}`,
-          small: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.SMALL)),
-          big: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.BIG)),
+          small: getWBImage(id ?? 0, index + 1, ImageSize.SMALL),
+          big: getWBImage(id ?? 0, index + 1, ImageSize.BIG),
         };
 
         return image;
@@ -63,8 +63,8 @@ export function mapProductsFromSimilarWB(dto?: WBSimilar | null, referenceId?: s
         .map((_: void, index: number) => {
           const image: Photo = {
             name: `product-${id}-${index + 1}`,
-            small: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.SMALL)),
-            big: proxifyLink(getWBImage(id ?? 0, index + 1, ImageSize.BIG)),
+            small: getWBImage(id ?? 0, index + 1, ImageSize.SMALL),
+            big: getWBImage(id ?? 0, index + 1, ImageSize.BIG),
           };
 
           return image;
