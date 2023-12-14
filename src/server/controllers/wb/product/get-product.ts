@@ -9,6 +9,14 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
   const shard = getHostV2(+volume);
   const url = `https://${shard}.wb.ru/vol${volume}/part${part}/${id}/info/ru/card.json`;
   const response = await smartFetch(null, url);
+  if (!response) {
+    return {
+      errorStatus: 500,
+      error: {
+        error: 'Empty response',
+      },
+    };
+  }
   if (!response?.ok) {
     const [parseError, errorBody] = await caught(response?.json());
     return {

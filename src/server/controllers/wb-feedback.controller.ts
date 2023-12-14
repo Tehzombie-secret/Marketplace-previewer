@@ -21,7 +21,7 @@ export async function WBFeedbackController(request: Request, response: Response)
 
     return;
   }
-  const [jsonError, responseBody] = await caught(feedbacksResponse.json());
+  const [jsonError, responseBody] = await caught(feedbacksResponse?.json());
   if (jsonError) {
     response.status(500).send(jsonError);
 

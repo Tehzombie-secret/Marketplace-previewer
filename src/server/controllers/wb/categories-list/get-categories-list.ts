@@ -19,7 +19,7 @@ export async function getCategoriesList(extractSlugs: boolean): Promise<Categori
       result: [],
     };
   }
-  const [jsonError, responseBody] = await caught(categoriesResponse.json());
+  const [jsonError, responseBody] = await caught(categoriesResponse?.json());
   if (jsonError) {
     return {
       status: 500,

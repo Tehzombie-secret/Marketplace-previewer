@@ -22,7 +22,7 @@ export async function getFeedbackV2(imtId?: string | number | null, nmId?: strin
 
     return { status: 500, hasError: true };
   }
-  const [jsonError, responseBody] = await caught(feedbacksResponse.json());
+  const [jsonError, responseBody] = await caught(feedbacksResponse?.json());
   if (jsonError) {
 
     return { status: 500, hasError: true, error: jsonError };

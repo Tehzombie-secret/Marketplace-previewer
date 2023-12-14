@@ -15,7 +15,7 @@ export async function getWBUserV1(id: string): Promise<UserResponse> {
 
     return {
       error: {
-        error: 'No has returned',
+        error: 'No hash returned',
       },
       status: 500,
     };
