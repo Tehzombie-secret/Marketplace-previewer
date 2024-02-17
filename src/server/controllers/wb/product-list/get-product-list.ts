@@ -41,12 +41,11 @@ export async function getProductList(id: string, page?: number | null): Promise<
 
   // Get items
   const params = new URLSearchParams({
-    spp: '32',
     appType: '1',
     curr: 'rub',
     dest: '-1181032',
-    regions: '80,38,83,4,64,33,68,70,30,40,86,69,1,31,66,48,22,114',
     sort: 'popular',
+    spp: '32',
     uclusters: '1',
     ...((page ?? 0) > 1 ? { page: `${page ?? 0}` } : {}),
   });
