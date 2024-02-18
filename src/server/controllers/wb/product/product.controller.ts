@@ -13,7 +13,7 @@ export async function WBProductController(request: Request, response: Response):
   }
   const result = await getWBProduct(id);
   if (result.error || result.errorStatus) {
-    response.status(500).send(`err, ${result.errorStatus}`);
+    response.status(result.errorStatus ?? 500).send(result.error);
 
     return;
   }
