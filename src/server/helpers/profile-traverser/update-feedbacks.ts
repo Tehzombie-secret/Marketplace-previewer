@@ -92,7 +92,7 @@ export async function fetchPack(mongoDB: MongoDBService): Promise<boolean> {
             return `fetch failed ${fetchResult?.status ?? 0}`;
           }
           // Add new products
-          const [jsonError, rawFeedbacks] = await caught(fetchResult?.json());
+          const [jsonError, rawFeedbacks] = await caught(fetchResult?.json?.());
           if (!rawFeedbacks?.length) {
             if (element.parentId) {
               await mongoDB.delete(MongoDBCollection.PRODUCTS, 'parentId', element.parentId);

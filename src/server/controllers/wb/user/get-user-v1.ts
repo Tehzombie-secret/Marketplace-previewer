@@ -20,7 +20,7 @@ export async function getWBUserV1(id: string): Promise<UserResponse> {
       status: 500,
     };
   }
-  const [userHashJsonError, userHashJSON] = await caught(userHashResponse?.json());
+  const [userHashJsonError, userHashJSON] = await caught(userHashResponse?.json?.());
   if (userHashJsonError) {
 
     return {
@@ -55,7 +55,7 @@ export async function getWBUserV1(id: string): Promise<UserResponse> {
       status: 500,
     };
   }
-  const [userJsonError, user] = await caught(userResponse?.json());
+  const [userJsonError, user] = await caught(userResponse?.json?.());
   if (userJsonError) {
 
     return {

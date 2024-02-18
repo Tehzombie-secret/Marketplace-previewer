@@ -38,7 +38,7 @@ export async function WBSearchController(request: Request, response: Response): 
 
     return;
   }
-  const [catalogJsonError, catalog] = await caught(catalogResponse?.json());
+  const [catalogJsonError, catalog] = await caught(catalogResponse?.json?.());
   if (catalogJsonError) {
     response.status(500).send({
       error: 'Catalog json parse error',

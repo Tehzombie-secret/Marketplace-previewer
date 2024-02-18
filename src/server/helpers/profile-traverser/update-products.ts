@@ -80,7 +80,7 @@ async function fetchPack(mongoDB: MongoDBService): Promise<void> {
             return `fetch failed ${fetchResult?.status ?? 0}`;
           }
           // Add new products
-          const [jsonError, products] = await caught(fetchResult?.json());
+          const [jsonError, products] = await caught(fetchResult?.json?.());
           if (!products?.length) {
             await mongoDB.delete(MongoDBCollection.CATEGORIES, 'slug', element.slug);
             blacklistSlugs.add(element.slug);

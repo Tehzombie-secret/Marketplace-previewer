@@ -22,7 +22,7 @@ export async function getWBProductListByNM(ids: string[]): Promise<WBSimilar> {
       state: 0,
     };
   }
-  const [productJsonError, products] = await caught(productsResponse?.json());
+  const [productJsonError, products] = await caught(productsResponse?.json?.());
   if (productJsonError) {
 
     return {

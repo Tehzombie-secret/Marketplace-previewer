@@ -19,7 +19,7 @@ export async function getProductList(id: string, page?: number | null): Promise<
       },
     };
   }
-  const [menuJsonError, menu]: Caught<WBCategory[]> = await caught(menuResponse?.json());
+  const [menuJsonError, menu]: Caught<WBCategory[]> = await caught(menuResponse?.json?.());
   if (menuJsonError) {
 
     return {
@@ -60,7 +60,7 @@ export async function getProductList(id: string, page?: number | null): Promise<
       }
     };
   }
-  const [catalogJsonError, catalog] = await caught(catalogResponse?.json());
+  const [catalogJsonError, catalog] = await caught(catalogResponse?.json?.());
   if (catalogJsonError) {
 
     return {

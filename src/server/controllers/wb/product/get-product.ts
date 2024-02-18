@@ -18,16 +18,17 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
     };
   }
   if (!response?.ok) {
-    const [parseError, errorBody] = await caught(response?.json());
+    const [parseError, errorBody] = await caught(response?.json?.());
     return {
       errorStatus: response?.status ?? 500,
       error: {
         error: 'Response error',
         body: errorBody ?? parseError,
+        response: JSON.stringify(response),
       }
     };
   } else {
-    const [parseError, result] = await caught(response?.json());
+    const [parseError, result] = await caught(response?.json?.());
     if (parseError) {
       return {
         errorStatus: 500,

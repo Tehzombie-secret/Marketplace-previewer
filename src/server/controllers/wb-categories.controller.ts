@@ -12,7 +12,7 @@ export async function WBCategoriesController(request: Request, response: Respons
 
     return;
   }
-  const [jsonError, responseBody] = await caught(categoriesResponse?.json());
+  const [jsonError, responseBody] = await caught(categoriesResponse?.json?.());
   if (jsonError) {
     response.status(500).send(jsonError)
 

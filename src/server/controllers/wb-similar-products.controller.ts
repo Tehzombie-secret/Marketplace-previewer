@@ -27,8 +27,8 @@ export async function WBSimilarProductsController(request: Request, response: Ex
     [recommendedError, recommended],
     [seeAlsoError, seeAlso],
   ] = await Promise.all([
-    caught(recommendedResponse?.json()),
-    caught(seeAlsoResponse?.json()),
+    caught(recommendedResponse?.json?.()),
+    caught(seeAlsoResponse?.json?.()),
   ]);
   const ids = [
     recommended?.nms ?? [],
