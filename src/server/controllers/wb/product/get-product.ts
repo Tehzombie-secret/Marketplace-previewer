@@ -9,10 +9,6 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
   const shard = getHostV2(+volume);
   const url = `https://${shard}.wb.ru/vol${volume}/part${part}/${id}/info/ru/card.json`;
   const response = await smartFetch(null, url);
-  return {
-    errorStatus: 500,
-    error: 'test',
-  };
   if (!response) {
     return {
       errorStatus: 500,
@@ -25,14 +21,20 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
     const [parseError, errorBody] = await caught(response?.json());
     return {
       errorStatus: response?.status ?? 500,
-      error: errorBody ?? parseError,
+      error: {
+        error: 'Response error',
+        body: errorBody ?? parseError,
+      }
     };
   } else {
     const [parseError, result] = await caught(response?.json());
     if (parseError) {
       return {
         errorStatus: 500,
-        error: parseError,
+        error: {
+          error: 'Parse error',
+          body: parseError,
+        }
       };
     }
     return {
