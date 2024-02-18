@@ -59,8 +59,11 @@ export function getHostV2(volume: number): string {
   } else if (volume >= 1920 && volume <= 2045) {
 
     return 'basket-13';
-  } else {
+  } else if (volume >= 2046 && volume <= 2189) {
 
     return 'basket-14';
+  } else {
+
+    return 'basket-15';
   }
 }

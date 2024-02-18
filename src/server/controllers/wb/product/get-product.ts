@@ -7,7 +7,7 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
   const volume = ~~(+id / 1e5);
   const part = ~~(+id / 1e3);
   const shard = getHostV2(+volume);
-  const url = `https://${shard}.wb.ru/vol${volume}/part${part}/${id}/info/ru/card.json`;
+  const url = `https://${shard}.wbbasket.ru/vol${volume}/part${part}/${id}/info/ru/card.json`;
   const response = await smartFetch(null, url);
   if (!response) {
     return {
