@@ -8,6 +8,10 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
   const part = ~~(+id / 1e3);
   const shard = getHostV2(+volume);
   const url = `https://${shard}.wb.ru/vol${volume}/part${part}/${id}/info/ru/card.json`;
+  return {
+    errorStatus: 500,
+    error: 'test',
+  };
   const response = await smartFetch(null, url);
   if (!response) {
     return {
