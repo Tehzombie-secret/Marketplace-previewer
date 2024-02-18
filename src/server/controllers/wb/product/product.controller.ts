@@ -11,11 +11,15 @@ export async function WBProductController(request: Request, response: Response):
 
     return;
   }
-  const result = await getWBProduct(id);
-  if (result.error || result.errorStatus) {
-    response.status(result.errorStatus ?? 500).send(result.error);
+  try {
+    const result = await getWBProduct(id);
+    if (result.error || result.errorStatus) {
+      response.status(result.errorStatus ?? 500).send(result.error);
 
-    return;
+      return;
+    }
+    response.send(result.result);
+  } catch (e) {
+    response.status(500).send(e);
   }
-  response.send(result.result);
 }
