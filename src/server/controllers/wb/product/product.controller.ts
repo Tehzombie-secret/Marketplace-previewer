@@ -11,15 +11,18 @@ export async function WBProductController(request: Request, response: Response):
 
     return;
   }
-  try {
-    const result = await getWBProduct(id);
-    if (result.error || result.errorStatus) {
-      response.status(result.errorStatus ?? 500).send(result.error);
+  response.status(500).send('test');
+  return;
 
-      return;
-    }
-    response.send(result.result);
-  } catch (e) {
-    response.status(500).send(e);
-  }
+  // try {
+  //   const result = await getWBProduct(id);
+  //   if (result.error || result.errorStatus) {
+  //     response.status(result.errorStatus ?? 500).send(result.error);
+
+  //     return;
+  //   }
+  //   response.send(result.result);
+  // } catch (e) {
+  //   response.status(500).send(e);
+  // }
 }
