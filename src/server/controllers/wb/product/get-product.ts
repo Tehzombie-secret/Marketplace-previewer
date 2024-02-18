@@ -18,11 +18,9 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
     };
   }
   if (!response?.ok) {
-    return {
-      errorStatus: 500,
-      error: 'not ok',
-    };
-    const [parseError, errorBody] = await caught(response?.json());
+    const [parseError, errorBody] = response
+      ? await caught(response?.json())
+      : ['No response', null];
     return {
       errorStatus: response?.status ?? 500,
       error: {
@@ -31,10 +29,6 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
       }
     };
   } else {
-    return {
-      errorStatus: 501,
-      error: 'ok',
-    };
     const [parseError, result] = await caught(response?.json());
     if (parseError) {
       return {
