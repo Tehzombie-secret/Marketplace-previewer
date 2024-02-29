@@ -113,6 +113,7 @@
       </div>
     </button>
     <div
+      *ngIf="currentPhoto?.photo?.big"
       (contextmenu)="download()"
       class="ui-gallery-image-wrapper">
       <img
@@ -147,6 +148,11 @@
         </button>
       </div>
     </div>
+    <div
+      *ngIf="!currentPhoto?.photo?.big"
+      class="wb-typography-body ui-gallery-empty-photo">
+      Отзыв без фото
+    </div>
     <button
       *ngIf="imagesLength > 1"
       (click)="next()"
@@ -162,6 +168,7 @@
   <!-- TOP (APP) BAR -->
   <div class="ui-gallery-app-bar">
     <button
+      *ngIf="currentPhoto?.photo?.big"
       (click)="rotate()"
       mat-icon-button
       aria-label="Повернуть вправо на 90 градусов (хоткей: клавиша r)"
@@ -169,6 +176,7 @@
       <mat-icon svgIcon="rotate"></mat-icon>
     </button>
     <button
+      *ngIf="currentPhoto?.photo?.big"
       (click)="download()"
       mat-icon-button
       aria-label="Скачать (хоткей: клавиша d)"
@@ -176,6 +184,7 @@
       <mat-icon svgIcon="download"></mat-icon>
     </button>
     <button
+      *ngIf="currentPhoto?.photo?.big"
       (click)="openInNewTab()"
       mat-icon-button
       aria-label="Открыть в новом окне (хоткей: клавиша o)"

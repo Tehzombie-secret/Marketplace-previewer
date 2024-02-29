@@ -20,7 +20,6 @@ export interface WBFeedbackV2 {
   updatedDate: string;
   answer?: WBFeedbackAnswerV2;
   feedbackHelpfulness?: WBFeedbackHelpfulnessV2[];
-  photos?: WBFeedbackPhotoV2[];
   photo?: number[];
   votes: WBFeedbackVotesV2;
   rank: number;

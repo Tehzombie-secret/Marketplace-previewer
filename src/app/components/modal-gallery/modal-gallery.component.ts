@@ -309,6 +309,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
       [ReferenceType.PRODUCT]: (item: ModalGalleryCurrentEntry<ReferenceType.PRODUCT>) =>
         this.API.getFeedbacksChanges(
           item.section.reference?.item,
+          false,
           (items: ProductFeedbacks) => {
             const feedbacks = (items.feedbacks || []).filter((feedback: Partial<Feedback>) => feedback.photo?.length ?? 0 > 0);
 

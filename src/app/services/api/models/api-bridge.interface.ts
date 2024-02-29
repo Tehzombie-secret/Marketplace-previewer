@@ -17,7 +17,8 @@ export interface APIBridge {
   getSimilarChanges(id: number | string): Observable<Partial<Product>[]>;
   getFeedbackSearchChanges(query?: string | null, page?: string | number | null): Observable<Partial<UserFeedback>[]>;
   getFeedbacksChanges(
-    item?: Partial<ProductReference> | null,
+    item: Partial<ProductReference> | null | undefined,
+    noPhotos: boolean,
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
     existingAccumulator?: ProductFeedbacks,
   ): Observable<ProductFeedbacks>;

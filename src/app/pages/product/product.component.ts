@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { catchError, combineLatest, filter, map, merge, Observable, of, ReplaySubject, shareReplay, startWith, Subject, Subscription, switchMap, take, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subject, Subscription, catchError, combineLatest, filter, map, merge, of, shareReplay, startWith, switchMap, take } from 'rxjs';
 import { filterTruthy } from '../../helpers/observables/filter-truthy';
 import { truthy } from '../../helpers/truthy';
 import { ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
@@ -19,6 +21,8 @@ import { HistoryService } from '../../services/history/history.service';
 import { VisitRequest } from '../../services/history/models/visit-request.interface';
 import { VisitedEntryType } from '../../services/history/models/visited-entry-type.enum';
 import { VisitedEntry } from '../../services/history/models/visited-entry.interface';
+import { SettingsKey } from '../../services/settings/models/settings-key.enum';
+import { SettingsService } from '../../services/settings/settings.service';
 import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { ProductViewModel } from './models/product-view-model.interface';
 import { ProductFeedbacksComponent } from './views/feedbacks/feedbacks.component';
@@ -36,6 +40,8 @@ import { ProductSimilarComponent } from './views/similar/similar.component';
     MatIconModule,
     MatProgressSpinnerModule,
     MatButtonToggleModule,
+    MatCheckboxModule,
+    MatTooltipModule,
     ProductOverviewComponent,
     ProductFeedbacksComponent,
     ProductSimilarComponent,
@@ -61,8 +67,10 @@ export class ProductComponent implements OnInit, OnDestroy {
   sortByDate = false;
   readonly id$ = this.getIdChanges();
   readonly product$ = this.getProductChanges(this.id$);
+  readonly isGallery$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
+  readonly noPhotos$ = new BehaviorSubject<boolean>(false);
   private readonly retryFeedbacks$ = new Subject<void>();
-  readonly feedbacks$ = this.getSafeFeedbackChanges(this.getFeedbackChanges(this.product$), this.retryFeedbacks$);
+  readonly feedbacks$ = this.getSafeFeedbackChanges(this.getFeedbackChanges(this.product$, this.noPhotos$), this.retryFeedbacks$, this.noPhotos$);
   private readonly visitDate$ = new ReplaySubject<Date>(1);
   readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.product$);
   private readonly subscriptions$ = new Subscription();
@@ -73,6 +81,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     private title: Title,
     private history: HistoryService,
     private toolbar: ToolbarService,
+    private settings: SettingsService,
   ) {
   }
 
@@ -111,6 +120,14 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.visit(this.sortByDate, false);
   }
 
+  changeNoPhoto(newValue: MatCheckboxChange): void {
+    this.noPhotos$.next(newValue.checked);
+  }
+
+  changeMode(newValue: MatButtonToggleChange): void {
+    this.settings.set(SettingsKey.GALLERY_MODE, newValue.value);
+  }
+
   private getIdChanges(): Observable<string> {
     return this.activatedRoute.paramMap
       .pipe(
@@ -143,7 +160,11 @@ export class ProductComponent implements OnInit, OnDestroy {
       );
   }
 
-  private getSafeFeedbackChanges(feedbacks$: Observable<ProductFeedbacks>, retrySignal$: Observable<void>): Observable<ProductFeedbacks> {
+  private getSafeFeedbackChanges(
+    feedbacks$: Observable<ProductFeedbacks>,
+    retrySignal$: Observable<void>,
+    noPhotos$: Observable<boolean>,
+  ): Observable<ProductFeedbacks> {
     return merge(
       feedbacks$,
       retrySignal$
@@ -152,19 +173,32 @@ export class ProductComponent implements OnInit, OnDestroy {
           filter((item: ProductViewModel) => !item.isLoading),
           map((item: ProductViewModel) => item.item),
           filterTruthy(),
-          withLatestFrom(feedbacks$),
-          switchMap(([product, feedbacks]: [Partial<Product>, ProductFeedbacks]) => this.API.getFeedbacksChanges(product, null, feedbacks)),
+          switchMap((item: Partial<Product>) => combineLatest([
+            of(item),
+            feedbacks$,
+            noPhotos$,
+          ])),
+          switchMap(([product, feedbacks, noPhotos]: [Partial<Product>, ProductFeedbacks, boolean]) =>
+            this.API.getFeedbacksChanges(product, noPhotos, null, feedbacks)
+          ),
         ),
     );
   }
 
-  private getFeedbackChanges(product$: Observable<ProductViewModel>): Observable<ProductFeedbacks> {
+  private getFeedbackChanges(
+    product$: Observable<ProductViewModel>,
+    noPhotos$: Observable<boolean>,
+  ): Observable<ProductFeedbacks> {
     return product$
       .pipe(
         filter((item: ProductViewModel) => !item.isLoading),
         map((item: ProductViewModel) => item.item),
         filterTruthy(),
-        switchMap((item: Partial<Product>) => this.API.getFeedbacksChanges(item)),
+        switchMap((item: Partial<Product>) => combineLatest([
+          of(item),
+          noPhotos$,
+        ])),
+        switchMap(([item, noPhotos]: [Partial<Product>, boolean]) => this.API.getFeedbacksChanges(item, noPhotos)),
       );
   }
 

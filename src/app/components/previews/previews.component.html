@@ -10,10 +10,12 @@
       [class.active]="sectionIndex === loopSectionIndex && photoIndex === loopPhotoIndex"
       [class.ui-previews-button-horizontal]="!vertical"
       [class.ui-previews-button-vertical]="vertical"
+      [class.ui-previews-full-width]="!image.small"
       (click)="emitChange(loopSectionIndex, loopPhotoIndex)"
       (dblclick)="emitOpenUrge()"
       class="ui-previews-button">
       <img
+        *ngIf="image.small"
         [class.ui-previews-image-vertical]="vertical"
         [class.ui-previews-image-horizontal]="!vertical"
         [src]="image.small"
@@ -21,6 +23,11 @@
         loading="lazy"
         referrerpolicy="no-referrer"
         class="ui-previews-image">
+      <div
+        *ngIf="!image.small"
+        class="wb-typography-caption">
+        {{ image.name }}
+      </div>
     </button>
   </ng-container>
 </div>

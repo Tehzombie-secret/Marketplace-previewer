@@ -8,7 +8,12 @@ export async function getWBProduct(id: string): Promise<WBProductResult> {
   const part = ~~(+id / 1e3);
   const shard = getHostV2(+volume);
   const url = `https://${shard}.wbbasket.ru/vol${volume}/part${part}/${id}/info/ru/card.json`;
-  const response = await smartFetch(null, url);
+  console.log('url', url);
+  const response = await smartFetch(null, url, {
+    headers: {
+      useragent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    }
+  });
   if (!response) {
     return {
       errorStatus: 500,

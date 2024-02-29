@@ -4,4 +4,5 @@ import { ProductPhotoViewModel } from './product-photo-view-model.interface';
 export interface ProductFeedbackViewModel {
   item: Partial<Feedback>;
   photos: ProductPhotoViewModel[];
+  hasNoPhotos: boolean;
 }

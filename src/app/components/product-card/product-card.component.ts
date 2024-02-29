@@ -71,6 +71,7 @@ export class ProductCardComponent implements OnChanges {
         switchMap((item: Partial<Product> | null) => item
           ? this.API.getFeedbacksChanges(
             item,
+            false,
             (items: ProductFeedbacks) => {
               const feedbacks = (items.feedbacks || []).filter((feedback: Partial<Feedback>) => feedback.photo?.length ?? 0 > 0);
 

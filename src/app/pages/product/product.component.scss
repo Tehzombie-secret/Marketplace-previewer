@@ -46,6 +46,17 @@
     }
   }
 
+  .options-block {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 40px;
+
+    & > * {
+      max-width: 400px;
+    }
+  }
+
   .sort-block {
     display: flex;
     flex-direction: column;
@@ -57,5 +68,16 @@
     display: flex;
     align-items: center;
     gap: 4px;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .info-icon {
+    height: 18px;
+    width: 18px;
   }
 }

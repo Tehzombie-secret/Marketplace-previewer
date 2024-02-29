@@ -30,12 +30,16 @@ export function getProductFeedbacksFromWB(
   return item;
 }
 
-export function getProductFeedbacksFromWBV2(id: string | number | undefined, dto?: WBFeedbacksV2 | null): ProductFeedbacks {
+export function getProductFeedbacksFromWBV2(
+  id: string | number | undefined,
+  noPhotos: boolean,
+  dto?: WBFeedbacksV2 | null,
+): ProductFeedbacks {
   const item: ProductFeedbacks = {
     progress: 100,
     size: dto?.feedbackCount ?? 0,
     withPhotosSize: dto?.feedbackCountWithPhoto ?? 0,
-    feedbacks: getFeedbackListFromWBV2(id, dto),
+    feedbacks: getFeedbackListFromWBV2(id, noPhotos, dto),
     hasError: false,
     requestsMade: 1,
   };

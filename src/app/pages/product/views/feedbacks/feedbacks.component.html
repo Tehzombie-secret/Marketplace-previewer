@@ -1,13 +1,6 @@
 <div class="feedbacks-body">
   <div class="informational-block">
     <div class="controls-block">
-      <button
-        *ngIf="feedbacks.length"
-        (click)="toggleGalleryMode()"
-        mat-stroked-button
-        color="primary">
-        {{ (galleryMode$ | async) ? 'Режим отзывов' : 'Режим галереи' }}
-      </button>
       <div
         *ngIf="isLoading"
         class="wb-typography-caption loader-block">
@@ -70,7 +63,9 @@
         <div class="wb-typography-caption feedback-text">
           {{ item.item.feedback }}
         </div>
-        <ul class="photos-list">
+        <ul
+          *ngIf="!item.hasNoPhotos"
+           class="photos-list">
           <li *ngFor="let photo of item.photos; trackBy: trackByPhoto;">
             <a
               [href]="photo.photo.big"
@@ -84,6 +79,14 @@
             </a>
           </li>
         </ul>
+        <button
+          *ngIf="item.hasNoPhotos"
+          (click)="openGallery($event, item.photos[0].gallery)"
+          mat-stroked-button
+          color="primary"
+          class="gallery-button">
+          Галерея
+        </button>
       </div>
     </li>
     <li

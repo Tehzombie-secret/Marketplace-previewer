@@ -32,29 +32,69 @@
     <!-- SIMILAR ITEMS -->
     <wb-product-similar [item]="product"></wb-product-similar>
 
-    <!-- FEEDBACKS -->
-    <div class="sort-block">
-      <div class="wb-typography-body sort-title">
-        <mat-icon svgIcon="sort"></mat-icon>
-        <span>Сортировка</span>
+    <div class="options-block">
+      <!-- FEEDBACKS -->
+      <div class="sort-block">
+        <div class="wb-typography-body sort-title">
+          <mat-icon svgIcon="sort"></mat-icon>
+          <span>Сортировка</span>
+          <mat-icon
+            svgIcon="info"
+            matTooltip="Посещенные товары автоматически сортируются по дате (сначала новые). Выбор сохраняется"
+            class="info-icon">
+          </mat-icon>
+        </div>
+        <mat-button-toggle-group
+          [value]="sortByDate"
+          (change)="changeSort($event)"
+          name="sort"
+          aria-label="Сортировка">
+          <mat-button-toggle [value]="false">По рейтингу</mat-button-toggle>
+          <mat-button-toggle [value]="true">По дате</mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
-      <mat-button-toggle-group
-        [value]="sortByDate"
-        (change)="changeSort($event)"
-        name="sort"
-        aria-label="Сортировка">
-        <mat-button-toggle [value]="false">По рейтингу</mat-button-toggle>
-        <mat-button-toggle [value]="true">По дате</mat-button-toggle>
-      </mat-button-toggle-group>
-      <div class="wb-typography-caption">
-        Посещенные товары автоматически сортируются по дате (сначала новые). Выбор сохраняется
+
+      <div class="sort-block">
+        <div class="wb-typography-body sort-title">
+          <mat-icon svgIcon="settings"></mat-icon>
+          <span>Режим</span>
+          <mat-icon
+            svgIcon="info"
+            matTooltip="Выбор сохраняется"
+            class="info-icon">
+          </mat-icon>
+        </div>
+        <mat-button-toggle-group
+          [value]="isGallery$ | async"
+          (change)="changeMode($event)"
+          name="sort"
+          aria-label="Сортировка">
+          <mat-button-toggle [value]="false">Отзывы</mat-button-toggle>
+          <mat-button-toggle [value]="true">Галерея</mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
+
+
+      <!-- NO PHOTOS -->
+      <mat-checkbox (change)="changeNoPhoto($event)">
+        <div class="checkbox-label">
+          <span>
+            Отзывы без фото
+          </span>
+          <mat-icon
+            svgIcon="info"
+            matTooltip="Может пригодиться, если на маркетплейсе наткнулись на отзыв без фото и вам надо найти человека на этом сайте. Переключитесь в режим отзывов для просмотра"
+            class="info-icon">
+          </mat-icon>
+        </div>
+      </mat-checkbox>
     </div>
 
     <wb-product-feedbacks
       [item]="feedbacks$ | async"
       [product]="product"
       [sortByDate]="sortByDate"
+      [noPhotos]="(noPhotos$ | async) || false"
       (retryFeedbacks)="retryFeedbacks()">
     </wb-product-feedbacks>
   </div>

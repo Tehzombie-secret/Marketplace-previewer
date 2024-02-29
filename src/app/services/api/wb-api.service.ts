@@ -5,7 +5,6 @@ import { catchError, delay, expand, shareReplay } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { VendorPlatform } from '../../../server/models/image-platform.enum';
 import { Categories } from '../../models/categories/categories.interface';
-import { Feedback } from '../../models/feedbacks/feedback.interface';
 import { getErrorProductFeedback, getProductFeedbacksFromWBV2, mergeProductFeedbacks, ProductFeedbacks } from '../../models/feedbacks/product-feedbacks.interface';
 import { UserFeedback } from '../../models/feedbacks/user-feedback.interface';
 import { Person } from '../../models/person/person.interface';
@@ -167,18 +166,20 @@ export class WBAPIService implements APIBridge {
 
   getFeedbacksChanges(
     item: Partial<ProductReference> | null | undefined,
+    noPhotos: boolean,
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
     existingAccumulator?: ProductFeedbacks,
   ): Observable<ProductFeedbacks> {
-    return this.getFeedbackChangesV2(item);
+    return this.getFeedbackChangesV2(item, noPhotos);
   }
 
-  private getFeedbackChangesV2(item: Partial<ProductReference> | null | undefined): Observable<ProductFeedbacks> {
+  private getFeedbackChangesV2(item: Partial<ProductReference> | null | undefined, noPhotos: boolean): Observable<ProductFeedbacks> {
     const params = {
       ...(item?.parentId ? { imtId: item?.parentId } : {}),
       ...(item?.id ? { nmId: item?.id } : {}),
+      ...(noPhotos ? { noPhotos } : {}),
     };
-    const key = `${params.imtId}~~~${params.nmId}`;
+    const key = `${params.imtId}~~~${params.nmId}~~${noPhotos}`;
     const existingStream$ = this.productIdToFeedbacksMap.get(key);
     if (existingStream$) {
 
@@ -187,7 +188,7 @@ export class WBAPIService implements APIBridge {
     const stream$ = this.http.get<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/v2/feedback`, { params })
       .pipe(
         map((item: WBFeedbacksV2) => {
-          const feedbacks = getProductFeedbacksFromWBV2(params.imtId, item);
+          const feedbacks = getProductFeedbacksFromWBV2(params.imtId, noPhotos, item);
 
           return feedbacks;
         }),
@@ -278,7 +279,7 @@ export class WBAPIService implements APIBridge {
     const stream$ = this.http.post<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/feedback`, request)
       .pipe(
         map((item: WBFeedbacksV2) => {
-          const feedbacks = getProductFeedbacksFromWBV2(itemId, item);
+          const feedbacks = getProductFeedbacksFromWBV2(itemId, false, item);
 
           return feedbacks;
         }),

@@ -41,7 +41,7 @@
     padding: 0;
     margin: 0;
     list-style: none;
-    gap: 24px;
+    gap: 32px;
   }
 
   .feedback-card {
@@ -79,6 +79,10 @@
 
   .photo-button {
     @include debuttonify;
+  }
+
+  .gallery-button {
+    align-self: start;
   }
 
   .photo-preview {

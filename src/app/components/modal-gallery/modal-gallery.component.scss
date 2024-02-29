@@ -291,6 +291,13 @@ $breakpoint: 1000px;
   z-index: 2; // To be above navigation buttons
 }
 
+.ui-gallery-empty-photo {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
 .ui-gallery-app-bar {
   grid-area: toolbar;
   display: flex;

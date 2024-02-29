@@ -23,6 +23,10 @@ $gallery-border: 3px;
   overflow-y: auto;
 }
 
+.ui-previews-full-width {
+  width: 100%;
+}
+
 .ui-previews-button {
   @include debuttonify;
 

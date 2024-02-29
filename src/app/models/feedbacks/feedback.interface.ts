@@ -51,9 +51,16 @@ export function getFeedbackListFromWB(id: string | number | undefined, dto?: WBF
   return items;
 }
 
-export function getFeedbackListFromWBV2(id: string | number | undefined, dto?: WBFeedbacksV2 | null): Partial<Feedback>[] {
+export function getFeedbackListFromWBV2(
+  id: string | number | undefined,
+  noPhotos: boolean,
+  dto?: WBFeedbacksV2 | null
+): Partial<Feedback>[] {
   const items: Partial<Feedback>[] = (dto?.feedbacks || [])
-    .filter((feedback: WBFeedbackV2) => (feedback?.photo?.length ?? 0) > 0)
+    .filter((feedback: WBFeedbackV2) => noPhotos
+      ? !feedback?.photo?.length
+      : (feedback?.photo?.length ?? 0) > 0
+    )
     .sort((a: WBFeedbackV2, b: WBFeedbackV2) => b.rank - a.rank)
     .map((feedback: WBFeedbackV2) => {
       const item: Partial<Feedback> = {

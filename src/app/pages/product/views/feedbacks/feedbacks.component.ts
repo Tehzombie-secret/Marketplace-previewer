@@ -44,14 +44,15 @@ export class ProductFeedbacksComponent {
   @Input() product?: ProductViewModel | null = null;
   @Input() item?: ProductFeedbacks | null = null;
   @Input() sortByDate?: boolean | null = false;
+  @Input() noPhotos: boolean = false;
   @Output() readonly retryFeedbacks = new EventEmitter<void>();
 
-  galleryMode$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
   isLoading = true;
   hasError = false;
   progress = 12;
   photoSize = 0;
   feedbacks: ProductFeedbackViewModel[] = [];
+  readonly galleryMode$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
   readonly personPathPrefix = ROUTE_PATH.PERSON;
 
   constructor(
@@ -74,9 +75,16 @@ export class ProductFeedbacksComponent {
       })
       : (this.item?.feedbacks ?? []);
     const gallery = feedbacks
-      .filter((item: Partial<Feedback>) => (item.feedbackPhotos?.length ?? 0) > 0)
+      .filter((item: Partial<Feedback>) => this.noPhotos
+        ? !item.feedbackPhotos?.length
+        : (item.feedbackPhotos?.length ?? 0) > 0
+      )
       .map((item: Partial<Feedback>) => {
+        const photos = item.feedbackPhotos?.length
+          ? item.feedbackPhotos
+          : [this.getEmptyPhoto(item)];
         const section: ModalGallerySection<ReferenceType.PERSON> = {
+          photos,
           author: {
             date: item.date,
             quote: item.feedback,
@@ -91,15 +99,20 @@ export class ProductFeedbacksComponent {
               photo: item.photo,
             },
           },
-          photos: item.feedbackPhotos || [],
         };
 
         return section;
       });
     this.feedbacks = feedbacks
-      .filter((item: Partial<Feedback>) => (item.feedbackPhotos?.length ?? 0) > 0)
+      .filter((item: Partial<Feedback>) => this.noPhotos
+        ? !item.feedbackPhotos?.length
+        : (item.feedbackPhotos?.length ?? 0) > 0
+      )
       .map((item: Partial<Feedback>, sectionIndex: number) => {
-        const photos = (item.feedbackPhotos || []).map((photo: Photo, photoIndex: number) => {
+        const photoArray = item.feedbackPhotos?.length
+          ? item.feedbackPhotos
+          : [this.getEmptyPhoto(item)];
+        const photos = photoArray.map((photo: Photo, photoIndex: number) => {
           const viewModel: ProductPhotoViewModel = {
             photo,
             gallery: {
@@ -117,6 +130,7 @@ export class ProductFeedbacksComponent {
         const viewModel: ProductFeedbackViewModel = {
           item,
           photos,
+          hasNoPhotos: !item.feedbackPhotos?.length,
         };
 
         return viewModel;
@@ -137,10 +151,6 @@ export class ProductFeedbacksComponent {
     this.retryFeedbacks.emit();
   }
 
-  toggleGalleryMode(): void {
-    this.settings.set(SettingsKey.GALLERY_MODE, !this.settings.get(SettingsKey.GALLERY_MODE));
-  }
-
   openGallery(event: Event, gallery: ModalGallery<ReferenceType.PERSON, ReferenceType.PRODUCT>): void {
     event.preventDefault();
     this.dialog.open(ModalGalleryComponent, {
@@ -148,5 +158,13 @@ export class ProductFeedbacksComponent {
       closeOnNavigation: true,
       data: gallery,
     });
+  }
+
+  private getEmptyPhoto(item: Partial<Feedback>): Photo {
+    return {
+      name: item.name || 'Без имени',
+      big: null,
+      small: null,
+    };
   }
 }
