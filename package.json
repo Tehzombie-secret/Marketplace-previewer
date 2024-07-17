@@ -27,6 +27,7 @@
     "@angular/platform-server": "^16.2.7",
     "@angular/router": "^16.2.7",
     "@nguniversal/express-engine": "^16.2.0",
+    "@yandex-cloud/nodejs-sdk": "^2.6.1",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
     "date-fns": "^2.30.0",

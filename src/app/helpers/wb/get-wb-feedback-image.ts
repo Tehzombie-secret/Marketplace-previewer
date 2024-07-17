@@ -32,8 +32,14 @@ export function getFeedbackHostV2(volume: number): string {
   } else if (volume >= 1200 && volume <= 1535) {
 
     return 'feedback04';
-  } else {
+  } else if (volume >= 1536 && volume <= 1919) {
 
     return 'feedback05';
+  } else if (volume >= 1920 && volume <= 2303) {
+
+    return 'feedback06';
+  } else {
+
+    return 'feedback07';
   }
 }
