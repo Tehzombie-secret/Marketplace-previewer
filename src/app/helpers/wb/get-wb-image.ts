@@ -14,7 +14,7 @@ export function getWBImage(id: string | number | null | undefined, name: string 
   // basket01.wb.ru/vol79/part7908/7908072/images/big/1.jpg
   const sizeSegment = WB_SIZE_TO_PREFIX_STRATEGY[size ?? ImageSize.BIG];
   const volume = ~~(+(id ?? 0) / 1e5);
-  const url = `https://${getHostV2(volume)}.wb.ru/vol${volume}/part${~~(+id / 1e3)}/${id}/images/${sizeSegment}/${name}.jpg`;
+  const url = `https://${getHostV2(volume)}.wbbasket.ru/vol${volume}/part${~~(+id / 1e3)}/${id}/images/${sizeSegment}/${name}.webp`;
 
   return url;
 }
