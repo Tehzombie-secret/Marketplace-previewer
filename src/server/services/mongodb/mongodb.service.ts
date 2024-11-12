@@ -230,7 +230,7 @@ export class MongoDBService {
     return products;
   }
 
-  private async setupConnection(): Promise<Db | null> {
+  public async setupConnection(): Promise<Db | null> {
     if (this.client) {
       return this.client;
     }
