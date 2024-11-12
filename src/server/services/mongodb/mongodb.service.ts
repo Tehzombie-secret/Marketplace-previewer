@@ -10,8 +10,10 @@ import { retryable } from '../../helpers/retryable';
 import { CollectionToSchemaStrategy } from './constants/collection-to-schema-strategy';
 import { Credentials } from './models/credentials.interface';
 import { MongoDBCollection } from './models/mongo-db-collection.enum';
+import { timeout } from '../../helpers/timeout';
 
 export class MongoDBService {
+  public setupStatus = 0;
   private readonly dbName = 'feedbacks';
   private client: Db | null = null;
 
@@ -234,20 +236,29 @@ export class MongoDBService {
     if (this.client) {
       return this.client;
     }
+    if (this.setupStatus) {
+      await timeout(300);
+      return await this.setupConnection();
+    }
+    this.setupStatus = 1;
 
     // Read credentials
     const [credentialsError, credentials] = await this.getCredentials();
     if (!credentials || credentialsError) {
+      this.setupStatus = 0;
       emitErrorLog(ErrorReason.MONGO, credentialsError, 'mongo credentials');
       return null;
     }
+    this.setupStatus = 2;
 
     // Read certificate
     const [certificateError, certificate] = await this.getCertificate();
     if (!certificate || certificateError) {
+      this.setupStatus = 0;
       emitErrorLog(ErrorReason.MONGO, credentialsError, 'mongo certificate');
       return null;
     }
+    this.setupStatus = 3;
 
     // Compose connection options
     const dbHosts = ['rc1a-51txvghtskmztaap.mdb.yandexcloud.net:27018'];
@@ -257,15 +268,19 @@ export class MongoDBService {
       ca: certificate,
       authSource: this.dbName,
     };
+    this.setupStatus = 4;
 
     // Receive client
     const [connectionError, client] = await caught(MongoClient.connect(url, options));
     if (!client || connectionError) {
+      this.setupStatus = 0;
       emitErrorLog(ErrorReason.MONGO, connectionError, 'mongo connection');
       return null;
     }
+    this.setupStatus = 5;
     const db = client.db(this.dbName);
     this.client = db;
+    this.setupStatus = 6;
     return db;
   }
 
