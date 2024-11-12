@@ -267,6 +267,7 @@ export class MongoDBService {
       tls: true,
       ca: certificate,
       authSource: this.dbName,
+      tlsAllowInvalidCertificates: true,
     };
     this.setupStatus = 4;
 
