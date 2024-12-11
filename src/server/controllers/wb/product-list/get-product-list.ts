@@ -9,7 +9,16 @@ import { ProductListResponse } from './models/product-list-response.interface';
 
 export async function getProductList(id: string, page?: number | null): Promise<ProductListResponse> {
   // Get menu
-  const menuResponse = await smartFetch(response, WB_CATALOG_URL);
+  const [menuError, menuResponse] = await smartFetch(WB_CATALOG_URL);
+  if (menuError) {
+    return {
+      status: 500,
+      error: {
+        body: 'Menu fetch error',
+        error: menuError,
+      },
+    };
+  }
   if (!menuResponse) {
 
     return {
@@ -41,16 +50,29 @@ export async function getProductList(id: string, page?: number | null): Promise<
 
   // Get items
   const params = new URLSearchParams({
+    ab_testing: 'false',
     appType: '1',
     curr: 'rub',
-    dest: '-1181032',
+    dest: '-1181033',
+    hide_dtype: '10',
+    lang: 'ru',
     sort: 'popular',
-    spp: '32',
-    uclusters: '1',
+    spp: '30',
+    uclusters: '2',
     ...((page ?? 0) > 1 ? { page: `${page ?? 0}` } : {}),
   });
-  const url = `https://catalog.wb.ru/catalog/${category.shard}/catalog?${[params, category.query].join('&')}`;
-  const catalogResponse = await smartFetch(response, url);
+  const url = `https://catalog.wb.ru/catalog/${category.shard}/v2/catalog?${[params, category.query].join('&')}`;
+  const [catalogError, catalogResponse] = await smartFetch(url);
+  if (catalogError) {
+
+    return {
+      status: 500,
+      error: {
+        body: 'Catalog fetch error',
+        error: catalogError,
+      },
+    };
+  }
   if (!catalogResponse) {
 
     return {

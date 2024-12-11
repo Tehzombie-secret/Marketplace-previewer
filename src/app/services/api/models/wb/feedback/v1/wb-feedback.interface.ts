@@ -43,5 +43,5 @@ export interface WBFeedback {
   // TBD
   metadata?: any;
   problem?: any;
-  video?: any;
+  video?: string;
 }

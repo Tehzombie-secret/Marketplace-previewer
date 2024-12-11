@@ -12,11 +12,16 @@ export async function WBFeedbackController(request: Request, response: Response)
     skip: request?.body?.skip,
     take: request?.body?.take,
   };
-  const feedbacksResponse = await smartFetch(response, 'https://public-feedbacks.wildberries.ru/api/v1/summary/full', {
+  const [error, feedbacksResponse] = await smartFetch('https://public-feedbacks.wildberries.ru/api/v1/summary/full', {
     body: JSON.stringify(body),
     headers: { 'content-type': 'application/json' },
     method: 'POST',
   });
+  if (error) {
+    response.status(500).send(error);
+
+    return;
+  }
   if (!feedbacksResponse) {
 
     return;

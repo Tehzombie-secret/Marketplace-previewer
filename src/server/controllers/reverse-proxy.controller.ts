@@ -20,7 +20,12 @@ export async function reverseProxyController(request: Request, response: Respons
     return;
   }
   const decodedURL = decodeURI(decoupledURL);
-  const proxyResponse = await smartFetch(response, decodedURL);
+  const [error, proxyResponse] = await smartFetch(decodedURL);
+  if (error) {
+    response.status(500).send(error);
+
+    return;
+  }
   response.status(proxyResponse?.status ?? 500);
   const excludedHeaders = ['content-encoding'];
   if (!proxyResponse?.headers) {

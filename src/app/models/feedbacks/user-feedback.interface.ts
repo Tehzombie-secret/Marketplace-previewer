@@ -4,6 +4,7 @@ import { proxifyLink } from '../../helpers/proxify-link';
 import { getWBProductCategoryId } from '../../helpers/wb/get-product-category-id';
 import { getWBFeedbackImage } from '../../helpers/wb/get-wb-feedback-image';
 import { getWBImage } from '../../helpers/wb/get-wb-image';
+import { getWBVideo, getWBVideoPreview } from '../../helpers/wb/get-wb-video';
 import { WBFeedbackPhoto } from '../../services/api/models/wb/person/wb-feedback-photo.interface';
 import { WBPersonFeedback } from '../../services/api/models/wb/person/wb-person-feedback.interface';
 import { Photo } from '../photo/photo.interface';
@@ -57,6 +58,19 @@ export function getUserFeedbackFromWB(dto?: WBPersonFeedback | null): Partial<Us
 }
 
 export function getUserFeedbackFromFeedbacksSchema(dto?: FeedbacksSchema): Partial<UserFeedback> {
+  const photos: Photo[] = (dto?.p ?? []).map((photo: number, index: number): Photo => ({
+    small: getWBFeedbackImage(photo, ImageSize.SMALL),
+    big: getWBFeedbackImage(photo, ImageSize.BIG),
+    name: `feedback-${dto?.uId || dto?.uWId}-${dto?.pId}-${index + 1}`,
+  }));
+  if (dto?.vi) {
+    photos.unshift({
+      small: getWBVideoPreview(dto.vi),
+      big: getWBVideoPreview(dto.vi),
+      name: `feedback-${dto?.uId || dto?.uWId}-${dto?.pId}-v`,
+      video: getWBVideo(dto.vi),
+    });
+  }
   const feedback: UserFeedback = {
     userId: dto?.uId ?? '',
     userWId: dto?.uWId ?? '',
@@ -72,11 +86,7 @@ export function getUserFeedbackFromFeedbacksSchema(dto?: FeedbacksSchema): Parti
     },
     name: dto?.un || 'Без имени',
     text: dto?.t ?? '',
-    photos: (dto?.p ?? []).map((photo: number, index: number) => ({
-      small: getWBFeedbackImage(photo, ImageSize.SMALL),
-      big: getWBFeedbackImage(photo, ImageSize.BIG),
-      name: `feedback-${dto?.uId || dto?.uWId}-${dto?.pId}-${index + 1}`,
-    })),
+    photos,
   };
 
   return feedback;

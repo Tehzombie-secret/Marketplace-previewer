@@ -15,7 +15,7 @@
       <div
         *ngIf="feedbacks.length"
         class="wb-typography-caption">
-        {{ feedbacks.length | wbPlural:['отзыв', 'отзыва', 'отзывов'] }} c {{ photoSize | wbPlural:['фотографией', 'фотографиями'] }}
+        {{ feedbacks.length | wbPlural:['отзыв', 'отзыва', 'отзывов'] }} c {{ photoSize | wbPlural:['фотографией', 'фотографиями'] }}{{ videoSize ? ' и ' + videoSize + ' видео' : '' }}
       </div>
     </div>
     <div
@@ -64,10 +64,11 @@
           {{ item.item.feedback }}
         </div>
         <ul
-          *ngIf="!item.hasNoPhotos"
-           class="photos-list">
+          *ngIf="!item.hasNoContent"
+          class="photos-list">
           <li *ngFor="let photo of item.photos; trackBy: trackByPhoto;">
             <a
+              [class.video]="photo.photo.video"
               [href]="photo.photo.big"
               (click)="openGallery($event, photo.gallery)"
               class="photo-button">
@@ -76,11 +77,14 @@
                 alt=""
                 referrerpolicy="no-referrer"
                 class="photo-preview">
+              <div *ngIf="photo.photo.video" class="play-icon">
+                <mat-icon svgIcon="play"></mat-icon>
+              </div>
             </a>
           </li>
         </ul>
         <button
-          *ngIf="item.hasNoPhotos"
+          *ngIf="item.hasNoContent"
           (click)="openGallery($event, item.photos[0].gallery)"
           mat-stroked-button
           color="primary"
@@ -117,6 +121,7 @@
         *ngFor="let photo of item.photos; last as isLast; trackBy: trackByPhoto;"
         [class.gallery-gap]="isLast">
         <a
+          [class.video]="photo.photo.video"
           [href]="photo.photo.big"
           (click)="openGallery($event, photo.gallery)"
           class="photo-button">

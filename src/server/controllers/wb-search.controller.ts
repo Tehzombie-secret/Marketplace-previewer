@@ -30,7 +30,12 @@ export async function WBSearchController(request: Request, response: Response): 
     ...(typeof page === 'string' && +page > 1 ? { page } : null),
   });
   const url = `https://search.wb.ru/exactmatch/ru/common/v4/search?${params}`;
-  const catalogResponse = await smartFetch(response, url);
+  const [error, catalogResponse] = await smartFetch(url);
+  if (error) {
+    response.status(500).send(error);
+
+    return;
+  }
   if (!catalogResponse) {
     response.status(500).send({
       error: 'No catalog response',

@@ -1,4 +1,3 @@
-import { response } from 'express';
 import { truthy } from '../../../../app/helpers/truthy';
 import { Category } from '../../../../app/models/categories/category.interface';
 import { getCategoriesChunkFromWB, WBCategory } from '../../../../app/services/api/models/wb/categories/wb-category.interface';
@@ -7,12 +6,18 @@ import { smartFetch } from '../../../helpers/smart-fetch';
 import { CategoriesListResponse } from './models/categories-list-response.interface';
 import { FlatCategory } from './models/flat-category.interface';
 
-export const WB_CATALOG_URL = 'https://static-basket-01.wb.ru/vol0/data/main-menu-ru-ru-v2.json';
+export const WB_CATALOG_URL = 'https://static-basket-01.wb.ru/vol0/data/main-menu-ru-ru-v3.json';
 
 export async function getCategoriesList(extractSlugs: false): Promise<CategoriesListResponse<FlatCategory>>;
 export async function getCategoriesList(extractSlugs: true): Promise<CategoriesListResponse<string>>;
 export async function getCategoriesList(extractSlugs: boolean): Promise<CategoriesListResponse<string | FlatCategory>> {
-  const categoriesResponse = await smartFetch(response, WB_CATALOG_URL);
+  const [error, categoriesResponse] = await smartFetch(WB_CATALOG_URL);
+  if (error) {
+    return {
+      status: 500,
+      error,
+    };
+  }
   if (!categoriesResponse) {
     return {
       status: 200,

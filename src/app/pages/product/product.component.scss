@@ -70,6 +70,11 @@
     gap: 4px;
   }
 
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+  }
+
   .checkbox-label {
     display: flex;
     align-items: center;

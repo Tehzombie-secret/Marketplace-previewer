@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
-import { combineLatest, map, Observable, ReplaySubject, shareReplay, Subscription, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, ReplaySubject, shareReplay, Subscription, switchMap } from 'rxjs';
 import { ModalGalleryComponent } from '../../components/modal-gallery/modal-gallery.component';
 import { ModalGallerySection } from '../../components/modal-gallery/models/modal-gallery-section.interface';
 import { ModalGallery } from '../../components/modal-gallery/models/modal-gallery.interface';
@@ -29,6 +29,7 @@ import { ToolbarService } from '../../services/toolbar/toolbar.service';
 import { PersonFeedbackViewModel } from './models/person-feedback-view-model.interface';
 import { PersonPhotoViewModel } from './models/person-photo-view-model.interface';
 import { PersonViewModel } from './models/person-view-model.interface';
+import { MatCheckbox, MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   standalone: true,
@@ -45,11 +46,13 @@ import { PersonViewModel } from './models/person-view-model.interface';
     MatDialogModule,
     FriendlyDatePipe,
     ModalGalleryComponent,
+    MatCheckboxModule,
   ],
 })
 export class PersonComponent implements OnInit, OnDestroy {
 
-  readonly person$ = this.getPersonChanges();
+  private readonly onlyVideo$ = new BehaviorSubject<boolean>(false);
+  readonly person$ = this.getPersonChanges(this.onlyVideo$);
   private readonly visitDate$ = new ReplaySubject<Date>(1);
   readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.person$);
   readonly galleryMode$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
@@ -102,6 +105,10 @@ export class PersonComponent implements OnInit, OnDestroy {
     return item.photo.name ?? item.photo.big ?? item.photo.small ?? null;
   }
 
+  changeVideoOnly(newValue: MatCheckboxChange): void {
+    this.onlyVideo$.next(newValue.checked);
+  }
+
   toggleGalleryMode(): void {
     this.settings.set(SettingsKey.GALLERY_MODE, !this.settings.get(SettingsKey.GALLERY_MODE));
   }
@@ -115,7 +122,7 @@ export class PersonComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getPersonChanges(): Observable<Partial<PersonViewModel>> {
+  private getPersonChanges(videosOnly$: Observable<boolean>): Observable<Partial<PersonViewModel>> {
     return combineLatest([
       this.activatedRoute.paramMap
         .pipe(
@@ -130,9 +137,12 @@ export class PersonComponent implements OnInit, OnDestroy {
     ])
       .pipe(
         switchMap(([id, global]: [string, boolean | undefined]) => this.API.getUserChanges(id, { useGlobalId: global })),
-        map((item: Partial<Person>) => {
+        switchMap((item) => combineLatest([of(item), videosOnly$])),
+        map(([item, videosOnly]: [Partial<Person>, boolean]) => {
           const images: ModalGallerySection<ReferenceType.PRODUCT>[] = (item.feedbacks || [])
-            .filter((feedback: Partial<UserFeedback>) => (feedback.photos?.length ?? 0) > 0)
+            .filter((feedback: Partial<UserFeedback>) =>
+              (feedback.photos?.length ?? 0) > 0 && (!videosOnly || feedback.photos?.some((item) => item.video))
+            )
             .map((feedback: Partial<UserFeedback>) => {
               const gallery: ModalGallerySection<ReferenceType.PRODUCT> = {
                 author: {
@@ -160,7 +170,9 @@ export class PersonComponent implements OnInit, OnDestroy {
           const viewModel: Partial<PersonViewModel> = {
             ...item,
             feedbackViewModels: (item.feedbacks || [])
-              .filter((feedback: Partial<UserFeedback>) => (feedback.photos?.length ?? 0) > 0)
+              .filter((feedback: Partial<UserFeedback>) =>
+                (feedback.photos?.length ?? 0) > 0 && (!videosOnly || feedback.photos?.some((item) => item.video))
+              )
               .map((feedback: Partial<UserFeedback>, sectionIndex: number) => {
                 const feedbackViewModel: PersonFeedbackViewModel = {
                   ...feedback,

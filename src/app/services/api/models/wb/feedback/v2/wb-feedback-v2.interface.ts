@@ -1,7 +1,7 @@
 import { WBFeedbackAnswerV2 } from './wb-feedback-answer-v2.interface';
 import { WBFeedbackHelpfulnessV2 } from './wb-feedback-helpfulness-v2.interface';
-import { WBFeedbackPhotoV2 } from './wb-feedback-photo-v2.interface';
 import { WBFeedbackUserV2 } from './wb-feedback-user-v2.interface';
+import { WBFeedbackVideo } from './wb-feedback-video.interface';
 import { WBFeedbackVotesV2 } from './wb-feedback-votes-v2.interface';
 
 export interface WBFeedbackV2 {
@@ -23,4 +23,5 @@ export interface WBFeedbackV2 {
   photo?: number[];
   votes: WBFeedbackVotesV2;
   rank: number;
+  video?: WBFeedbackVideo;
 }

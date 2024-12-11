@@ -32,7 +32,7 @@ export function getCategoriesFromWB(categories?: WBCategory[] | null): Category[
         title: dto?.name,
         shard: dto?.shard,
         query: dto?.query,
-        slug: !dto?.landing && dto?.query ? dto?.id : null,
+        slug: !dto?.landing && !dto.isDenyLink && dto?.query ? dto?.id : null,
         children: getCategoriesFromWB(dto?.childs),
       };
 

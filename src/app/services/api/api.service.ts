@@ -57,10 +57,11 @@ export class APIService implements APIBridge {
   getFeedbacksChanges(
     item: Partial<ProductReference> | null | undefined,
     noPhotos: boolean,
+    videosOnly: boolean,
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
     existingAccumulator?: ProductFeedbacks,
   ): Observable<ProductFeedbacks> {
-    return this.request((service: APIBridge) => service.getFeedbacksChanges(item, noPhotos, fetchWhile, existingAccumulator));
+    return this.request((service: APIBridge) => service.getFeedbacksChanges(item, noPhotos, videosOnly, fetchWhile, existingAccumulator));
   }
 
   private request<T>(fn: (service: APIBridge) => Observable<T>): Observable<T> {

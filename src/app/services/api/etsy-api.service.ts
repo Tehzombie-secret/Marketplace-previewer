@@ -44,6 +44,7 @@ export class EtsyAPIService implements APIBridge {
   getFeedbacksChanges(
     item: Partial<ProductReference> | null | undefined,
     noPhotos: boolean,
+    videosOnly: boolean,
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null | undefined,
     existingAccumulator?: ProductFeedbacks | undefined): Observable<ProductFeedbacks> {
     throw new Error('Method not implemented.');

@@ -14,18 +14,24 @@ export async function WBSimilarProductsController(request: Request, response: Ex
 
     return;
   }
-  const [recommendedResponse, seeAlsoResponse] = await Promise.all([
-    smartFetch(response, `https://rec-goods.wildberries.ru/api/v1/recommendations?nm=${id}`),
-    smartFetch(response, `https://waterfall-card-rec.wildberries.ru/api/v1/recommendations?nm=${id}`),
+  const [[recommendError, recommendedResponse], [seeAlsoError, seeAlsoResponse]] = await Promise.all([
+    smartFetch(`https://rec-goods.wildberries.ru/api/v1/recommendations?nm=${id}`),
+    smartFetch(`https://waterfall-card-rec.wildberries.ru/api/v1/recommendations?nm=${id}`),
   ]);
+  if (recommendError || seeAlsoError) {
+    response.status(500).send({
+      recommendError,
+      seeAlsoError,
+    });
+  }
   if (!recommendedResponse || !seeAlsoResponse) {
     response.sendStatus(500);
 
     return;
   }
   const [
-    [recommendedError, recommended],
-    [seeAlsoError, seeAlso],
+    [recommendedParseError, recommended],
+    [seeAlsoParseError, seeAlso],
   ] = await Promise.all([
     caught(recommendedResponse?.json?.()),
     caught(seeAlsoResponse?.json?.()),

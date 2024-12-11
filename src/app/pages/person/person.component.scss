@@ -37,11 +37,16 @@
     flex-shrink: 0;
   }
 
+  .options-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 16px;
+  }
 
   .gallery-switcher {
     align-self: flex-start;
     width: 160px;
-    margin: 0 16px;
   }
 
   .feedback-list {
@@ -89,6 +94,7 @@
   .feedback-photo {
     display: block;
     border-radius: 4px;
+    max-height: 160px;
   }
 
   .gallery-list {
@@ -103,5 +109,16 @@
 
   .gallery-gap {
     margin-right: 16px;
+  }
+
+  .photo-preview {
+    max-height: 160px;
+  }
+
+  .video {
+    display: block;
+    background: #ccccff;
+    border-radius: 4px;
+    max-height: 160px;
   }
 }

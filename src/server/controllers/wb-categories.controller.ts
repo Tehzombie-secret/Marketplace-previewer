@@ -7,7 +7,12 @@ import { WB_CATALOG_URL } from './wb/categories-list/get-categories-list';
 export async function WBCategoriesController(request: Request, response: Response): Promise<void> {
   emitRequestLog(request, response);
 
-  const categoriesResponse = await smartFetch(response, WB_CATALOG_URL);
+  const [error, categoriesResponse] = await smartFetch(WB_CATALOG_URL);
+  if (error) {
+    response.status(500).send(error);
+
+    return;
+  }
   if (!categoriesResponse) {
 
     return;

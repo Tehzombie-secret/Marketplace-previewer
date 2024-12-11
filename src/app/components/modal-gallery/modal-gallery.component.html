@@ -63,14 +63,8 @@
             <span
               *ngIf="!feedbacks.isLoading"
               class="wb-typography-caption">
-              {{ feedbacks.amount ? 'Еще ' + (feedbacks.amount | wbPlural:['отзыв', 'отзыва', 'отзывов']) : 'Без отзывов' }}
+              {{ feedbacks.amount ? 'Еще ' + (feedbacks.amount | wbPlural:['отзыв', 'отзыва', 'отзывов']) : 'Без отзывов' }}{{ feedbacks.videoAmount ? ' и ' + feedbacks.videoAmount + ' видео' : '' }}
             </span>
-            <mat-icon
-              *ngIf="feedbacks.isHidden"
-              svgIcon="visibility"
-              matTooltip="Этот отзыв скрыт"
-              class="wb-typography-caption">
-            </mat-icon>
           </div>
           <div
             *ngIf="(visitedEntry$ | async) as visitedEntry"
@@ -104,6 +98,7 @@
   <div class="ui-gallery-image-wrapper-cell">
     <button
       *ngIf="imagesLength > 1"
+      [class.full-size]="!currentPhoto?.photo?.video"
       (click)="prev()"
       (contextmenu)="download()"
       aria-label="Предыдущее фото"
@@ -116,24 +111,35 @@
       *ngIf="currentPhoto?.photo?.big"
       (contextmenu)="download()"
       class="ui-gallery-image-wrapper">
-      <img
-        #image
-        [src]="currentPhoto?.photo?.big"
-        (load)="drawImage($event)"
-        (error)="showError()"
-        alt=""
-        referrerpolicy="no-referrer"
-        crossorigin="anonymous"
-        class="ui-gallery-image">
-      <canvas
-        #canvas
-        class="ui-gallery-image-canvas">
-      </canvas>
-      <mat-spinner
-        *ngIf="loadingImage"
-        diameter="24"
-        class="ui-gallery-image-loader">
-      </mat-spinner>
+      <video
+        *ngIf="currentPhoto?.photo?.video"
+        #video
+        [appAppearId]="currentPhoto?.photo?.video"
+        (appAppear)="loadVideo(currentPhoto, video)"
+        controls
+        autoplay
+        class="ui-gallery-video-block">
+      </video>
+      <ng-container *ngIf="!currentPhoto?.photo?.video">
+        <img
+          #image
+          [src]="currentPhoto?.photo?.big"
+          (load)="drawImage()"
+          (error)="showError()"
+          alt=""
+          referrerpolicy="no-referrer"
+          crossorigin="anonymous"
+          class="ui-gallery-image">
+        <canvas
+          #canvas
+          class="ui-gallery-image-canvas">
+        </canvas>
+        <mat-spinner
+          *ngIf="loadingImage"
+          diameter="24"
+          class="ui-gallery-image-loader">
+        </mat-spinner>
+      </ng-container>
       <div
         *ngIf="hasError"
         class="ui-gallery-retry-block">
@@ -155,6 +161,7 @@
     </div>
     <button
       *ngIf="imagesLength > 1"
+      [class.full-size]="!currentPhoto?.photo?.video"
       (click)="next()"
       (contextmenu)="download()"
       aria-label="Следующее фото"

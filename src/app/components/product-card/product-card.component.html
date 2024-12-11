@@ -40,6 +40,7 @@
       <span>
         {{ (feedbacks?.amount ?? 0) | wbPlural:['отзыв', 'отзыва', 'отзывов'] }}
       </span>
+      <span>{{ feedbacks.videoAmount || 'Нет' }} видео</span>
       <div class="feedback-photos">
         <img
           *ngFor="let photo of (feedbacks.photos | slice:0:feedbackPhotosPerProduct)"

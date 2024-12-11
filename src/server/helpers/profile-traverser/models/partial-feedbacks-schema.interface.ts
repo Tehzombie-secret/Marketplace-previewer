@@ -13,4 +13,6 @@ export interface PartialFeedbacksSchema {
   t: string;
   /** Feedback photo ids */
   p: number[];
+  /** Video segment, if available */
+  v: string;
 }

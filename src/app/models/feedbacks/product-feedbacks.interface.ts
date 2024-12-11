@@ -9,6 +9,7 @@ export interface ProductFeedbacks {
   requestsMade: number;
   size: number | null;
   withPhotosSize: number | null;
+  withVideoSize: number | null;
   feedbacks: Partial<Feedback>[];
 }
 
@@ -22,6 +23,7 @@ export function getProductFeedbacksFromWB(
     progress,
     size: dto?.feedbackCount ?? 0,
     withPhotosSize: dto?.feedbackCountWithPhoto ?? 0,
+    withVideoSize: dto?.feedbackCountWithVideo ?? 0,
     feedbacks: getFeedbackListFromWB(id, dto),
     hasError: false,
     requestsMade,
@@ -33,13 +35,15 @@ export function getProductFeedbacksFromWB(
 export function getProductFeedbacksFromWBV2(
   id: string | number | undefined,
   noPhotos: boolean,
+  videosOnly: boolean,
   dto?: WBFeedbacksV2 | null,
 ): ProductFeedbacks {
   const item: ProductFeedbacks = {
     progress: 100,
     size: dto?.feedbackCount ?? 0,
     withPhotosSize: dto?.feedbackCountWithPhoto ?? 0,
-    feedbacks: getFeedbackListFromWBV2(id, noPhotos, dto),
+    withVideoSize: dto?.feedbacks?.filter((item) => Boolean(item.video))?.length ?? 0,
+    feedbacks: getFeedbackListFromWBV2(id, noPhotos, videosOnly, dto),
     hasError: false,
     requestsMade: 1,
   };
@@ -55,6 +59,7 @@ export function getErrorProductFeedback(requestsMade: number, progress: number):
     feedbacks: [],
     size: null,
     withPhotosSize: null,
+    withVideoSize: null,
   };
 
   return item;
@@ -68,6 +73,7 @@ export function mergeProductFeedbacks(acc: ProductFeedbacks, value: ProductFeedb
     size: value?.size ?? acc?.size ?? 0,
     progress: value.progress ?? acc.progress ?? 0,
     withPhotosSize: value?.withPhotosSize ?? acc?.withPhotosSize ?? 0,
+    withVideoSize: value?.withVideoSize ?? acc?.withVideoSize ?? 0,
     feedbacks: [
       ...(acc?.feedbacks || []),
       ...(value?.feedbacks || []),

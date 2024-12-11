@@ -21,4 +21,6 @@ export interface FeedbacksSchema {
   n: string;
   /** Feedback photo ids */
   p: number[];
+  /** Video stream */
+  vi?: string;
 }

@@ -14,13 +14,20 @@ export async function getFeedbackV2(
   mongoDB?: MongoDBService
 ): Promise<FeedbacksV2Response> {
   const checksum = crc16(+(imtId || 0)) % 100 >= 50 ? '2' : '1';
-  const feedbacksResponse = await smartFetch(null, `https://feedbacks${checksum}.wb.ru/feedbacks/v1/${imtId}`, {
+  const [error, feedbacksResponse] = await smartFetch(`https://feedbacks${checksum}.wb.ru/feedbacks/v1/${imtId}`, {
     headers: {
       'content-type': 'application/json',
     },
     cache: 'no-cache',
     method: 'GET',
   });
+  if (error) {
+    return {
+      status: 500,
+      hasError: true,
+      error,
+    };
+  }
   if (!feedbacksResponse) {
 
     return { status: 500, hasError: true };
@@ -42,7 +49,7 @@ export async function getFeedbackV2(
       }
       const product = mapProductFromWB(productDTO.result);
       const dbFeedbacks = ((responseBody as WBFeedbacksV2)?.feedbacks ?? [])
-        .filter((item) => (item.photo?.length ?? 0) > 0)
+        .filter((item) => (item.photo?.length ?? 0) > 0  || item.video)
         .map((item) => {
           const result: FeedbacksSchema = {
             id: item.id,
@@ -56,6 +63,7 @@ export async function getFeedbackV2(
             pId: `${product.id}`,
             ppId: product.parentId ? `${product.parentId}` : null,
             p: item.photo || [],
+            vi: item.video?.id,
           };
 
           return result;

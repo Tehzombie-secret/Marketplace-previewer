@@ -85,8 +85,12 @@ export async function fetchPack(mongoDB: MongoDBService): Promise<boolean> {
         });
         const url = 'https://functions.yandexcloud.net/d4e3id4kd5olr5krqa8j?' + params.toString();
         while (true) {
-          const fetchResult = await smartFetch(null, url);
+          const [error, fetchResult] = await smartFetch(url);
           marker('fetch complete');
+          if (error) {
+
+            return `fetch failed internally: ${error.toString()}`;
+          }
           if (fetchResult?.status !== 200) {
 
             return `fetch failed ${fetchResult?.status ?? 0}`;

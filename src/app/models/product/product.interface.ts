@@ -1,5 +1,4 @@
 import { ImageSize } from '../../../server/models/image-size.enum';
-import { proxifyLink } from '../../helpers/proxify-link';
 import { getWBImage } from '../../helpers/wb/get-wb-image';
 import { getWBProductURL } from '../../helpers/wb/get-wb-product-url';
 import { APIPlatform } from '../../services/api/models/api-platform.enum';

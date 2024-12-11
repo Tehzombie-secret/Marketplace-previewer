@@ -7,70 +7,84 @@ export async function getWBUserV1(id: string): Promise<UserResponse> {
   // Get user hash from ID
   const userFormData = new FormData();
   userFormData.append('userId', id);
-  const userHashResponse = await smartFetch(null, 'https://www.wildberries.ru/webapi/profile/spa/profile/url', {
+  const [userHashError, userHashResponse] = await smartFetch('https://www.wildberries.ru/webapi/profile/spa/profile/url', {
     method: 'POST',
     body: userFormData,
   });
+  if (userHashError) {
+
+    return {
+      status: 500,
+      error: userHashError,
+    };
+  }
   if (!userHashResponse) {
 
     return {
+      status: 500,
       error: {
         error: 'No hash returned',
       },
-      status: 500,
     };
   }
   const [userHashJsonError, userHashJSON] = await caught(userHashResponse?.json?.());
   if (userHashJsonError) {
 
     return {
+      status: 500,
       error: {
         error: 'Failed to parse user hash response',
         body: userHashJsonError,
       },
-      status: 500,
     };
   }
   const userHash = userHashJSON?.value?.url ?? '';
   if (!userHash) {
 
     return {
+      status: 400,
       error: {
         error: 'User hash not found from hash response',
       },
-      status: 400,
     };
   }
   const segments = userHash.split('/') || [];
   const hash = segments[segments.length - 1];
 
   // Get user profile by hash
-  const userResponse = await smartFetch(null, `https://www.wildberries.ru/webapi/profile/${hash}/data`, { method: 'POST' });
+  const [userError, userResponse] = await smartFetch(`https://www.wildberries.ru/webapi/profile/${hash}/data`, { method: 'POST' });
+  if (userError) {
+
+    return {
+      status: 500,
+      error: userError,
+    };
+  }
   if (!userResponse) {
 
     return {
+      status: 500,
       error: {
         error: 'Empty user response',
       },
-      status: 500,
     };
   }
   const [userJsonError, user] = await caught(userResponse?.json?.());
   if (userJsonError) {
 
     return {
+      status: 500,
       error: {
         error: 'Failed to parse profile response',
         body: userJsonError,
       },
-      status: 500,
     };
   }
   user.path = userHash;
   const response = getPersonFromWB(id, user);
 
   return {
-    response,
     status: userResponse?.status ?? 200,
+    response,
   };
 }

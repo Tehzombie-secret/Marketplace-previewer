@@ -9,20 +9,24 @@ export async function retryable<T>(promise?: Promise<T>): Promise<Caught<T, any>
     return [null, null];
   }
   let retries = 0;
-  let lastError: any = null;
+  let errors: unknown[] = [];
   do {
     const [error, result] = await caught(promise);
     if (result) {
 
       return [null, result as T];
     } else {
-      lastError = error;
+      errors.push(error);
       retries++;
     }
 
     // Exponentially wait for next try
     await timeout(RETRY_TIMEOUT[retries]);
   } while (retries <= RETRY_TIMEOUT.length);
+  const error = {
+    error: `retry failed ${retries} times`,
+    errors,
+  }
 
-  return [lastError, null];
+  return [error, null];
 }

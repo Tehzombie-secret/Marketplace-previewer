@@ -32,6 +32,8 @@ import { ModalGalleryReferenceStrategy } from './models/modal-gallery-reference-
 import { ModalGalleryReference } from './models/modal-gallery-reference.interface';
 import { ModalGallerySection } from './models/modal-gallery-section.interface';
 import { ModalGallery } from './models/modal-gallery.interface';
+import Hls from 'hls.js';
+import { AppearDirective } from '../../directives/appear.directive';
 
 @Component({
   standalone: true,
@@ -51,12 +53,14 @@ import { ModalGallery } from './models/modal-gallery.interface';
     PluralPipe,
     FriendlyDatePipe,
     RouterLink,
+    AppearDirective,
   ],
 })
 export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceType> {
 
   @ViewChild('canvas') canvasRef: ElementRef<HTMLCanvasElement> | null = null;
   @ViewChild('image') imageRef: ElementRef<HTMLImageElement> | null = null;
+  @ViewChild('video') videoRef: ElementRef<HTMLVideoElement> | null = null;
 
   @HostListener('window:keydown', ['$event']) processKeydown(event: KeyboardEvent): void {
     const key = event.key.toLocaleLowerCase();
@@ -137,7 +141,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
     setTimeout(() => {
       if (this.shouldClear) {
         this.clearCanvas();
-        if (!this.hasError) {
+        if (!this.hasError && !newEntry.photo.video) {
           this.loadingImage = true;
         }
         this.cdr.markForCheck();
@@ -179,17 +183,21 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
   }
 
   download(): false {
-    const photo = this.currentPhoto$.getValue()?.photo?.big;
-    if (!photo) {
+    const photo = this.currentPhoto$.getValue();
+    if (photo?.photo.video) {
+
+      return false;
+    }
+    if (!photo?.photo?.big) {
 
       return false;
     }
     download(
       this.imageRef?.nativeElement,
-      this.currentPhoto$.getValue()?.photo?.name,
+      photo?.photo?.name,
       this.renderer,
       this.document,
-      this.imageToRotationMap.get(photo) ?? 0,
+      this.imageToRotationMap.get(photo.photo.big) ?? 0,
     );
 
     return false;
@@ -199,7 +207,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
     openInNewTab(this.currentPhoto$.getValue()?.photo?.big, this.document);
   }
 
-  drawImage(event?: any): void {
+  drawImage(): void {
     this.shouldClear = false;
     this.loadingImage = false;
     this.clearCanvas();
@@ -226,6 +234,19 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
       newWidth = newHeight * ratio;
     }
     context?.drawImage(image, -canvas.width / 2, -canvas.height / 2, newWidth, newHeight);
+  }
+
+  loadVideo(entry: ModalGalleryCurrentEntry<T>, videoRef: HTMLVideoElement): void {
+    if (!entry?.photo?.video) {
+      return;
+    }
+    if (Hls.isSupported()) {
+      var hls = new Hls();
+      hls.loadSource(entry.photo.video);
+      hls.attachMedia(videoRef);
+    } else if (videoRef.canPlayType('application/vnd.apple.mpegurl')) {
+      videoRef.src = entry.photo.video;
+    }
   }
 
   showError(): void {
@@ -294,6 +315,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
               const asyncFeedback: AsyncFeedback = {
                 isLoading: false,
                 amount: (person.feedbacks || []).filter((feedback: Partial<UserFeedback>) => feedback.text !== item.section.author?.quote).length,
+                videoAmount: (person.feedbacks || []).filter((feedback) => feedback.photos?.some((item) => item.video)).length,
                 isHidden,
                 photos: (person.feedbacks || [])
                   .filter((feedback: Partial<UserFeedback>) => feedback.text !== item.section.author?.quote)
@@ -310,6 +332,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
         this.API.getFeedbacksChanges(
           item.section.reference?.item,
           false,
+          false,
           (items: ProductFeedbacks) => {
             const feedbacks = (items.feedbacks || []).filter((feedback: Partial<Feedback>) => feedback.photo?.length ?? 0 > 0);
 
@@ -320,6 +343,7 @@ export class ModalGalleryComponent<T extends ReferenceType, J extends ReferenceT
             map((feedbacks: ProductFeedbacks | null) => ({
               isLoading: false,
               amount: Math.max((feedbacks?.withPhotosSize ?? 1) - 1, 0),
+              videoAmount: feedbacks?.withVideoSize ?? 0,
               photos: (feedbacks?.feedbacks || [])
                 .filter((feedback: Partial<Feedback>) => feedback.feedback !== item.section.author?.quote)
                 .map((feedback: Partial<Feedback>) => feedback.feedbackPhotos?.[0]?.small || null)

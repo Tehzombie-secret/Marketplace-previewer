@@ -72,6 +72,7 @@ export class ProductCardComponent implements OnChanges {
           ? this.API.getFeedbacksChanges(
             item,
             false,
+            false,
             (items: ProductFeedbacks) => {
               const feedbacks = (items.feedbacks || []).filter((feedback: Partial<Feedback>) => feedback.photo?.length ?? 0 > 0);
 
@@ -84,6 +85,7 @@ export class ProductCardComponent implements OnChanges {
           const feedback: AsyncFeedback = {
             isLoading: false,
             amount: item?.withPhotosSize ?? 0,
+            videoAmount: item?.withVideoSize ?? 0,
             photos: (item?.feedbacks || [])
               .map((feedback: Partial<Feedback>) => feedback.feedbackPhotos?.[0]?.small)
               .filter(truthy),
@@ -91,7 +93,7 @@ export class ProductCardComponent implements OnChanges {
 
           return feedback;
         }),
-        startWith({ isLoading: true, amount: 0, photos: [] }), // It's null while it's loading
+        startWith({ isLoading: true, amount: 0, videoAmount: 0, photos: [] }), // It's null while it's loading
         shareReplay(1),
       );
   }

@@ -2,8 +2,9 @@ import { Response } from 'express';
 import { emitErrorLog } from '../../app/helpers/emit-error-log/emit-error-log';
 import { ErrorReason } from '../../app/helpers/emit-error-log/models/error-reason.enum';
 import { retryable } from './retryable';
+import { Caught } from './caught/models/caught.type';
 
-export async function smartFetch(response: Response | null, input: string, init?: RequestInit): Promise<globalThis.Response | null> {
+export async function smartFetch(input: string, init?: RequestInit): Promise<Caught<globalThis.Response | null>> {
   const abort = new AbortController();
   setTimeout(() => abort.abort(), 20_000);
   const [fetchError, fetchResponse] = await retryable(fetch(input, init));
@@ -14,9 +15,8 @@ export async function smartFetch(response: Response | null, input: string, init?
       url: input,
       error: fetchError,
     };
-    response?.status(500)?.send(error);
 
-    return fetchError;
+    return [error, null];
   }
   if (!fetchResponse) {
     emitErrorLog(ErrorReason.EXPRESS, '', `Subfetch ${input} empty response`);
@@ -24,10 +24,9 @@ export async function smartFetch(response: Response | null, input: string, init?
       type: 'subfetch empty response',
       url: input,
     };
-    response?.status(500)?.send(error);
 
-    return null;
+    return [error, null];
   }
 
-  return fetchResponse;
+  return [null, fetchResponse];
 }

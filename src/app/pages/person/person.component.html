@@ -37,13 +37,19 @@
     </span>
   </div>
 
-  <button
-    (click)="toggleGalleryMode()"
-    mat-stroked-button
-    color="primary"
-    class="gallery-switcher">
-    {{ (galleryMode$ | async) ? 'Режим отзывов' : 'Режим галереи' }}
-  </button>
+  <div class="options-row">
+    <button
+      (click)="toggleGalleryMode()"
+      mat-stroked-button
+      color="primary"
+      class="gallery-switcher">
+      {{ (galleryMode$ | async) ? 'Режим отзывов' : 'Режим галереи' }}
+    </button>
+
+    <mat-checkbox (change)="changeVideoOnly($event)">
+      Только с видео
+    </mat-checkbox>
+  </div>
 
   <!-- CARD MODE -->
   <ul
@@ -72,6 +78,7 @@
         <ul class="feedback-items">
           <li *ngFor="let photo of feedback.photoViewModels; index as i; trackBy: trackByPhoto;">
             <a
+              [class.video]="photo.photo.video"
               [href]="photo.photo.big"
               (click)="openGallery($event, photo.gallery)">
               <img
@@ -94,6 +101,7 @@
         *ngFor="let photo of item.photoViewModels; last as isLast; trackBy: trackByPhoto;"
         [class.gallery-gap]="isLast">
         <a
+          [class.video]="photo.photo.video"
           [href]="photo.photo.big"
           (click)="openGallery($event, photo.gallery)"
           class="photo-button">

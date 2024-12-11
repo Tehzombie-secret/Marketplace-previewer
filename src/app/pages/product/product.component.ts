@@ -69,8 +69,14 @@ export class ProductComponent implements OnInit, OnDestroy {
   readonly product$ = this.getProductChanges(this.id$);
   readonly isGallery$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
   readonly noPhotos$ = new BehaviorSubject<boolean>(false);
+  readonly onlyVideos$ = new BehaviorSubject<boolean>(false);
   private readonly retryFeedbacks$ = new Subject<void>();
-  readonly feedbacks$ = this.getSafeFeedbackChanges(this.getFeedbackChanges(this.product$, this.noPhotos$), this.retryFeedbacks$, this.noPhotos$);
+  readonly feedbacks$ = this.getSafeFeedbackChanges(
+    this.getFeedbackChanges(this.product$, this.noPhotos$, this.onlyVideos$),
+    this.retryFeedbacks$,
+    this.noPhotos$,
+    this.onlyVideos$,
+  );
   private readonly visitDate$ = new ReplaySubject<Date>(1);
   readonly visitedEntry$ = this.getVisitedChanges(this.visitDate$, this.product$);
   private readonly subscriptions$ = new Subscription();
@@ -124,6 +130,10 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.noPhotos$.next(newValue.checked);
   }
 
+  changeVideoOnly(newValue: MatCheckboxChange): void {
+    this.onlyVideos$.next(newValue.checked)
+  }
+
   changeMode(newValue: MatButtonToggleChange): void {
     this.settings.set(SettingsKey.GALLERY_MODE, newValue.value);
   }
@@ -164,6 +174,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     feedbacks$: Observable<ProductFeedbacks>,
     retrySignal$: Observable<void>,
     noPhotos$: Observable<boolean>,
+    onlyVideos$: Observable<boolean>,
   ): Observable<ProductFeedbacks> {
     return merge(
       feedbacks$,
@@ -177,9 +188,10 @@ export class ProductComponent implements OnInit, OnDestroy {
             of(item),
             feedbacks$,
             noPhotos$,
+            onlyVideos$,
           ])),
-          switchMap(([product, feedbacks, noPhotos]: [Partial<Product>, ProductFeedbacks, boolean]) =>
-            this.API.getFeedbacksChanges(product, noPhotos, null, feedbacks)
+          switchMap(([product, feedbacks, noPhotos, videosOnly]: [Partial<Product>, ProductFeedbacks, boolean, boolean]) =>
+            this.API.getFeedbacksChanges(product, noPhotos, videosOnly, null, feedbacks)
           ),
         ),
     );
@@ -188,6 +200,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   private getFeedbackChanges(
     product$: Observable<ProductViewModel>,
     noPhotos$: Observable<boolean>,
+    videosOnly$: Observable<boolean>,
   ): Observable<ProductFeedbacks> {
     return product$
       .pipe(
@@ -197,8 +210,9 @@ export class ProductComponent implements OnInit, OnDestroy {
         switchMap((item: Partial<Product>) => combineLatest([
           of(item),
           noPhotos$,
+          videosOnly$,
         ])),
-        switchMap(([item, noPhotos]: [Partial<Product>, boolean]) => this.API.getFeedbacksChanges(item, noPhotos)),
+        switchMap(([item, noPhotos, videosOnly]) => this.API.getFeedbacksChanges(item, noPhotos, videosOnly)),
       );
   }
 

@@ -19,6 +19,7 @@ export interface APIBridge {
   getFeedbacksChanges(
     item: Partial<ProductReference> | null | undefined,
     noPhotos: boolean,
+    videosOnly: boolean,
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
     existingAccumulator?: ProductFeedbacks,
   ): Observable<ProductFeedbacks>;

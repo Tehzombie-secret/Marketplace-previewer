@@ -12,7 +12,17 @@ export async function getWBProductListByNM(ids: string[]): Promise<WBSimilar> {
     nm: ids.join(';'),
   });
   const params = decodeURIComponent(`${paramsList}`);
-  const productsResponse = await smartFetch(null, `https://card.wb.ru/cards/list?${params}`);
+  const [error, productsResponse] = await smartFetch(`https://card.wb.ru/cards/list?${params}`);
+  if (error) {
+
+    return {
+      state: 0,
+      data: {
+        products: [],
+      },
+      error
+    };
+  }
   if (!productsResponse) {
 
     return {

@@ -159,8 +159,8 @@ $breakpoint: 1000px;
 
 .ui-gallery-reference-feedbacks {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .ui-gallery-visited-entry {
@@ -215,15 +215,33 @@ $breakpoint: 1000px;
   @include paginationButton;
 
   left: 0;
-  right: 80%;
+
+  &:not(.full-size) {
+    height: 200px;
+    max-height: 40vh;
+    align-self: center;
+  }
+
+  &.full-size {
+    right: 80%;
+  }
 }
 
 .ui-gallery-next-button {
   @include paginationButton;
 
-  left: 20%;
   right: 0;
   justify-content: flex-end;
+
+  &:not(.full-size) {
+    height: 200px;
+    max-height: 40vh;
+    align-self: center;
+  }
+
+  &.full-size {
+    left: 20%;
+  }
 }
 
 .ui-gallery-hover-trigger {
@@ -262,6 +280,12 @@ $breakpoint: 1000px;
   min-height: 0;
   object-fit: contain;
   visibility: hidden; // We need this block to be hidden, but we need to get it's dimensions
+}
+
+.ui-gallery-video-block {
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
 }
 
 .ui-gallery-image-canvas {

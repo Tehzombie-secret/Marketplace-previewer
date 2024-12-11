@@ -45,12 +45,14 @@ export class ProductFeedbacksComponent {
   @Input() item?: ProductFeedbacks | null = null;
   @Input() sortByDate?: boolean | null = false;
   @Input() noPhotos: boolean = false;
+  @Input() videosOnly: boolean = false;
   @Output() readonly retryFeedbacks = new EventEmitter<void>();
 
   isLoading = true;
   hasError = false;
   progress = 12;
   photoSize = 0;
+  videoSize = 0;
   feedbacks: ProductFeedbackViewModel[] = [];
   readonly galleryMode$ = this.settings.getChanges(SettingsKey.GALLERY_MODE);
   readonly personPathPrefix = ROUTE_PATH.PERSON;
@@ -75,13 +77,16 @@ export class ProductFeedbacksComponent {
       })
       : (this.item?.feedbacks ?? []);
     const gallery = feedbacks
-      .filter((item: Partial<Feedback>) => this.noPhotos
-        ? !item.feedbackPhotos?.length
-        : (item.feedbackPhotos?.length ?? 0) > 0
-      )
+      .filter((item: Partial<Feedback>) => {
+        const video = !this.videosOnly || item.feedbackPhotos?.some(({ video }) => video);
+        const photo = this.noPhotos
+          ? !item.feedbackPhotos?.length
+          : (item.feedbackPhotos?.length ?? 0) > 0;
+        return video && photo;
+      })
       .map((item: Partial<Feedback>) => {
         const photos = item.feedbackPhotos?.length
-          ? item.feedbackPhotos
+          ? item.feedbackPhotos.filter((item) => !this.videosOnly || item.video)
           : [this.getEmptyPhoto(item)];
         const section: ModalGallerySection<ReferenceType.PERSON> = {
           photos,
@@ -104,13 +109,16 @@ export class ProductFeedbacksComponent {
         return section;
       });
     this.feedbacks = feedbacks
-      .filter((item: Partial<Feedback>) => this.noPhotos
-        ? !item.feedbackPhotos?.length
-        : (item.feedbackPhotos?.length ?? 0) > 0
-      )
+      .filter((item: Partial<Feedback>) => {
+        const video = !this.videosOnly || item.feedbackPhotos?.some(({ video }) => video);
+        const photo = this.noPhotos
+          ? !item.feedbackPhotos?.length
+          : (item.feedbackPhotos?.length ?? 0) > 0;
+        return video && photo;
+      })
       .map((item: Partial<Feedback>, sectionIndex: number) => {
         const photoArray = item.feedbackPhotos?.length
-          ? item.feedbackPhotos
+          ? item.feedbackPhotos.filter((item) => !this.videosOnly || item.video)
           : [this.getEmptyPhoto(item)];
         const photos = photoArray.map((photo: Photo, photoIndex: number) => {
           const viewModel: ProductPhotoViewModel = {
@@ -130,13 +138,15 @@ export class ProductFeedbacksComponent {
         const viewModel: ProductFeedbackViewModel = {
           item,
           photos,
-          hasNoPhotos: !item.feedbackPhotos?.length,
+          hasNoContent: !item.feedbackPhotos?.length,
         };
 
         return viewModel;
       });
     this.photoSize = (this.item?.feedbacks || [])
       .reduce((acc: number, value: Partial<Feedback>) => acc + (value?.feedbackPhotos?.length ?? 0), 0);
+    this.videoSize = (this.item?.feedbacks || [])
+      .reduce((acc: number, value: Partial<Feedback>) => acc + (value?.feedbackPhotos?.some(({ video }) => video) ? 1 : 0), 0);
   }
 
   trackByFeedback(_index: number, item: ProductFeedbackViewModel): string {

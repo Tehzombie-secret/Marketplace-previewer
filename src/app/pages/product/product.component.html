@@ -75,19 +75,28 @@
       </div>
 
 
-      <!-- NO PHOTOS -->
-      <mat-checkbox (change)="changeNoPhoto($event)">
-        <div class="checkbox-label">
-          <span>
-            Отзывы без фото
-          </span>
-          <mat-icon
-            svgIcon="info"
-            matTooltip="Может пригодиться, если на маркетплейсе наткнулись на отзыв без фото и вам надо найти человека на этом сайте. Переключитесь в режим отзывов для просмотра"
-            class="info-icon">
-          </mat-icon>
-        </div>
-      </mat-checkbox>
+      <div class="checkbox-group">
+        <!-- NO PHOTOS -->
+        <mat-checkbox (change)="changeNoPhoto($event)">
+          <div class="checkbox-label">
+            <span>
+              Отзывы без фото
+            </span>
+            <mat-icon
+              svgIcon="info"
+              matTooltip="Может пригодиться, если на маркетплейсе наткнулись на отзыв без фото и вам надо найти человека на этом сайте. Переключитесь в режим отзывов для просмотра"
+              class="info-icon">
+            </mat-icon>
+          </div>
+        </mat-checkbox>
+
+        <!-- VIDEO ONLY -->
+        <mat-checkbox (change)="changeVideoOnly($event)">
+          <div class="checkbox-label">
+            Только видео
+          </div>
+        </mat-checkbox>
+      </div>
     </div>
 
     <wb-product-feedbacks
@@ -95,6 +104,7 @@
       [product]="product"
       [sortByDate]="sortByDate"
       [noPhotos]="(noPhotos$ | async) || false"
+      [videosOnly]="(onlyVideos$ | async) || false"
       (retryFeedbacks)="retryFeedbacks()">
     </wb-product-feedbacks>
   </div>

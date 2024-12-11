@@ -167,19 +167,21 @@ export class WBAPIService implements APIBridge {
   getFeedbacksChanges(
     item: Partial<ProductReference> | null | undefined,
     noPhotos: boolean,
+    videosOnly: boolean,
     fetchWhile?: ((items: ProductFeedbacks) => boolean) | null,
     existingAccumulator?: ProductFeedbacks,
   ): Observable<ProductFeedbacks> {
-    return this.getFeedbackChangesV2(item, noPhotos);
+    return this.getFeedbackChangesV2(item, noPhotos, videosOnly);
   }
 
-  private getFeedbackChangesV2(item: Partial<ProductReference> | null | undefined, noPhotos: boolean): Observable<ProductFeedbacks> {
+  private getFeedbackChangesV2(item: Partial<ProductReference> | null | undefined, noPhotos: boolean, videosOnly: boolean): Observable<ProductFeedbacks> {
     const params = {
       ...(item?.parentId ? { imtId: item?.parentId } : {}),
       ...(item?.id ? { nmId: item?.id } : {}),
       ...(noPhotos ? { noPhotos } : {}),
+      ...(videosOnly ? { videosOnly } : {}),
     };
-    const key = `${params.imtId}~~~${params.nmId}~~${noPhotos}`;
+    const key = `${params.imtId}~~~${params.nmId}~~${noPhotos}~~${videosOnly}`;
     const existingStream$ = this.productIdToFeedbacksMap.get(key);
     if (existingStream$) {
 
@@ -188,7 +190,7 @@ export class WBAPIService implements APIBridge {
     const stream$ = this.http.get<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/v2/feedback`, { params })
       .pipe(
         map((item: WBFeedbacksV2) => {
-          const feedbacks = getProductFeedbacksFromWBV2(params.imtId, noPhotos, item);
+          const feedbacks = getProductFeedbacksFromWBV2(params.imtId, noPhotos, videosOnly, item);
 
           return feedbacks;
         }),
@@ -227,6 +229,7 @@ export class WBAPIService implements APIBridge {
       requestsMade: 0,
       size: null,
       withPhotosSize: null,
+      withVideoSize: null,
       ...(existingAccumulator ?? {}),
       hasError: false,
     };
@@ -279,7 +282,7 @@ export class WBAPIService implements APIBridge {
     const stream$ = this.http.post<WBFeedbacksV2>(`${environment.host}/api/${VendorPlatform.WB}/feedback`, request)
       .pipe(
         map((item: WBFeedbacksV2) => {
-          const feedbacks = getProductFeedbacksFromWBV2(itemId, false, item);
+          const feedbacks = getProductFeedbacksFromWBV2(itemId, false, false, item);
 
           return feedbacks;
         }),
