@@ -196,9 +196,16 @@ export class MongoDBService {
     key: J,
     value: CollectionToSchemaStrategy[T][J],
   ): Promise<boolean> {
+    return await this.deleteBy(collection, { [key]: value } as any);
+  }
+
+  public async deleteBy<T extends MongoDBCollection>(
+    collection: T,
+    filter: Partial<CollectionToSchemaStrategy[T]>,
+  ): Promise<boolean> {
     const client = await this.setupConnection();
     const realCollection = client?.collection<CollectionToSchemaStrategy[T]>(collection);
-    const result = await realCollection?.deleteOne({ [key]: value } as any);
+    const result = await realCollection?.deleteOne(filter as any);
     return result?.acknowledged ?? false;
   }
 

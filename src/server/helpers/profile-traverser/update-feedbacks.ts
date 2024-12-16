@@ -9,6 +9,8 @@ import { TaskMark, TaskQueue } from '../task-queue';
 import { PartialFeedbacksSchema } from './models/partial-feedbacks-schema.interface';
 import { updateStatus } from './update-status';
 
+const retryMap = new Map<string, number>();
+
 export async function updateFeedbacks(mongoDB: MongoDBService): Promise<boolean> {
   const idIndexResult = await mongoDB.createIndexIfNone(MongoDBCollection.FEEDBACKS, 'id');
   if (!idIndexResult) {
@@ -29,6 +31,7 @@ export async function updateFeedbacks(mongoDB: MongoDBService): Promise<boolean>
         break;
       }
     }
+    retryMap.clear();
     const statusChangeResult = updateStatus(mongoDB, TraverseStatus.DONE);
     resolve(statusChangeResult);
   });
@@ -82,18 +85,27 @@ export async function fetchPack(mongoDB: MongoDBService): Promise<boolean> {
       pageQueue.add(`${element.slug}`, async ({ marker }) => {
         const params = new URLSearchParams({
           slug: `${element.parentId}`,
-        });
-        const url = 'https://functions.yandexcloud.net/d4e3id4kd5olr5krqa8j?' + params.toString();
+        }).toString();
+        const url = 'https://functions.yandexcloud.net/d4e3id4kd5olr5krqa8j?' + params;
         while (true) {
           const [error, fetchResult] = await smartFetch(url);
           marker('fetch complete');
-          if (error) {
+          if (error || fetchResult?.status !== 200) {
+            const retryCount = retryMap.get(params) ?? 0;
+            if (retryCount >= 5) {
+              if (element.parentId) {
+                await mongoDB.delete(MongoDBCollection.PRODUCTS, 'parentId', element.parentId);
+              } else {
+                await mongoDB.delete(MongoDBCollection.PRODUCTS, 'slug', element.slug);
+              }
 
-            return `fetch failed internally: ${error.toString()}`;
-          }
-          if (fetchResult?.status !== 200) {
+              return 'blacklisted';
+            }
+            retryMap.set(params, (retryMap.get(params) ?? 0) + 1);
 
-            return `fetch failed ${fetchResult?.status ?? 0}`;
+            return error
+              ? `fetch failed internally: ${error.toString()}`
+              : `fetch failed ${fetchResult?.status ?? 0}`;
           }
           // Add new products
           const [jsonError, rawFeedbacks] = await caught(fetchResult?.json?.());

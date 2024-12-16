@@ -7,6 +7,8 @@ import { smartFetch } from '../smart-fetch';
 import { TaskMark, TaskQueue } from '../task-queue';
 import { updateStatus } from './update-status';
 
+const retryMap = new Map<string, number>();
+
 export async function updateProducts(mongoDB: MongoDBService): Promise<boolean> {
   const indexResult = await mongoDB.createIndexIfNone(MongoDBCollection.PRODUCTS, 'slug');
   if (!indexResult) {
@@ -16,6 +18,7 @@ export async function updateProducts(mongoDB: MongoDBService): Promise<boolean> 
     while (await mongoDB.size(MongoDBCollection.CATEGORIES)) {
       await fetchPack(mongoDB);
     }
+    retryMap.clear();
     const statusChangeResult = updateStatus(mongoDB, TraverseStatus.FEEDBACKS);
     resolve(statusChangeResult);
   });
@@ -70,18 +73,23 @@ async function fetchPack(mongoDB: MongoDBService): Promise<void> {
           shard: element.shard,
           query: element.query,
           page: element.page,
-        });
-        const url = 'https://functions.yandexcloud.net/d4er1solcu4ou7maei00?' + params.toString();
+        }).toString();
+        const url = 'https://functions.yandexcloud.net/d4er1solcu4ou7maei00?' + params;
         while (true) {
           const [error, fetchResult] = await smartFetch(url);
           marker('fetch complete');
-          if (error) {
+          if (error || fetchResult?.status !== 200) {
+            const retryCount = retryMap.get(params) ?? 0;
+            if (retryCount >= 5) {
+              await mongoDB.deleteBy(MongoDBCollection.CATEGORIES, element);
 
-            return `fetch failed internally: ${error.toString()}`;
-          }
-          if (fetchResult?.status !== 200) {
+              return 'blacklisted';
+            }
+            retryMap.set(params, (retryMap.get(params) ?? 0) + 1);
 
-            return `fetch failed ${fetchResult?.status ?? 0}`;
+            return error
+              ? `fetch failed internally: ${error.toString()}`
+              : `fetch failed ${fetchResult?.status ?? 0}`;
           }
           // Add new products
           const [jsonError, products] = await caught(fetchResult?.json?.());
